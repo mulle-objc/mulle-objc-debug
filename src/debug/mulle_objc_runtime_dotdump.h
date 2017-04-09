@@ -1,10 +1,10 @@
 //
-//  mulle_objc_runtime_dump_html.h
+//  mulle_objc_runtime_dotdump.h
 //  mulle-objc
 //
-//  Created by Nat! on 10.05.16.
-//  Copyright (c) 2016 Nat! - Mulle kybernetiK.
-//  Copyright (c) 2016 Codeon GmbH.
+//  Created by Nat! on 25.10.15.
+//  Copyright (c) 2015 Nat! - Mulle kybernetiK.
+//  Copyright (c) 2015 Codeon GmbH.
 //  All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
@@ -32,22 +32,45 @@
 //  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 //  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 //  POSSIBILITY OF SUCH DAMAGE.
+
 //
-#ifndef mulle_objc_runtime_dump_html_h__
-#define mulle_objc_runtime_dump_html_h__
 
+//
+
+#ifndef mulle_objc_runtime_dotdump_h__
+#define mulle_objc_runtime_dotdump_h__
+
+#include <stdio.h>
+
+struct _mulle_objc_class;
 struct _mulle_objc_runtime;
-struct _mulle_objc_classpair;
+struct _mulle_objc_methodlist;
 
-void   mulle_objc_runtime_dump_as_html_to_directory( struct _mulle_objc_runtime *runtime, char *directory);
-void   mulle_objc_dump_runtime_as_html_to_directory( char *directory);
-void   mulle_objc_dump_runtime_as_html_to_tmp( void);
+//
+// dumping to graphviz is nice, if you are dealing with the mulle-objc
+// by itself. But soon it gets too complex for graphviz
+//
+
+void   _mulle_objc_runtime_dotdump( struct _mulle_objc_runtime *runtime, FILE *fp);
+
+void   mulle_objc_dotdump_runtime( void);
+
+void   mulle_objc_dotdump_runtime_to_file( char *filename);
+void   mulle_objc_dotdump_runtime_to_tmp( void);
 
 
-void   mulle_objc_classpair_dump_as_html_to_directory( struct _mulle_objc_classpair *pair,
-                                                       char *directory);
-void   mulle_objc_dump_classpair_as_html_to_directory( char *classname,
-                                                       char *directory);
-void   mulle_objc_dump_classpair_as_html_to_tmp( char *classname);
+// dumps the class pairs, but pass in any class meta or infra
+// for convenience
+
+void   mulle_objc_class_dotdump_to_tmp( struct _mulle_objc_class *cls);
+void   _mulle_objc_class_dotdump( struct _mulle_objc_class *cls, FILE *fp);
+void   mulle_objc_class_dotdump_to_file( struct _mulle_objc_class *cls, char *filename);
+void   mulle_objc_class_dotdump_to_tmp( struct _mulle_objc_class *cls);
+
+
+# pragma mark - -
+#pragma mark stuff for the debugger
+
+void   mulle_objc_methodlist_dump( struct _mulle_objc_methodlist *list);
 
 #endif
