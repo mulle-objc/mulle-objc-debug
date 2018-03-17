@@ -33,9 +33,9 @@
 //  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 //  POSSIBILITY OF SUCH DAMAGE.
 //
-#include "mulle_objc_html.h"
+#include "mulle-objc-html.h"
 
-#include "mulle_objc_runtime.h"
+#include "mulle-objc-runtime.h"
 #include <stdarg.h>
 #include <stddef.h>
 #include <string.h>
@@ -647,7 +647,7 @@ char   *mulle_objc_super_html_row_description( intptr_t  superid,
 {
    struct _mulle_objc_super  *superinfo = value;
    char  *s;
-   
+
    asprintf( &s,
             "<TR>"
             "<TD>%s</TD>"
@@ -655,7 +655,7 @@ char   *mulle_objc_super_html_row_description( intptr_t  superid,
             "</TR>\n",
             html_escape( _mulle_objc_super_get_name( superinfo)),
             superid);
-   
+
    return( s);
 }
 
@@ -752,7 +752,7 @@ char   *mulle_objc_cache_html_description( struct _mulle_objc_cache *cache,
    unsigned int    n;
    int             index;
    mulle_objc_methodid_t   sel;
-   
+
    n   = cache->size + 3 + 2;
    tmp = mulle_allocator_calloc( &mulle_stdlib_allocator, n, sizeof( char *));
 
@@ -815,7 +815,7 @@ char   *mulle_objc_methodlist_html_description( struct _mulle_objc_methodlist *l
    unsigned int   j;
    unsigned int   n;
    char           buf[ s_mulle_objc_sprintf_functionpointer_buffer];
-   
+
    n   = list->n_methods + 3;
    tmp = mulle_allocator_calloc( &mulle_stdlib_allocator, n, sizeof( char *));
 
@@ -825,7 +825,7 @@ char   *mulle_objc_methodlist_html_description( struct _mulle_objc_methodlist *l
    len = strlen( tmp[ i]);
    ++i;
 
-   
+
    if( universe)
    {
       asprintf( &tmp[ i], "<TR><TD>owner</TD><TD>%s</TD></TR>",
@@ -838,7 +838,7 @@ char   *mulle_objc_methodlist_html_description( struct _mulle_objc_methodlist *l
    }
    len += strlen( tmp[ i]);
    ++i;
-   
+
    for( j = 0; j < list->n_methods; j++)
    {
       mulle_objc_sprintf_functionpointer( buf,
@@ -1196,7 +1196,7 @@ char   *mulle_objc_uniqueidarray_html_description( struct _mulle_objc_uniqueidar
    unsigned int            n;
    mulle_objc_uniqueid_t   *p;
    mulle_objc_uniqueid_t   *sentinel;
-   
+
    count = array->n;
 
    n   = count + 2;
@@ -1216,7 +1216,7 @@ char   *mulle_objc_uniqueidarray_html_description( struct _mulle_objc_uniqueidar
 
    p        = array->entries;
    sentinel = &p[ count];
-   
+
    while( p < sentinel)
    {
       tmp[ i] = (*row_description)( (void *) (uintptr_t) *p++, universe, styling);

@@ -33,14 +33,14 @@
 //  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 //  POSSIBILITY OF SUCH DAMAGE.
 //
-#include "mulle_objc_lldb.h"
+#include "mulle-objc-lldb.h"
 
-#include "mulle_objc_call.h"
-#include "mulle_objc_class.h"
-#include "mulle_objc_infraclass.h"
-#include "mulle_objc_metaclass.h"
-#include "mulle_objc_method.h"
-#include "mulle_objc_universe.h"
+#include "mulle-objc-call.h"
+#include "mulle-objc-class.h"
+#include "mulle-objc-infraclass.h"
+#include "mulle-objc-metaclass.h"
+#include "mulle-objc-method.h"
+#include "mulle-objc-universe.h"
 
 
 # pragma mark - lldb support
@@ -58,20 +58,20 @@ mulle_objc_implementation_t
    struct _mulle_objc_infraclass       *found;
    struct _mulle_objc_class            *call_cls;
    mulle_objc_implementation_t   imp;
-   
+
    if( debug)
       fprintf( stderr, "lookup %p %08x %p (%d)\n", obj, methodid, cls_or_classid, is_classid);
-   
+
    if( ! obj || mulle_objc_uniqueid_is_sane( MULLE_OBJC_NO_METHODID))
       return( 0);
-   
+
    // ensure class init
    cls  = is_meta ? obj : _mulle_objc_object_get_isa( obj);
-   
+
    // call "-class" so class initializes.. But WHY ??
    // if( ! _mulle_objc_metaclass_get_state_bit( meta, MULLE_OBJC_METACLASS_INITIALIZE_DONE))
    //   mulle_objc_object_call( cls, MULLE_OBJC_CLASS_METHODID, NULL);
-   
+
    if( is_classid)
    {
       universe  = _mulle_objc_class_get_universe( cls);
@@ -84,7 +84,7 @@ mulle_objc_implementation_t
    }
    else
       call_cls = cls_or_classid;
-   
+
    imp = _mulle_objc_class_noncachinglookup_implementation_no_forward( call_cls, methodid);
    if( debug)
    {
@@ -102,7 +102,7 @@ struct _mulle_objc_descriptor  *
 {
    mulle_objc_methodid_t        methodid;
    struct _mulle_objc_universe   *universe;
-   
+
    methodid = mulle_objc_uniqueid_from_string( name);
    universe = mulle_objc_get_universe();
    return( _mulle_objc_universe_lookup_descriptor( universe, methodid));
@@ -113,13 +113,13 @@ struct _mulle_objc_descriptor  *
 void   mulle_objc_lldb_check_object( void *obj, mulle_objc_methodid_t sel)
 {
    struct _mulle_objc_class  *cls;
-   
+
    if( ! obj)
       return;
-   
+
    cls = _mulle_objc_object_get_isa( obj);
    strlen( cls->name);    // try to crash here
-   
+
    if( ! _mulle_objc_class_lookup_implementation_no_forward( cls, sel))
       *((volatile int *)0) = '1848'; // force crash
 }
@@ -129,7 +129,7 @@ void   *mulle_objc_lldb_get_dangerous_classstorage_pointer( void)
 {
    struct _mulle_objc_universe   *universe;
    struct mulle_concurrent_hashmap *map;
-   
+
    universe = mulle_objc_get_universe();
    map     = &universe->classtable;
    return( _mulle_atomic_pointer_read( &map->next_storage.pointer));

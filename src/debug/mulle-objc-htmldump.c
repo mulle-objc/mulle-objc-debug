@@ -33,21 +33,19 @@
 //  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 //  POSSIBILITY OF SUCH DAMAGE.
 //
-#include "mulle_objc_htmldump.h"
+#include "mulle-objc-htmldump.h"
 
-#include "mulle_objc_runtime.h"
+#include "mulle-objc-runtime.h"
 
-#include "mulle_objc_html.h"
+#include "mulle-objc-html.h"
 
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <mulle_thread/mulle_thread.h>
-#include <mulle_allocator/mulle_allocator.h>
-#include <mulle_concurrent/mulle_concurrent.h>
+#include "dependencies.h"
 
-#include "c_set.inc"
+#include "c-set.inc"
 
 
 static struct _mulle_objc_htmltablestyle    categorytable_style =
@@ -198,7 +196,7 @@ static char   *filename_for_universe( struct _mulle_objc_universe  *universe,
    size_t   len;
 
    assert( directory);
-   
+
    len = strlen( directory) + 16;
    buf = mulle_allocator_malloc( &mulle_stdlib_allocator, len);
    sprintf( buf, "%s/index.html", directory);
@@ -427,10 +425,10 @@ static void   _print_infraclass( struct _mulle_objc_infraclass *infra, FILE *fp)
    struct _mulle_objc_htmltablestyle                style;
    struct _mulle_objc_uniqueidarray                 *array;
    mulle_objc_categoryid_t                          categoryid;
-   
+
    cls      = _mulle_objc_infraclass_as_class( infra);
    universe = _mulle_objc_infraclass_get_universe( infra);
-   
+
    print_to_body_with_level( cls->name, NULL, 1, fp);
 
    print_to_body( NULL, "<DIV CLASS=\"class_links\">", fp);
