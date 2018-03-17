@@ -33,20 +33,19 @@
 //  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 //  POSSIBILITY OF SUCH DAMAGE.
 //
-#include "mulle_objc_dotdump.h"
+#include "mulle-objc-dotdump.h"
 
-#include "mulle_objc_runtime.h"
-#include "mulle_objc_html.h"
-#include "mulle_objc_universe.h"  // for getenv
+#include "mulle-objc-runtime.h"
+#include "mulle-objc-html.h"
+#include "mulle-objc-universe.h"  // for getenv
 
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <mulle_thread/mulle_thread.h>
-#include <mulle_concurrent/mulle_concurrent.h>
+#include "dependencies.h"
 
-#include "c_set.inc"
+#include "c-set.inc"
 
 
 static char   *html_escape( char *s)
@@ -316,13 +315,13 @@ static void   print_universe( struct _mulle_objc_universe *universe,
    label = mulle_objc_universe_html_description( universe, &universe_style);
    fprintf( info->fp, "\"%p\" [ label=<%s>, shape=\"%s\", URL=\"file:///%s/overview.dot\"  ];\n", universe, label, "component", info->directory);
    free( label);
-   
+
    if( ! info->omit_selectors)
       if( mulle_concurrent_hashmap_count( &universe->descriptortable))
       {
          fprintf( info->fp, "\"%p\" -> \"%p\" [ label=\"descriptortable\" ];\n",
                  universe, &universe->descriptortable);
-         
+
          label = mulle_concurrent_hashmap_html_description( &universe->descriptortable,
                                                            mulle_objc_descriptor_html_row_description,
                                                            &selectortable_style);
@@ -330,12 +329,12 @@ static void   print_universe( struct _mulle_objc_universe *universe,
                  &universe->descriptortable, label, "box");
          free( label);
       }
-   
+
    if( mulle_concurrent_hashmap_count( &universe->protocoltable))
    {
       fprintf( info->fp, "\"%p\" -> \"%p\" [ label=\"protocoltable\" ];\n",
               universe, &universe->protocoltable);
-      
+
       label = mulle_concurrent_hashmap_html_description( &universe->protocoltable,
                                                         mulle_objc_protocol_html_row_description,
                                                         &protocoltable_style);
@@ -343,12 +342,12 @@ static void   print_universe( struct _mulle_objc_universe *universe,
               &universe->protocoltable, label, "box");
       free( label);
    }
-   
+
    if( mulle_concurrent_hashmap_count( &universe->categorytable))
    {
       fprintf( info->fp, "\"%p\" -> \"%p\" [ label=\"categorytable\" ];\n",
               universe, &universe->categorytable);
-      
+
       label = mulle_concurrent_hashmap_html_description( &universe->categorytable,
                                                         mulle_objc_category_html_row_description,
                                                         &categorytable_style);
@@ -361,7 +360,7 @@ static void   print_universe( struct _mulle_objc_universe *universe,
    {
       fprintf( info->fp, "\"%p\" -> \"%p\" [ label=\"supertable\" ];\n",
               universe, &universe->supertable);
-      
+
       label = mulle_concurrent_hashmap_html_description( &universe->supertable,
                                                         mulle_objc_super_html_row_description,
                                                         &supertable_style);
@@ -390,7 +389,7 @@ static void   print_universe( struct _mulle_objc_universe *universe,
          if( _mulle_atomic_pointer_nonatomic_read( &universe->fastclasstable.classes[ i].pointer))
             break;
       }
-   
+
       if( i < MULLE_OBJC_S_FASTCLASSES)
       {
          label = mulle_objc_fastclasstable_html_description( &universe->fastclasstable,
@@ -409,7 +408,7 @@ static void   print_universe( struct _mulle_objc_universe *universe,
    {
       fprintf( info->fp, "\"%p\" -> \"%p\" [ label=\"classes\" ];\n",
               universe, &universe->classtable);
-      
+
       label = mulle_concurrent_hashmap_html_description( &universe->classtable,
                                                          mulle_objc_infraclass_html_row_description,
                                                          &classtable_style);
@@ -423,7 +422,7 @@ static void   print_universe( struct _mulle_objc_universe *universe,
       {
          fprintf( info->fp, "\"%p\" -> \"%p\" [ label=\"classestoload\" ];\n",
                  universe, &universe->waitqueues.classestoload);
-         
+
          label = mulle_concurrent_hashmap_html_description( &universe->waitqueues.classestoload,
                                                            mulle_objc_loadclasslist_html_row_description,
                                                            &classestoload_style);
@@ -431,12 +430,12 @@ static void   print_universe( struct _mulle_objc_universe *universe,
                  &universe->waitqueues.classestoload, label, "box");
          free( label);
       }
-      
+
       if( mulle_concurrent_hashmap_count( &universe->waitqueues.categoriestoload))
       {
          fprintf( info->fp, "\"%p\" -> \"%p\" [ label=\"categoriestoload\" ];\n",
                  universe, &universe->waitqueues.categoriestoload);
-         
+
          label = mulle_concurrent_hashmap_html_description( &universe->waitqueues.categoriestoload,
                                                            mulle_objc_loadcategorylist_html_row_description,
                                                            &categoriestoload_style);
@@ -612,9 +611,9 @@ static void   print_classpair( struct _mulle_objc_classpair *pair,
    struct _mulle_objc_uniqueidarray   *array;
    char                               *label;
    struct _mulle_objc_universe        *universe;
-   
+
    universe = _mulle_objc_classpair_get_universe( pair);
-   
+
    array = _mulle_atomic_pointer_read( &pair->p_protocolids.pointer);
    if( array->n)
    {
@@ -710,7 +709,7 @@ static void   print_hyper_infraclass( struct _mulle_objc_infraclass *infra,
 
    if( _mulle_objc_infraclass_get_universe( infra))
       fprintf( info->fp, "\"%p\" -> \"%p\"  [ label=\"universe\" ];\n", infra,  _mulle_objc_infraclass_get_universe( infra));
-   
+
    {
       superclass = _mulle_objc_infraclass_get_superclass( infra);
       if( superclass)
@@ -817,12 +816,12 @@ static void   _mulle_objc_class_dotdump_to_file( struct _mulle_objc_class *cls,
    c_set_init( &info.set);
    info.fp        = fp;
    info.directory = directory;
-   
+
    info.protocolclasses_as_hyperlink = 1;
    info.universe_as_hyperlink        = 1;
-   
+
    print_hyper_universe( _mulle_objc_class_get_universe( cls), &info);
-   
+
    pair = NULL;
    do
    {
@@ -960,7 +959,7 @@ static void   _mulle_objc_dotdump_overview_to_file( char *directory, char *filen
 static void   _mulle_objc_dotdump_overview( char *directory)
 {
    char   *path;
-   
+
    path = dot_filename_for_name( "overview", directory);
    _mulle_objc_dotdump_overview_to_file( directory, path);
    mulle_allocator_free( &mulle_stdlib_allocator, path);
@@ -983,7 +982,7 @@ static void   _mulle_objc_universe_dotdump( struct _mulle_objc_universe *univers
    info.directory      = directory;
    info.draw_strings   = (char) mulle_objc_getenv_yes_no_default( "MULLE_OBJC_DRAW_STRING_TABLE", 0);
    info.omit_selectors = ! (char) mulle_objc_getenv_yes_no_default( "MULLE_OBJC_DRAW_SELECTOR_TABLE", 1);
-   
+
    fprintf( fp, "digraph mulle_objc_universe\n{\n");
    print_universe( universe, &info);
    fprintf( fp, "}\n");
@@ -1024,7 +1023,7 @@ static void   mulle_objc_dotdump_universe_to_file( char *directory,
 static void   _mulle_objc_dotdump_universe( char *directory, int log)
 {
    char   *path;
-   
+
    path = dot_filename_for_name( "universe", directory);
    mulle_objc_dotdump_universe_to_file( directory, path, log);
    mulle_allocator_free( &mulle_stdlib_allocator, path);
@@ -1041,10 +1040,10 @@ static void   _mulle_objc_dotdump_classes( char *directory)
 static void   _mulle_objc_class_dotdump( struct _mulle_objc_class *cls, char *directory)
 {
    char   *path;
- 
+
    if( ! cls)
       return;
-   
+
    path = dot_filename_for_name( _mulle_objc_class_get_name( cls), directory);
    mulle_objc_class_dotdump_to_file( cls, directory, path);
    mulle_allocator_free( &mulle_stdlib_allocator, path);
@@ -1054,7 +1053,7 @@ static void   _mulle_objc_class_dotdump( struct _mulle_objc_class *cls, char *di
 static void   _mulle_objc_dotdump_classname( char *classname, char *directory)
 {
    char   *path;
-   
+
    path = dot_filename_for_name( classname, directory);
    mulle_objc_dotdump_classname_to_file( classname, directory, path);
    mulle_allocator_free( &mulle_stdlib_allocator, path);
@@ -1101,7 +1100,7 @@ void   mulle_objc_dotdump_classes_to_tmp( void)
 static char  *get_pwd( void)
 {
    char   *pwd;
-   
+
    // don't use OS specifica!
    pwd = getenv( "PWD");
    if( ! pwd)
@@ -1125,10 +1124,10 @@ void   mulle_objc_class_dotdump( struct _mulle_objc_class *cls)
 {
    char   *path;
    char   *directory;
-   
+
    if( ! cls)
       return;
-   
+
    directory = get_pwd();
    path = dot_filename_for_name( _mulle_objc_class_get_name( cls), get_pwd());
    mulle_objc_class_dotdump_to_file( cls, directory, path);
@@ -1140,7 +1139,7 @@ void   mulle_objc_dotdump_classname( char *classname)
 {
    char   *path;
    char   *directory;
-   
+
    directory = get_pwd();
    path = dot_filename_for_name( classname, directory);
    mulle_objc_dotdump_classname_to_file( classname, directory, path);
@@ -1181,7 +1180,7 @@ void   mulle_objc_dotdump_universe_frame_to_tmp()
 void   mulle_objc_dotdump( void)
 {
    char   *pwd;
-   
+
    pwd = get_pwd();
    _mulle_objc_dotdump_overview( pwd);
    _mulle_objc_dotdump_universe( pwd, 0);
