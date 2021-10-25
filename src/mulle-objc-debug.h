@@ -39,16 +39,14 @@
 
 #include "include.h"
 
+#define MULLE_OBJC_DEBUG_VERSION  ((0 << 20) | (20 << 8) | 0)
+
 
 #include "mulle-objc-csvdump.h"
 #include "mulle-objc-dotdump.h"
 #include "mulle-objc-htmldump.h"
 #include "mulle-objc-html.h"
 #include "mulle-objc-typeinfodump.h"
-
-#include <assert.h>
-#include <stdarg.h>
-#include <setjmp.h>
 
 #endif
 
