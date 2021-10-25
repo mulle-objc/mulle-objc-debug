@@ -1,8 +1,8 @@
 //
-//  mulle_objc_fastenumeration.h
-//  mulle-objc-runtime
+//  mulle_objc_htmldump.h
+//  mulle-objc-debug
 //
-//  Created by Nat! on 15.02.16.
+//  Created by Nat! on 10.05.16.
 //  Copyright (c) 2016 Nat! - Mulle kybernetiK.
 //  Copyright (c) 2016 Codeon GmbH.
 //  All rights reserved.
@@ -33,12 +33,25 @@
 //  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 //  POSSIBILITY OF SUCH DAMAGE.
 //
-#ifndef mulle_objc_fastenumeration_h__
-#define mulle_objc_fastenumeration_h__
+#ifndef mulle_objc_htmldump_h__
+#define mulle_objc_htmldump_h__
 
 #include "include.h"
 
-MULLE_C_NO_RETURN
-void   mulle_objc_enumeration_mutation( void *collection);
+struct _mulle_objc_classpair;
+struct _mulle_objc_universe;
+struct _mulle_objc_class;
 
-#endif /* mulle_objc_fastenumeration_h */
+void   mulle_objc_classpair_htmldump_to_directory( struct _mulle_objc_classpair *pair,
+                                                  char *directory);
+
+void   mulle_objc_universe_htmldump_to_directory( struct _mulle_objc_universe *universe,
+                                                 char *directory);
+void   mulle_objc_class_htmldump_to_directory( struct _mulle_objc_class *cls,
+                                               char *directory);
+
+// sometimes nice in the debugger
+void   mulle_objc_object_htmldump_class_to_directory( void *obj,
+                                                      char *directory);
+
+#endif

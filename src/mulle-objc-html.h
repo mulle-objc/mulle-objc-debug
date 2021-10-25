@@ -1,6 +1,6 @@
 //
 //  mulle_objc_html.h
-//  mulle-objc-runtime
+//  mulle-objc-debug
 //
 //  Created by Nat! on 10.05.16.
 //  Copyright (c) 2016 Nat! - Mulle kybernetiK.
@@ -35,6 +35,8 @@
 //
 #ifndef mulle_objc_html_h__
 #define mulle_objc_html_h__
+
+#include "include.h"
 
 #include <stdarg.h>
 #include <stdint.h>
@@ -167,10 +169,5 @@ char   *mulle_objc_uniqueidarray_describe_html( struct _mulle_objc_uniqueidarray
                                                    char *(row_description)( void *, struct _mulle_objc_universe *, struct _mulle_objc_htmltablestyle *),
                                                    struct _mulle_objc_universe *universe,
                                                    struct _mulle_objc_htmltablestyle *styling);
-
-
-int   mulle_objc_vasprintf( char **output, char *format, va_list args);
-int   mulle_objc_asprintf( char **output, char *format, ...);
-
 
 #endif /* mulle_objc_html_h */

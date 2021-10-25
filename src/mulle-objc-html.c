@@ -1,6 +1,6 @@
 //
 //  common.inc
-//  mulle-objc-runtime
+//  mulle-objc-debug
 //
 //  Created by Nat! on 10.05.16.
 //  Copyright (c) 2016 Nat! - Mulle kybernetiK.
@@ -35,7 +35,8 @@
 //
 #include "mulle-objc-html.h"
 
-#include "mulle-objc-runtime.h"
+#include "include-private.h"
+
 #include <stdarg.h>
 #include <stddef.h>
 #include <string.h>
@@ -57,44 +58,8 @@ static int   qsort_strcmp( const void * s1, const void * s2)
     return( strcmp( *(char **) s1, *(char **) s2));
 }
 
-//
-// have my own, because asprintf is a gnu extension, whereas
-// vsnprintf should be C99. Use malloc because that's what vsprintf does
-//
-int   mulle_objc_vasprintf( char **output, char *format, va_list args)
-{
-   int      size;
-   va_list  tmp;
 
-   va_copy( tmp, args);
-   size = vsnprintf( NULL, 0, format, tmp);
-   va_end( tmp);
-
-   if( size < 0)
-      return( size);
-
-   *output = (char *) malloc( size + 1);
-   if( ! *output)
-      return( -1);
-
-   return( vsprintf( *output, format, args));
-}
-
-
-int   mulle_objc_asprintf( char **output, char *format, ...)
-{
-   va_list  args;
-   int      size;
-
-   va_start( args, format);
-   size = mulle_objc_vasprintf( output, format, args);
-   va_end(args);
-
-   return size;
-}
-
-
-#define asprintf  mulle_objc_asprintf
+#define asprintf  mulle_asprintf
 
 
 
@@ -141,7 +106,7 @@ static char  *categoryid_describe_row_html( void *value,
    s          = _mulle_objc_universe_describe_categoryid( universe,
                                                            categoryid);
 
-   mulle_objc_asprintf( &result, "<TR><TD>\"%s\"</TD><TD>%08x</TD></TR>\n",
+   mulle_asprintf( &result, "<TR><TD>\"%s\"</TD><TD>%08x</TD></TR>\n",
          s, categoryid);
    return( result);
 }
@@ -158,7 +123,7 @@ static char  *protocolid_describe_row_html( void *value,
    protocolid = (mulle_objc_protocolid_t) (intptr_t) value;
    s          = _mulle_objc_universe_describe_protocolid( universe, protocolid);
 
-   mulle_objc_asprintf( &result, "<TR><TD>\"%s\"</TD><TD>%08x</TD></TR>\n",
+   mulle_asprintf( &result, "<TR><TD>\"%s\"</TD><TD>%08x</TD></TR>\n",
          s, protocolid);
    return( result);
 }

@@ -1,10 +1,10 @@
 //
-//  mulle_objc_htmldump.h
+//  mulle-objc-debug.h
 //  mulle-objc-runtime
 //
-//  Created by Nat! on 10.05.16.
-//  Copyright (c) 2016 Nat! - Mulle kybernetiK.
-//  Copyright (c) 2016 Codeon GmbH.
+//  Created by Nat! on 10.07.16.
+//  Copyright (c) 2021 Nat! - Mulle kybernetiK.
+//  Copyright (c) 2021 Codeon GmbH.
 //  All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
@@ -33,24 +33,22 @@
 //  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 //  POSSIBILITY OF SUCH DAMAGE.
 //
-#ifndef mulle_objc_htmldump_h__
-#define mulle_objc_htmldump_h__
-
-struct _mulle_objc_universe;
-struct _mulle_objc_class;
-struct _mulle_objc_classpair;
+#ifndef mulle_objc_debug_h__
+#define mulle_objc_debug_h__
 
 
-void   mulle_objc_classpair_htmldump_to_directory( struct _mulle_objc_classpair *pair,
-                                                  char *directory);
+#include "include.h"
 
-void   mulle_objc_universe_htmldump_to_directory( struct _mulle_objc_universe *universe,
-                                                 char *directory);
-void   mulle_objc_class_htmldump_to_directory( struct _mulle_objc_class *cls,
-                                               char *directory);
 
-// sometimes nice in the debugger
-void   mulle_objc_object_htmldump_class_to_directory( void *obj,
-                                                      char *directory);
+#include "mulle-objc-csvdump.h"
+#include "mulle-objc-dotdump.h"
+#include "mulle-objc-htmldump.h"
+#include "mulle-objc-html.h"
+#include "mulle-objc-typeinfodump.h"
+
+#include <assert.h>
+#include <stdarg.h>
+#include <setjmp.h>
 
 #endif
+

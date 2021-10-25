@@ -1,6 +1,6 @@
 //
 //  mulle_objc_dotdump.h
-//  mulle-objc-runtime
+//  mulle-objc-debug
 //
 //  Created by Nat! on 25.10.15.
 //  Copyright (c) 2015 Nat! - Mulle kybernetiK.
@@ -36,13 +36,12 @@
 #ifndef mulle_objc_dotdump_h__
 #define mulle_objc_dotdump_h__
 
+#include "include.h"
+
 #include <stdio.h>
 
-struct _mulle_objc_class;
-struct _mulle_objc_classpair;
 struct _mulle_objc_universe;
-struct _mulle_objc_methodlist;
-
+struct _mulle_objc_class;
 
 #pragma mark - preferred ABI
 

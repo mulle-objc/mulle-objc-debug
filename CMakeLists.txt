@@ -1,8 +1,6 @@
 cmake_minimum_required( VERSION 3.1)
 
-project( mulle-objc-runtime C)
-
-option( MULLE_OBJC_DEBUG_SUPPORT "Add html/dot debug support to mulle-objc" ON)
+project( mulle-objc-debug C)
 
 
 ### mulle-sde environment
@@ -18,31 +16,13 @@ include( CCompiler)
 
 include( Files)
 
-if( MULLE_OBJC_DEBUG_SUPPORT)
-   set( SOURCES
-${SOURCES}
-${DEBUG_SOURCES}
-)
-
-   set( PUBLIC_HEADERS
-${PUBLIC_HEADERS}
-${DEBUG_HEADERS}
-)
-
-   set( INSTALL_PUBLIC_HEADERS
-${INSTALL_PUBLIC_HEADERS}
-${DEBUG_HEADERS}
-)
-   add_definitions( -DMULLE_OBJC_DEBUG_SUPPORT)
-endif()
-
 
 ### Library
 
 if( HEADERS_PHASE)
-   install( FILES ${INSTALL_PUBLIC_HEADERS}  DESTINATION "include/mulle-objc-runtime")
-   install( FILES ${INSTALL_PRIVATE_HEADERS} DESTINATION "include/mulle-objc-runtime/private")
-   install( FILES ${CMAKE_INCLUDES}          DESTINATION "include/mulle-objc-runtime/cmake")
+   install( FILES ${INSTALL_PUBLIC_HEADERS}  DESTINATION "include/mulle-objc-debug")
+   install( FILES ${INSTALL_PRIVATE_HEADERS} DESTINATION "include/mulle-objc-debug/private")
+   install( FILES ${CMAKE_INCLUDES}          DESTINATION "include/mulle-objc-debug/cmake")
 
    # short cut out
    if( NOT COMPILE_PHASE AND NOT LINK_PHASE)
@@ -56,30 +36,4 @@ endif()
 
 include( Library)
 include( InstallLibrary)
-
-
-set( EXECUTABLE_NAME mulle-objc-uniqueid)
-
-# only need the hash function (done like this if runtime is built as shared)
-set( EXECUTABLE_SOURCES  ${UNIQUEID_SOURCES}
-src/mulle-objc-uniqueid.c
-)
-set( EXECUTABLE_DEPENDENCY_NAMES
-mulle-objc-runtime)
-# only need the hash function
-set( EXECUTABLE_LIBRARY_LIST "${MULLE_DATA_LIBRARY}")
-
-include( Executable)
-
-set( EXECUTABLE_NAME mulle-objc-signature)
-# only need the signature function
-set( EXECUTABLE_SOURCES  ${SIGNATURE_SOURCES}
-src/mulle-objc-signature.c)
-set( EXECUTABLE_LIBRARY_LIST "")
-set( EXECUTABLE_DEPENDENCY_NAMES "")
-
-include( Executable)
-
-include( InstallExecutable)
-
 include( FinalOutput OPTIONAL)

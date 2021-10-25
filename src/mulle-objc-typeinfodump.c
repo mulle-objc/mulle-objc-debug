@@ -1,10 +1,10 @@
 //
-//  mulle_objc_dotdump.h
-//  mulle-objc-runtime
+//  mulle-objc.typeinfodump.c
+//  mulle-objc-debug
 //
-//  Created by Nat! on 25.10.15.
-//  Copyright (c) 2015 Nat! - Mulle kybernetiK.
-//  Copyright (c) 2015 Codeon GmbH.
+//  Created by Nat! on 18.02.20
+//  Copyright (c) 2020 Nat! - Mulle kybernetiK.
+//  Copyright (c) 2020 Codeon GmbH.
 //  All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
@@ -33,16 +33,22 @@
 //  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 //  POSSIBILITY OF SUCH DAMAGE.
 //
-#ifndef mulle_objc_typeinfodump_h__
-#define mulle_objc_typeinfodump_h__
 
-#include <stdio.h>
+#include "mulle-objc-typeinfodump.h"
 
-#include "mulle-objc-signature.h"
+#include "include-private.h"
 
 
 void   mulle_objc_typeinfo_dump_to_file( struct mulle_objc_typeinfo *info,
                                          char *indent,
-                                         FILE *fp);
-
-#endif
+                                         FILE *fp)
+{
+   fprintf( fp, "%stype=%.*s\n", indent, (int) (info->pure_type_end - info->type), info->type);
+   fprintf( fp, "%sinvocation_offset=%d\n", indent, (int) info->invocation_offset);
+   fprintf( fp, "%snatural_size=%u\n", indent, (unsigned int) info->natural_size);
+   fprintf( fp, "%sbits_size=%u\n", indent, (unsigned int) info->bits_size);
+   fprintf( fp, "%sbits_struct_alignment=%u\n", indent, (unsigned int) info->bits_struct_alignment);
+   fprintf( fp, "%snatural_alignment=%u\n", indent, (unsigned int) info->natural_alignment);
+   fprintf( fp, "%sn_members= %d\n", indent, info->n_members);
+   fprintf( fp, "%shas_object= %d\n", indent, info->has_object);
+}
