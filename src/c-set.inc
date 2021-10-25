@@ -1,6 +1,6 @@
 //
 //  c_set.c
-//  mulle-objc-runtime
+//  mulle-objc-debug
 //
 //  Created by Nat! on 10.05.16.
 //  Copyright (c) 2016 Nat! - Mulle kybernetiK.

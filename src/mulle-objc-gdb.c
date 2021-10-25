@@ -1,6 +1,6 @@
 //
 //  mulle-objc-gdb.h
-//  mulle-objc-runtime
+//  mulle-objc-debug
 //
 //  Created by Nat! on 14.10.19
 //  Copyright © 2019 Mulle kybernetiK. All rights reserved.
@@ -32,21 +32,9 @@
 //  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 //  POSSIBILITY OF SUCH DAMAGE.
 //
-#ifndef mulle_objc_gdb_h__
-#define mulle_objc_gdb_h__
+#include "include.h"
 
-#include "mulle-objc-gdb.h"
-
-#include "mulle-objc-call.h"
-#include "mulle-objc-class.h"
-#include "mulle-objc-class-convenience.h"
-#include "mulle-objc-class-lookup.h"
-#include "mulle-objc-infraclass.h"
-#include "mulle-objc-metaclass.h"
-#include "mulle-objc-method.h"
-#include "mulle-objc-retain-release.h"
-#include "mulle-objc-universe.h"
-#include "mulle-objc-universe-global.h"
+#include "include-private.h"
 
 //
 // used by the mulle-gdb debugger
@@ -134,4 +122,11 @@ mulle_objc_implementation_t
 }
 
 
-#endif
+void   mulle_objc_reference_gdb_functions( void);
+
+void   mulle_objc_reference_gdb_functions( void)
+{
+   mulle_objc_gdb_lookup_class( 0);
+   mulle_objc_gdb_lookup_selector( 0);
+   mulle_objc_gdb_lookup_implementation( 0, 0, 0, 0);
+}

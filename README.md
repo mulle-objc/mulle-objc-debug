@@ -1,4 +1,4 @@
-# mulle-objc-runtime
+# mulle-objc-debug
 
 #### ⏩ A fast, portable Objective-C runtime written 100% in C11
 
@@ -9,7 +9,7 @@ It is designed to be suitable for massive multi-threading.
 
 | Release Version
 |-----------------------------------
- ![Mulle kybernetiK tag](https://img.shields.io/github/tag/mulle-objc/mulle-objc-runtime.svg) [![Build Status](https://github.com/mulle-objc/mulle-objc-runtime/workflows/CI/badge.svg?branch=release)](https://github.com/mulle-objc/mulle-objc-runtime/workflows)
+ ![Mulle kybernetiK tag](https://img.shields.io/github/tag/mulle-objc/mulle-objc-debug.svg) [![Build Status](https://github.com/mulle-objc/mulle-objc-debug/workflows/CI/badge.svg?branch=release)](https://github.com/mulle-objc/mulle-objc-debug/workflows)
 
 
 ## What's so different ?
@@ -44,7 +44,7 @@ only locks during `+initialize` on a per class basis.
 
 ## Required Libraries and Tools
 
-![Libraries and Tools](https://raw.githubusercontent.com/mulle-objc/mulle-objc-runtime/release/dox/mulle-objc-runtime-dependencies.png)
+![Libraries and Tools](https://raw.githubusercontent.com/mulle-objc/mulle-objc-debug/release/dox/mulle-objc-debug-dependencies.png)
 
   Name         | Release Version
 ---------------|---------------------------------
@@ -66,7 +66,7 @@ could be a good starting point.
 
 > #### C Caveat
 >
-> It you use `.c` files that include `<mulle-objc-runtime/mulle-objc-runtime.h>`
+> It you use `.c` files that include `<mulle-objc-debug/mulle-objc-debug.h>`
 > make sure that you compile with `__MULLE_OBJC_TPS__`, `__MULLE_OBJC_NO_TPS__`
 > `__MULLE_OBJC_FCS__`  `__MULLE_OBJC_NO_FCS__` as defined when compiling the
 > runtime. Since C-only compilations do not emit runtime information,
@@ -84,7 +84,7 @@ API                                                  | Description
 [`_mulle_objc_method`](dox/API_METHOD.md)  et al.    | Deal with Methods
 [`_mulle_objc_object`](dox/API_OBJECT.md)  et al.    | Deal with Instances
 [`_mulle_objc_property`](dox/API_PROPERTY.md) et al. | Handle Properties
-[`_mulle_objc_runtime`](dox/API_RUNTIME.md)          | Work with the runtime
+[`_mulle_objc_debug`](dox/API_RUNTIME.md)          | Work with the runtime
 
 
 ### Other functions
@@ -113,7 +113,7 @@ These articles give you some background about the **mulle-objc** runtime:
 10. [mulle_objc: ivar layout with @property](//www.mulle-kybernetik.com/weblog/2016/mulle_objc_ivar_layout.html)
 11. mulle_objc: technically speaking
    1. [mulle-clang, technically speaking](//www.mulle-kybernetik.com/weblog/2016/mulle_objc_clang_technically.html)
-   2. [mulle-objc-runtime, technically speaking](//www.mulle-kybernetik.com/weblog/2016/mulle_objc_runtime_technically.html)
+   2. [mulle-objc-debug, technically speaking](//www.mulle-kybernetik.com/weblog/2016/mulle_objc_debug_technically.html)
    3. [MulleFoundation, technically speaking](//www.mulle-kybernetik.com/weblog/2016/mulle_objc_foundation_technically.html)
 
 If something is unclear, feel free to contact the author.
@@ -128,28 +128,28 @@ All platforms and compilers supported by
 
 ## Add
 
-Use [mulle-sde](//github.com/mulle-sde) to add mulle-objc-runtime to your project:
+Use [mulle-sde](//github.com/mulle-sde) to add mulle-objc-debug to your project:
 
 ```
-mulle-sde dependency add --c --github mulle-objc mulle-objc-runtime
+mulle-sde dependency add --c --github mulle-objc mulle-objc-debug
 ```
 
-Executables will need to link with [mulle-objc-runtime-startup](//github.com/mulle-objc/mulle-objc-runtime-startup) as well.
+Executables will need to link with [mulle-objc-debug-startup](//github.com/mulle-objc/mulle-objc-debug-startup) as well.
 
 
 ## Install
 
 See [mulle-objc-developer](//github.com/mulle-objc/mulle-objc-developer) for the preferred
-way to installation mulle-objc-runtime.
+way to installation mulle-objc-debug.
 
 
 ### mulle-sde
 
-Use [mulle-sde](//github.com/mulle-sde) to build and install mulle-objc-runtime and all dependencies:
+Use [mulle-sde](//github.com/mulle-sde) to build and install mulle-objc-debug and all dependencies:
 
 ```
 mulle-sde install --prefix /usr/local \
-   https://github.com/mulle-objc/mulle-objc-runtime/archive/latest.tar.gz
+   https://github.com/mulle-objc/mulle-objc-debug/archive/latest.tar.gz
 ```
 
 ### Manual Installation

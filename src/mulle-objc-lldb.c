@@ -1,6 +1,6 @@
 //
 //  mulle_objc_lldb.c
-//  mulle-objc-runtime-universe
+//  mulle-objc-debug-universe
 //
 //  Created by Nat! on 18.05.17.
 //  Copyright © 2017 Mulle kybernetiK.
@@ -33,18 +33,19 @@
 //  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 //  POSSIBILITY OF SUCH DAMAGE.
 //
-#include "mulle-objc-lldb.h"
+#include "include.h"
 
-#include "mulle-objc-call.h"
-#include "mulle-objc-class.h"
-#include "mulle-objc-class-lookup.h"
-#include "mulle-objc-class-convenience.h"
-#include "mulle-objc-infraclass.h"
-#include "mulle-objc-metaclass.h"
-#include "mulle-objc-method.h"
-#include "mulle-objc-retain-release.h"
-#include "mulle-objc-universe.h"
-#include "mulle-objc-universe-global.h"
+#include "include-private.h"
+
+
+
+struct mulle_objc_lldb_lookup_implementation_args
+{
+   void   *class_or_superid;
+   int    calltype;
+   int    debug;
+};
+
 
 #pragma clang diagnostic ignored  "-Wmultichar"
 
@@ -74,7 +75,8 @@ mulle_objc_implementation_t
    }
 
    if( args->debug)
-      fprintf( stderr, "mulle_objc_lldb_lookup_implementation: %p %08x %p (%d)\n", obj, methodid, args->class_or_superid, args->calltype);
+      fprintf( stderr, "mulle_objc_lldb_lookup_implementation: %p %08x %p (%d)\n",
+                        obj, methodid, args->class_or_superid, args->calltype);
 
    // call "-class" so class initializes.. But WHY ??
    // if( ! _mulle_objc_metaclass_get_state_bit( meta, MULLE_OBJC_METACLASS_INITIALIZE_DONE))
@@ -284,3 +286,17 @@ void   *mulle_objc_lldb_create_staticstring( void *cfalloc,
 
    return( obj);
 }
+
+
+void   mulle_objc_reference_lldb_functions( void);
+
+void   mulle_objc_reference_lldb_functions( void)
+{
+   mulle_objc_lldb_get_dangerous_classstorage_pointer();
+   mulle_objc_lldb_lookup_implementation( 0, 0, NULL);
+   mulle_objc_lldb_lookup_isa( 0, 0);
+   $__lldb_objc_object_check( 0, 0);
+   mulle_objc_lldb_check_object( 0, 0);
+   mulle_objc_lldb_lookup_descriptor_by_name( 0);
+}
+

@@ -1,6 +1,6 @@
 //
 //  mulle_objc_dotdump.c
-//  mulle-objc-runtime
+//  mulle-objc-debug
 //
 //  Created by Nat! on 25.10.15.
 //  Copyright (c) 2015 Nat! - Mulle kybernetiK.
@@ -35,15 +35,14 @@
 //
 #include "mulle-objc-dotdump.h"
 
-#include "mulle-objc-runtime.h"
+#include "include-private.h"
+
 #include "mulle-objc-html.h"
-#include "mulle-objc-universe.h"  // for getenv
 
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "include-private.h"
 
 #include "c-set.inc"
 

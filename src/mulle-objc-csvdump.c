@@ -1,6 +1,6 @@
 //
 //  mulle_objc_universe_csvdump.c
-//  mulle-objc-runtime-universe
+//  mulle-objc-debug-universe
 //
 //  Created by Nat! on 16.05.17.
 //  Copyright © 2017 Mulle kybernetiK. All rights reserved.
@@ -34,19 +34,16 @@
 //
 #include "mulle-objc-csvdump.h"
 
-#include "mulle-objc-cache.h"
-#include "mulle-objc-class.h"
-#include "mulle-objc-universe-class.h"
-#include "mulle-objc-class-search.h"
-#include "mulle-objc-class-struct.h"
-#include "mulle-objc-classpair.h"
-#include "mulle-objc-infraclass.h"
-#include "mulle-objc-load.h"
-#include "mulle-objc-metaclass.h"
-#include "mulle-objc-method.h"
-#include "mulle-objc-universe.h"
+
+#include "include-private.h"
 
 #include <errno.h>
+
+
+#if MULLE_OBJC_RUNTIME_VERSION < ((0 << 20) | (20 << 8) | 0)
+# error "mulle-objc-runtime is too old"
+#endif
+
 
 
 static char   *html_escape( char *s)

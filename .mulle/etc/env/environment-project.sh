@@ -1,7 +1,7 @@
 #
 #
 #
-export PROJECT_NAME="mulle-objc-runtime"
+export PROJECT_NAME="mulle-objc-debug"
 
 
 #
