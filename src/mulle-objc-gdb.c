@@ -122,6 +122,102 @@ mulle_objc_implementation_t
 }
 
 
+// sel_getUID will be added by the compat layer, so use this
+void  *sel_get_any_uid( char *name)
+{
+   struct _mulle_objc_universe    *universe;
+   mulle_objc_methodid_t          methodid;
+   struct _mulle_objc_descriptor  *desc;
+
+   if( ! name)
+      return( NULL);
+
+   methodid = mulle_objc_methodid_from_string( name);
+   universe =  mulle_objc_global_get_universe( __MULLE_OBJC_UNIVERSEID__);
+   desc     = _mulle_objc_universe_lookup_descriptor( universe, methodid);
+   return( desc ? (void *) (intptr_t) methodid : NULL);
+}
+
+
+// doesn't work in gdb, and I am not really sure why
+#if 0
+//
+// reuse gnustep like lookup mechanism for our purposes
+// likely to fail for metaABI though, is just hack (we check if method does
+// MetaABI and if yes, say so...)
+
+void   *objc_msg_lookup( void *obj, void *cmd)
+{
+   mulle_objc_methodid_t       sel;
+   struct _mulle_objc_class    *cls;
+   struct _mulle_objc_method   *method;
+   char                        *signature;
+
+   if( ! obj)
+      return( NULL);
+
+   sel = (mulle_objc_methodid_t) (uintptr_t) cmd;
+   if( ! mulle_objc_methodid_is_sane( sel))
+   {
+      fprintf( stderr, "objc_msg_lookup: incoming selector is broken\n");
+      return( NULL);
+   }
+
+   cls = _mulle_objc_object_get_isa( obj);
+   // we no forward
+   method = mulle_objc_class_defaultsearch_method( cls, sel);
+   if( ! method)
+      return( NULL);
+
+   signature = mulle_objc_method_get_signature( method);
+   switch( mulle_objc_signature_get_metaabiparamtype( signature))
+   {
+   case mulle_metaabi_param_struct :
+   case mulle_metaabi_param_error :
+      fprintf( stderr, "objc_msg_lookup: method requires MetaABI _param, gdb can't do metaABI yet.\n");
+      return( NULL);
+   }
+
+   switch( mulle_objc_signature_get_metaabiparamtype( signature))
+   {
+   case mulle_metaabi_param_struct :
+   case mulle_metaabi_param_error :
+      fprintf( stderr, "objc_msg_lookup: return value will not be available, gdb can't do metaABI yet.\n");
+   }
+   return( mulle_objc_method_get_implementation( method));
+}
+#endif
+
+#if 0
+void   *objc_msgSend( void *obj, void *cmd, void *param)
+{
+   mulle_objc_methodid_t   sel;
+
+
+   if( (uintptr_t) cmd & (~(mulle_objc_methodid_t) -1))
+   {
+      fprintf( stderr, "objc_msgSend: incoming selector is not a mulle-objc selector\n");
+      return( NULL);
+   }
+
+   sel = (mulle_objc_methodid_t) (uintptr_t) cmd;
+   if( ! mulle_objc_methodid_is_sane( sel))
+   {
+      fprintf( stderr, "objc_msgSend: incoming selector is broken\n");
+      return( NULL);
+   }
+
+   return( mulle_objc_object_call( obj, (mulle_objc_methodid_t) (uintptr_t) sel, param));
+}
+
+void   *objc_msgSend_stret( void *obj, void *cmd, void *param)
+{
+   fprintf( stderr, "objc_msgSend_stret: doesn't work with mulle-objc");
+   return( NULL);
+}
+#endif
+
+
 void   mulle_objc_reference_gdb_functions( void);
 
 void   mulle_objc_reference_gdb_functions( void)
@@ -129,4 +225,6 @@ void   mulle_objc_reference_gdb_functions( void)
    mulle_objc_gdb_lookup_class( 0);
    mulle_objc_gdb_lookup_selector( 0);
    mulle_objc_gdb_lookup_implementation( 0, 0, 0, 0);
+//   objc_msgSend( NULL, NULL, NULL);
+   sel_get_any_uid( NULL);
 }

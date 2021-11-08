@@ -183,7 +183,7 @@ static char   *html_filename_for_name( char *name, char *directory)
 #endif
 
    len = strlen( name) + strlen( directory) + 16;
-   buf = mulle_allocator_malloc( &mulle_stdlib_allocator, len);
+   buf = mulle_malloc( len);
    sprintf( buf, "%s%c%s.html", directory, separator, html_escape( name));
    return( buf);
 }
@@ -198,7 +198,7 @@ static char   *filename_for_universe( struct _mulle_objc_universe  *universe,
    assert( directory);
 
    len = strlen( directory) + 16;
-   buf = mulle_allocator_malloc( &mulle_stdlib_allocator, len);
+   buf = mulle_malloc( len);
    sprintf( buf, "%s/index.html", directory);
    return( buf);
 }
@@ -274,7 +274,7 @@ static void   _print_universe( struct _mulle_objc_universe *universe, FILE *fp)
    {
       label = mulle_objc_universe_describe_html( universe, &universe_style);
       print_to_body( "Values", label, fp);
-      mulle_allocator_free( &mulle_stdlib_allocator, label);
+      mulle_free( label);
    }
    fprintf( fp, "</DIV>\n");
 
@@ -285,7 +285,7 @@ static void   _print_universe( struct _mulle_objc_universe *universe, FILE *fp)
                                                       mulle_objc_class_describe_row_html,
                                                           &classtable_style);
       print_to_body( "Classes", label, fp);
-      mulle_allocator_free( &mulle_stdlib_allocator, label);
+      mulle_free( label);
    }
    fprintf( fp, "</DIV>\n");
 
@@ -307,7 +307,7 @@ static void   _print_universe( struct _mulle_objc_universe *universe, FILE *fp)
                cls = _mulle_atomic_pointer_nonatomic_read( &universe->fastclasstable.classes[ i].pointer);
                label = mulle_objc_class_describe_html_short( cls, &classtable_style);
                fprintf( fp, "<TR><TH>%u</TH><TD>%s</TD></TR>\n", i, label);
-               mulle_allocator_free( &mulle_stdlib_allocator, label);
+               mulle_free( label);
             }
          fprintf( fp, "</TABLE>\n");
       }
@@ -323,7 +323,7 @@ static void   _print_universe( struct _mulle_objc_universe *universe, FILE *fp)
                                                            mulle_objc_descriptor_describe_row_html,
                                                            &descriptortable_style);
          print_to_body( "Method Descriptors", label, fp);
-         mulle_allocator_free( &mulle_stdlib_allocator, label);
+         mulle_free( label);
          fprintf( fp, "</TABLE>\n");
       }
    }
@@ -339,7 +339,7 @@ static void   _print_universe( struct _mulle_objc_universe *universe, FILE *fp)
                                                            mulle_objc_protocol_describe_row_html,
                                                            &protocoltable_style);
          print_to_body( "Protocols", label, fp);
-         mulle_allocator_free( &mulle_stdlib_allocator, label);
+         mulle_free( label);
          fprintf( fp, "</TABLE>\n");
       }
    }
@@ -354,7 +354,7 @@ static void   _print_universe( struct _mulle_objc_universe *universe, FILE *fp)
                                                            mulle_objc_category_describe_row_html,
                                                            &categorytable_style);
          print_to_body( "Categories", label, fp);
-         mulle_allocator_free( &mulle_stdlib_allocator, label);
+         mulle_free( label);
          fprintf( fp, "</TABLE>\n");
       }
    }
@@ -372,7 +372,7 @@ static void   _print_universe( struct _mulle_objc_universe *universe, FILE *fp)
          {
             label = mulle_objc_staticstring_describe_html( string, &stringtable_style);
             fprintf( fp, "<li>%s\n", label);
-            mulle_allocator_free( &mulle_stdlib_allocator, label);
+            mulle_free( label);
          }
          mulle_concurrent_pointerarrayenumerator_done( &rover);
          fprintf( fp, "</TABLE>\n");
@@ -396,7 +396,7 @@ static void   print_universe( struct _mulle_objc_universe *universe,
    	_print_universe( universe, fp);
    	print_end_and_close( fp);
 	}
-   mulle_allocator_free( &mulle_stdlib_allocator, path);
+   mulle_free( path);
 }
 
 
@@ -449,7 +449,7 @@ static void   _print_infraclass( struct _mulle_objc_infraclass *infra, FILE *fp)
             label = mulle_objc_class_describe_html_short( _mulle_objc_infraclass_as_class( superclass),
                                                             &classtable_style);
             print_to_body( "Superclass", label, fp);
-            mulle_allocator_free( &mulle_stdlib_allocator, label);
+            mulle_free( label);
          }
       }
       print_to_body( NULL, "</DIV>\n", fp);
@@ -471,7 +471,7 @@ static void   _print_infraclass( struct _mulle_objc_infraclass *infra, FILE *fp)
             label = mulle_objc_class_describe_html_short( _mulle_objc_infraclass_as_class( prop_cls),
                                                             &classtable_style);
             fprintf( fp, "<LI>%s\n", label);
-            mulle_allocator_free( &mulle_stdlib_allocator, label);
+            mulle_free( label);
          }
          mulle_concurrent_pointerarrayenumerator_done( &rover);
 
@@ -487,7 +487,7 @@ static void   _print_infraclass( struct _mulle_objc_infraclass *infra, FILE *fp)
       label       = mulle_objc_class_describe_html( cls, 1, &style);
 
       print_to_body( "Values", label, fp);
-      mulle_allocator_free( &mulle_stdlib_allocator, label);
+      mulle_free( label);
    }
    fprintf( fp, "</DIV>\n");
 
@@ -502,7 +502,7 @@ static void   _print_infraclass( struct _mulle_objc_infraclass *infra, FILE *fp)
          {
             label = mulle_objc_propertylist_describe_html( propertylist, &propertytable_style);
             fprintf( fp, "%s\n", label);
-            mulle_allocator_free( &mulle_stdlib_allocator, label);
+            mulle_free( label);
          }
          mulle_concurrent_pointerarrayenumerator_done( &rover);
       }
@@ -521,7 +521,7 @@ static void   _print_infraclass( struct _mulle_objc_infraclass *infra, FILE *fp)
          {
             label = mulle_objc_ivarlist_describe_hor_html( ivarlist, &ivartable_style);
             fprintf( fp, "%s\n", label);
-            mulle_allocator_free( &mulle_stdlib_allocator, label);
+            mulle_free( label);
          }
          mulle_concurrent_pointerarrayenumerator_done( &rover);
       }
@@ -542,7 +542,7 @@ static void   _print_infraclass( struct _mulle_objc_infraclass *infra, FILE *fp)
             style.title = _mulle_objc_methodlist_get_categoryname( methodlist);
             label       = mulle_objc_methodlist_describe_hor_html( methodlist, &style);
             fprintf( fp, "%s\n", label);
-            mulle_allocator_free( &mulle_stdlib_allocator, label);
+            mulle_free( label);
          }
          mulle_concurrent_pointerarrayenumerator_done( &rover);
       }
@@ -562,7 +562,7 @@ static void   _print_infraclass( struct _mulle_objc_infraclass *infra, FILE *fp)
             style.title = _mulle_objc_methodlist_get_categoryname( methodlist);
             label       = mulle_objc_methodlist_describe_hor_html( methodlist, &style);
             fprintf( fp, "%s\n", label);
-            mulle_allocator_free( &mulle_stdlib_allocator, label);
+            mulle_free( label);
          }
          mulle_concurrent_pointerarrayenumerator_done( &rover);
       }
@@ -578,7 +578,7 @@ static void   _print_infraclass( struct _mulle_objc_infraclass *infra, FILE *fp)
                                                         universe,
                                                         &protocoltable_style);
          print_to_body( "Protocols", label, fp);
-         mulle_allocator_free( &mulle_stdlib_allocator, label);
+         mulle_free( label);
       }
    }
    fprintf( fp, "</DIV>\n");
@@ -593,7 +593,7 @@ static void   _print_infraclass( struct _mulle_objc_infraclass *infra, FILE *fp)
                                                       &categorytable_style);
 
          print_to_body( "Categories", label, fp);
-         mulle_allocator_free( &mulle_stdlib_allocator, label);
+         mulle_free( label);
       }
    }
    fprintf( fp, "</DIV>\n");
@@ -603,7 +603,7 @@ static void   _print_infraclass( struct _mulle_objc_infraclass *infra, FILE *fp)
       cache = _mulle_objc_cachepivot_atomicget_cache( &cls->cachepivot.pivot);
       label = mulle_objc_cache_describe_html( cache, universe, &cachetable_style);
       print_to_body( "Instance Cache", label, fp);
-      mulle_allocator_free( &mulle_stdlib_allocator, label);
+      mulle_free( label);
    }
    fprintf( fp, "</DIV>\n");
 
@@ -612,7 +612,7 @@ static void   _print_infraclass( struct _mulle_objc_infraclass *infra, FILE *fp)
       cache = _mulle_objc_cachepivot_atomicget_cache( &meta->base.cachepivot.pivot);
       label = mulle_objc_cache_describe_html( cache, universe, &cachetable_style);
       print_to_body( "Meta Cache", label, fp);
-      mulle_allocator_free( &mulle_stdlib_allocator, label);
+      mulle_free( label);
    }
    fprintf( fp, "</DIV>\n");
 }
@@ -631,7 +631,7 @@ static void   print_infraclass( struct _mulle_objc_infraclass *infra, char *dire
    	_print_infraclass( infra, fp);
    	print_end_and_close( fp);
    }
-   mulle_allocator_free( &mulle_stdlib_allocator, path);
+   mulle_free( path);
 }
 
 
