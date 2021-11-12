@@ -1,2 +1,2 @@
-mulle-testallocator;${MULLE_TESTALLOCATOR_NODETYPE:-tar};no-import,no-singlephase;0993A88B-6520-4A57-8135-24BB2D0214DB;${MULLE_TESTALLOCATOR_URL:-https://github.com/mulle-core/mulle-testallocator/archive/${MULLE_TAG}.tar.gz};;${MULLE_TESTALLOCATOR_TAG:-latest};;
-mulle-objc-debug;${MULLE_OBJC_DEBUG_NODETYPE:-tar};;5BC54049-1F1A-4916-BF4F-34C6ABB4A35A;${MULLE_OBJC_DEBUG_URL:-https://github.com/nat/mulle-objc-debug/archive/${MULLE_TAG}.tar.gz};;${MULLE_OBJC_DEBUG_TAG:-latest};;
+mulle-testallocator;${MULLE_TESTALLOCATOR_NODETYPE:-tar};no-import,no-singlephase;609DF52D-4ED9-4B09-A406-42A4EB35B7F3;${MULLE_TESTALLOCATOR_URL:-https://github.com/mulle-core/mulle-testallocator/archive/${MULLE_TAG}.tar.gz};;${MULLE_TESTALLOCATOR_TAG:-latest};;
+mulle-objc-debug;${MULLE_OBJC_DEBUG_NODETYPE:-tar};;BA4F9CA3-D031-493C-AC9E-98A7ED696588;${MULLE_OBJC_DEBUG_URL:-https://github.com/nat/mulle-objc-debug/archive/${MULLE_TAG}.tar.gz};;${MULLE_OBJC_DEBUG_TAG:-latest};;
