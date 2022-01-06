@@ -42,6 +42,7 @@
 
 struct mulle_objc_typeinfo;
 
+MULLE_OBJC_DEBUG_EXTERN_GLOBAL
 void   mulle_objc_typeinfo_dump_to_file( struct mulle_objc_typeinfo *info,
                                          char *indent,
                                          FILE *fp);

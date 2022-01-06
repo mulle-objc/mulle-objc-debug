@@ -66,108 +66,141 @@ struct _mulle_objc_htmltablestyle
    int    colspan;       // optional
 };
 
+MULLE_OBJC_DEBUG_EXTERN_GLOBAL
 char   *mulle_objc_universe_describe_html( struct _mulle_objc_universe *universe,
                                            struct _mulle_objc_htmltablestyle *styling);
 
+MULLE_OBJC_DEBUG_EXTERN_GLOBAL
 char   *mulle_objc_staticstring_describe_html( struct _mulle_objc_staticstring *string,
                                                struct _mulle_objc_htmltablestyle *styling);
+MULLE_OBJC_DEBUG_EXTERN_GLOBAL
 char   *mulle_objc_staticstring_describe_hor_html( struct _mulle_objc_staticstring *string,
                                                    struct _mulle_objc_htmltablestyle *styling);
+MULLE_OBJC_DEBUG_EXTERN_GLOBAL
 char   *mulle_objc_staticstring_describe_row_html( void *value,
                                                    struct _mulle_objc_htmltablestyle *styling);
 
+MULLE_OBJC_DEBUG_EXTERN_GLOBAL
 char   *mulle_objc_infraclass_describe_row_html( intptr_t  classid,
                                                  void *cls,
                                                  struct _mulle_objc_htmltablestyle *styling);
+MULLE_OBJC_DEBUG_EXTERN_GLOBAL
 char   *mulle_objc_fastclassentry_describe_row_html( unsigned int i,
                                                      struct _mulle_objc_infraclass *infra,
                                                      struct _mulle_objc_htmltablestyle *styling);
 
+MULLE_OBJC_DEBUG_EXTERN_GLOBAL
 char   *mulle_objc_classestoload_describe_row( intptr_t classid,
                                                void *cls,
                                                struct _mulle_objc_htmltablestyle *styling);
+MULLE_OBJC_DEBUG_EXTERN_GLOBAL
 char   *mulle_objc_categoriestoload_describe_row( intptr_t classid,
                                                   void *cls,
                                                   struct _mulle_objc_htmltablestyle *styling);
 
+MULLE_OBJC_DEBUG_EXTERN_GLOBAL
 char   *mulle_objc_class_describe_html( struct _mulle_objc_class *cls,
                                         int show_fields,
                                         struct _mulle_objc_htmltablestyle *styling);
+MULLE_OBJC_DEBUG_EXTERN_GLOBAL
 char   *mulle_objc_class_describe_html_short( struct _mulle_objc_class *cls,
                                              struct _mulle_objc_htmltablestyle *styling);
+MULLE_OBJC_DEBUG_EXTERN_GLOBAL
 char   *mulle_objc_class_describe_html_tiny( struct _mulle_objc_class *cls,
                                              struct _mulle_objc_htmltablestyle *styling);
 
+MULLE_OBJC_DEBUG_EXTERN_GLOBAL
 char   *mulle_objc_class_describe_row_html( intptr_t classid,
                                             void *cls,
                                             struct _mulle_objc_htmltablestyle *styling);
 
+MULLE_OBJC_DEBUG_EXTERN_GLOBAL
 char   *mulle_objc_ivarlist_describe_html( struct _mulle_objc_ivarlist *list,
                                            struct _mulle_objc_htmltablestyle *styling);
 
+MULLE_OBJC_DEBUG_EXTERN_GLOBAL
 char   *mulle_objc_ivarlist_describe_hor_html( struct _mulle_objc_ivarlist *list,
                                               struct _mulle_objc_htmltablestyle *styling);
 
+MULLE_OBJC_DEBUG_EXTERN_GLOBAL
 char   *mulle_objc_propertylist_describe_html( struct _mulle_objc_propertylist *list,
                                               struct _mulle_objc_htmltablestyle *styling);
 
+MULLE_OBJC_DEBUG_EXTERN_GLOBAL
 char   *mulle_objc_cache_describe_html( struct _mulle_objc_cache *cache,
                                         struct _mulle_objc_universe *universe,
                                         struct _mulle_objc_htmltablestyle *styling);
 
+MULLE_OBJC_DEBUG_EXTERN_GLOBAL
 char   *mulle_objc_descriptor_describe_html( struct _mulle_objc_descriptor *desc,
                                              struct _mulle_objc_htmltablestyle *styling);
+MULLE_OBJC_DEBUG_EXTERN_GLOBAL
 char   *mulle_objc_descriptor_describe_hor_html( struct _mulle_objc_descriptor *desc);
+
+MULLE_OBJC_DEBUG_EXTERN_GLOBAL
 char   *mulle_objc_descriptor_describe_row_html( intptr_t  methodid,
                                                  void *descriptor,
                                                  struct _mulle_objc_htmltablestyle *styling);
+MULLE_OBJC_DEBUG_EXTERN_GLOBAL
 char   *mulle_objc_category_describe_row_html( intptr_t  categoryid,
                                                void *value,
                                                struct _mulle_objc_htmltablestyle *styling);
+MULLE_OBJC_DEBUG_EXTERN_GLOBAL
 char   *mulle_objc_protocol_describe_row_html( intptr_t  methodid,
                                                void *value,
                                                struct _mulle_objc_htmltablestyle *styling);
 
+MULLE_OBJC_DEBUG_EXTERN_GLOBAL
 char   *mulle_objc_super_describe_row_html( intptr_t  superid,
                                             void *value,
                                             struct _mulle_objc_htmltablestyle *styling);
 
+MULLE_OBJC_DEBUG_EXTERN_GLOBAL
 char   *mulle_objc_methodlist_describe_html( struct _mulle_objc_methodlist *list,
                                              struct _mulle_objc_universe *universe,
                                              int show_fields,
                                              struct _mulle_objc_htmltablestyle *styling);
 
+MULLE_OBJC_DEBUG_EXTERN_GLOBAL
 char   *mulle_objc_methodlist_describe_hor_html( struct _mulle_objc_methodlist *list,
                                                  struct _mulle_objc_htmltablestyle *styling);
 
+MULLE_OBJC_DEBUG_EXTERN_GLOBAL
 char   *mulle_objc_protocols_describe_html( struct _mulle_objc_uniqueidarray *array,
                                             struct _mulle_objc_universe *universe,
                                             struct _mulle_objc_htmltablestyle *styling);
+MULLE_OBJC_DEBUG_EXTERN_GLOBAL
 char   *mulle_objc_categories_describe_html( struct _mulle_objc_uniqueidarray *array,
                                              struct _mulle_objc_universe *universe,
                                              struct _mulle_objc_htmltablestyle *styling);
 
+MULLE_OBJC_DEBUG_EXTERN_GLOBAL
 char   *mulle_objc_loadclass_describe_row_html( void *value,
                                                 struct _mulle_objc_htmltablestyle *styling);
+MULLE_OBJC_DEBUG_EXTERN_GLOBAL
 char   *mulle_objc_loadcategory_describe_row_html( void *value,
                                                    struct _mulle_objc_htmltablestyle *styling);
 
+MULLE_OBJC_DEBUG_EXTERN_GLOBAL
 char   *mulle_objc_fastclasstable_describe_html( struct _mulle_objc_fastclasstable *fastclasstable,
                                                  char *(row_description)( unsigned int i,
                                                                           struct _mulle_objc_infraclass *,
                                                                           struct _mulle_objc_htmltablestyle *),
                                                  struct _mulle_objc_htmltablestyle *styling);
 
+MULLE_OBJC_DEBUG_EXTERN_GLOBAL
 char   *mulle_concurrent_pointerarray_describe_html( struct   mulle_concurrent_pointerarray *list,
                                                      char *(row_description)( void *,
                                                                               struct _mulle_objc_htmltablestyle *),
                                                      struct _mulle_objc_htmltablestyle *styling);
+MULLE_OBJC_DEBUG_EXTERN_GLOBAL
 char   *mulle_concurrent_hashmap_describe_html( struct mulle_concurrent_hashmap *map,
                                                 char *(row_description)( intptr_t,
                                                                          void *,
                                                                          struct _mulle_objc_htmltablestyle *),
                                                 struct _mulle_objc_htmltablestyle *styling);
 
+MULLE_OBJC_DEBUG_EXTERN_GLOBAL
 char   *mulle_objc_uniqueidarray_describe_html( struct _mulle_objc_uniqueidarray *array,
                                                 char *(row_description)( void *,
                                                                          struct _mulle_objc_universe *,
