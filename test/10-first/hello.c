@@ -3,8 +3,9 @@
 #include <stdio.h>
 
 
+// TODO: what is there to test ?
 int   main( int argc, char *argv[])
 {
-   printf( "%s\n", "VfL Bochum <missing number, please fix>");
+   printf( "%s\n", "VfL Bochum 1848");
    return( 0);
 }

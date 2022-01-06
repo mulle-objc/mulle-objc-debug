@@ -48,5 +48,11 @@
 #include "mulle-objc-html.h"
 #include "mulle-objc-typeinfodump.h"
 
+#ifdef __has_include
+# if __has_include( "_mulle-objc-debug-versioncheck.h")
+#  include "_mulle-objc-debug-versioncheck.h"
+# endif
+#endif
+
 #endif
 

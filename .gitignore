@@ -18,6 +18,7 @@ build*.d/
 *.bak
 *.old
 tmp.*
+*.*-workspace
 
 /research*
 

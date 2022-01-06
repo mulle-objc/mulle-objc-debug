@@ -36,5 +36,6 @@ src/mulle-objc-htmldump.h
 src/mulle-objc-html.h
 src/mulle-objc-typeinfodump.h
 src/reflect/_mulle-objc-debug-include.h
+src/reflect/_mulle-objc-debug-versioncheck.h
 )
 
