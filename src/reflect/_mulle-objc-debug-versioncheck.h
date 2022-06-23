@@ -3,19 +3,19 @@
  *   Any edits will be lost.
  */
 #if defined( MULLE_FPRINTF_VERSION)
-# if MULLE_FPRINTF_VERSION < ((0 << 20) | (0 << 8) | 1)
+# if MULLE_FPRINTF_VERSION < ((0 << 20) | (1 << 8) | 0)
 #  error "mulle-fprintf is too old"
 # endif
-# if MULLE_FPRINTF_VERSION >= ((0 << 20) | (1 << 8) | 0)
+# if MULLE_FPRINTF_VERSION >= ((0 << 20) | (2 << 8) | 0)
 #  error "mulle-fprintf is too new"
 # endif
 #endif
 
 #if defined( MULLE_OBJC_RUNTIME_VERSION)
-# if MULLE_OBJC_RUNTIME_VERSION < ((0 << 20) | (20 << 8) | 0)
+# if MULLE_OBJC_RUNTIME_VERSION < ((0 << 20) | (21 << 8) | 0)
 #  error "mulle-objc-runtime is too old"
 # endif
-# if MULLE_OBJC_RUNTIME_VERSION >= ((0 << 20) | (21 << 8) | 0)
+# if MULLE_OBJC_RUNTIME_VERSION >= ((0 << 20) | (22 << 8) | 0)
 #  error "mulle-objc-runtime is too new"
 # endif
 #endif

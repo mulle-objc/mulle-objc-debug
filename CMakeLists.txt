@@ -1,8 +1,6 @@
 cmake_minimum_required( VERSION 3.1)
 
 project( mulle-objc-debug C)
-add_definitions( -DMULLE_OBJC_DEBUG_EXTERN_GLOBAL=extern)
-
 
 
 ### mulle-sde environment

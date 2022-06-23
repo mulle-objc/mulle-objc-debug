@@ -42,20 +42,20 @@ struct _mulle_objc_classpair;
 struct _mulle_objc_universe;
 struct _mulle_objc_class;
 
-MULLE_OBJC_DEBUG_EXTERN_GLOBAL
+MULLE_OBJC_DEBUG_GLOBAL
 void   mulle_objc_classpair_htmldump_to_directory( struct _mulle_objc_classpair *pair,
                                                   char *directory);
 
-MULLE_OBJC_DEBUG_EXTERN_GLOBAL
+MULLE_OBJC_DEBUG_GLOBAL
 void   mulle_objc_universe_htmldump_to_directory( struct _mulle_objc_universe *universe,
                                                  char *directory);
 
-MULLE_OBJC_DEBUG_EXTERN_GLOBAL
+MULLE_OBJC_DEBUG_GLOBAL
 void   mulle_objc_class_htmldump_to_directory( struct _mulle_objc_class *cls,
                                                char *directory);
 
 // sometimes nice in the debugger
-MULLE_OBJC_DEBUG_EXTERN_GLOBAL
+MULLE_OBJC_DEBUG_GLOBAL
 void   mulle_objc_object_htmldump_class_to_directory( void *obj,
                                                       char *directory);
 

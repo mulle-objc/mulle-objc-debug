@@ -12,6 +12,7 @@ endif()
 
 set( INCLUDE_DIRS
 src
+src/generic
 src/reflect
 )
 
@@ -19,7 +20,7 @@ src/reflect
 # contents selected with patternfile ??-header--private-headers
 #
 set( PRIVATE_HEADERS
-src/include-private.h
+src/generic/include-private.h
 src/reflect/_mulle-objc-debug-include-private.h
 )
 
@@ -28,7 +29,7 @@ src/reflect/_mulle-objc-debug-include-private.h
 #
 set( PUBLIC_HEADERS
 src/c-set.inc
-src/include.h
+src/generic/include.h
 src/mulle-objc-csvdump.h
 src/mulle-objc-debug.h
 src/mulle-objc-dotdump.h

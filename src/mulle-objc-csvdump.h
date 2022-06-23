@@ -42,40 +42,40 @@ struct _mulle_objc_universe;
 struct _mulle_objc_loadinfo;
 
 
-MULLE_OBJC_DEBUG_EXTERN_GLOBAL
+MULLE_OBJC_DEBUG_GLOBAL
 void   mulle_objc_universe_csvdump_classcoverage_to_fp( struct _mulle_objc_universe *universe,
                                                         FILE *fp);
-MULLE_OBJC_DEBUG_EXTERN_GLOBAL
+MULLE_OBJC_DEBUG_GLOBAL
 void   mulle_objc_universe_csvdump_methodcoverage_to_fp( struct _mulle_objc_universe *universe,
                                                          FILE *fp);
-MULLE_OBJC_DEBUG_EXTERN_GLOBAL
+MULLE_OBJC_DEBUG_GLOBAL
 void   mulle_objc_universe_csvdump_cachedmethodcoverage_to_fp( struct _mulle_objc_universe *universe,
                                                                FILE *fp);
-MULLE_OBJC_DEBUG_EXTERN_GLOBAL
+MULLE_OBJC_DEBUG_GLOBAL
 void   mulle_objc_universe_csvdump_cachesizes_to_fp( struct _mulle_objc_universe *universe,
                                                      FILE *fp);
 
-MULLE_OBJC_DEBUG_EXTERN_GLOBAL
+MULLE_OBJC_DEBUG_GLOBAL
 void   mulle_objc_class_csvdump_methodcoverage_to_fp( struct _mulle_objc_class *cls,
                                                       FILE *fp);
-MULLE_OBJC_DEBUG_EXTERN_GLOBAL
+MULLE_OBJC_DEBUG_GLOBAL
 void   mulle_objc_class_csvdump_cachedmethodcoverage_to_fp( struct _mulle_objc_class *cls,
                                                             FILE *fp);
-MULLE_OBJC_DEBUG_EXTERN_GLOBAL
+MULLE_OBJC_DEBUG_GLOBAL
 void   mulle_objc_class_csvdump_cachesizes_to_fp( struct _mulle_objc_class *cls,
                                                   FILE *fp);
 
-MULLE_OBJC_DEBUG_EXTERN_GLOBAL
+MULLE_OBJC_DEBUG_GLOBAL
 void   mulle_objc_loadinfo_csvdump_terse_to_fp( struct _mulle_objc_loadinfo *info, FILE *fp);
 
 // appends to existing files
-MULLE_OBJC_DEBUG_EXTERN_GLOBAL
+MULLE_OBJC_DEBUG_GLOBAL
 void   mulle_objc_universe_csvdump_methodcoverage_to_filename( struct _mulle_objc_universe *universe,
                                                                char *filename);
-MULLE_OBJC_DEBUG_EXTERN_GLOBAL
+MULLE_OBJC_DEBUG_GLOBAL
 void   mulle_objc_universe_csvdump_classcoverage_to_filename( struct _mulle_objc_universe *universe,
                                                               char *filename);
-MULLE_OBJC_DEBUG_EXTERN_GLOBAL
+MULLE_OBJC_DEBUG_GLOBAL
 void   mulle_objc_universe_csvdump_cachesizes_to_filename( struct _mulle_objc_universe *universe,
                                                            char *filename);
 
