@@ -21,8 +21,14 @@
 
 #include "_mulle-objc-debug-include.h"
 
-#ifndef MULLE_OBJC_DEBUG_EXTERN_GLOBAL
-# define MULLE_OBJC_DEBUG_EXTERN_GLOBAL MULLE_C_EXTERN_GLOBAL
+#ifdef MULLE_OBJC_DEBUG_BUILD
+# define MULLE_OBJC_DEBUG_GLOBAL    MULLE_C_GLOBAL
+#else
+# if defined( MULLE_OBJC_DEBUG_INCLUDE_DYNAMIC) || (defined( MULLE_INCLUDE_DYNAMIC) && ! defined( MULLE_OBJC_DEBUG_INCLUDE_STATIC))
+#  define MULLE_OBJC_DEBUG_GLOBAL   MULLE_C_EXTERN_GLOBAL
+# else
+#  define MULLE_OBJC_DEBUG_GLOBAL   extern
+# endif
 #endif
 
 

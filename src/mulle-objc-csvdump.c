@@ -129,7 +129,7 @@ void
       if( methodid == MULLE_OBJC_NO_METHODID)
          continue;
 
-      _mulle_objc_searcharguments_defaultinit( &search, methodid);
+      _mulle_objc_searcharguments_init_default( &search, methodid);
       method = mulle_objc_class_search_method( cls,
                                                &search,
                                                _mulle_objc_class_get_inheritance( cls),

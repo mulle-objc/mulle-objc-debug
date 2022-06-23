@@ -45,27 +45,27 @@ struct _mulle_objc_class;
 
 #pragma mark - preferred ABI
 
-MULLE_OBJC_DEBUG_EXTERN_GLOBAL
+MULLE_OBJC_DEBUG_GLOBAL
 void   mulle_objc_universe_dotdump_to_directory( struct _mulle_objc_universe *universe,
                                                  char *directory);
-MULLE_OBJC_DEBUG_EXTERN_GLOBAL
+MULLE_OBJC_DEBUG_GLOBAL
 void   mulle_objc_class_dotdump_to_directory( struct _mulle_objc_class *cls,
                                               char *directory);
 
-MULLE_OBJC_DEBUG_EXTERN_GLOBAL
+MULLE_OBJC_DEBUG_GLOBAL
 void   mulle_objc_class_dotdump_to_directory( struct _mulle_objc_class *cls,
                                               char *directory);
 
-MULLE_OBJC_DEBUG_EXTERN_GLOBAL
+MULLE_OBJC_DEBUG_GLOBAL
 void   mulle_objc_classhierarchy_dotdump_to_stream( struct _mulle_objc_class *cls,
                                                     FILE *fp);
-MULLE_OBJC_DEBUG_EXTERN_GLOBAL
+MULLE_OBJC_DEBUG_GLOBAL
 void   mulle_objc_classhierarchy_dotdump_to_file( struct _mulle_objc_class *cls,
                                                   char *filename);
 
 #pragma mark - "movie" support
 
-MULLE_OBJC_DEBUG_EXTERN_GLOBAL
+MULLE_OBJC_DEBUG_GLOBAL
 void   mulle_objc_universe_dotdump_frame_to_directory( struct _mulle_objc_universe *universe,
                                                        char *directory);
 
