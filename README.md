@@ -9,7 +9,7 @@ and debugging support.
 
 | Release Version
 |-----------------------------------
- ![Mulle kybernetiK tag](//img.shields.io/github/tag/mulle-objc/mulle-objc-debug.svg) [![Build Status](//github.com/mulle-objc/mulle-objc-debug/workflows/CI/badge.svg?branch=release)](//github.com/mulle-objc/mulle-objc-debug/actions)
+ ![Mulle kybernetiK tag](https://img.shields.io/github/tag/mulle-objc/mulle-objc-debug.svg) [![Build Status](https://github.com/mulle-objc/mulle-objc-debug/workflows/CI/badge.svg?branch=release)](//github.com/mulle-objc/mulle-objc-debug/actions)
 
 
 ## Required Libraries and Tools
@@ -17,8 +17,8 @@ and debugging support.
 
   Name         | Release Version
 ---------------|---------------------------------
-[mulle-objc-runtime](//github.com/mulle-objc/mulle-objc-runtime) | ![Mulle kybernetiK tag](//img.shields.io/github/tag/mulle-objc/objc-runtime.svg) [![Build Status](//github.com/mulle-objc/mulle-objc-runtime/workflows.svg?branch=release)](//github.com/mulle-objc/mulle-objc-runtime/actions)
-[mulle-fprintf](//github.com/mulle-core/mulle-fprintf) | ![Mulle kybernetiK tag](//img.shields.io/github/tag/mulle-core/mulle-fprintf.svg) [![Build Status](//github.com/mulle-core/mulle-fprintf/workflows/CI/badge.svg?branch=release)](//github.com/mulle-core/mulle-fprintf/actions)
+[mulle-objc-runtime](//github.com/mulle-objc/mulle-objc-runtime) | ![Mulle kybernetiK tag](https://img.shields.io/github/tag/mulle-objc/objc-runtime.svg) [![Build Status](https://github.com/mulle-objc/mulle-objc-runtime/workflows.svg?branch=release)](//github.com/mulle-objc/mulle-objc-runtime/actions)
+[mulle-fprintf](//github.com/mulle-core/mulle-fprintf) | ![Mulle kybernetiK tag](https://img.shields.io/github/tag/mulle-core/mulle-fprintf.svg) [![Build Status](https://github.com/mulle-core/mulle-fprintf/workflows/CI/badge.svg?branch=release)](//github.com/mulle-core/mulle-fprintf/actions)
 
 
 ### Platforms and Compilers
@@ -35,7 +35,7 @@ All platforms and compilers supported by
 
 Use [mulle-sde](//github.com/mulle-sde) to add mulle-objc-debug to your project:
 
-```
+``` sh
 mulle-sde dependency add --github mulle-objc mulle-objc-debug
 ```
 
@@ -52,9 +52,9 @@ the preferred way to installation mulle-objc-debug.
 
 Use [mulle-sde](//github.com/mulle-sde) to build and install mulle-objc-debug and all dependencies:
 
-```
+``` sh
 mulle-sde install --prefix /usr/local \
-   //github.com/mulle-objc/mulle-objc-debug/archive/latest.tar.gz
+   https://github.com/mulle-objc/mulle-objc-debug/archive/latest.tar.gz
 ```
 
 ## Author
