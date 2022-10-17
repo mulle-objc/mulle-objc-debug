@@ -16,13 +16,13 @@
 
 // You can tweak the following #include with these commands.
 // (Use 816D910C-5462-4079-83F7-6E3223DFF075 instead of mulle-fprintf if there are duplicate entries)
-//    remove:             `mulle-sde dependency mark mulle-fprintf no-header`
-//    rename:             `mulle-sde dependency|library set mulle-fprintf include whatever.h`
-//    reorder:            `mulle-sde dependency move mulle-fprintf <up|down>`
+//    remove #include:: `mulle-sde dependency mark mulle-fprintf no-header`
+//    rename:              `mulle-sde dependency|library set mulle-fprintf include whatever.h`
+//    reorder:             `mulle-sde dependency move mulle-fprintf <up|down>`
 //    toggle #include:    `mulle-sde dependency mark mulle-fprintf [no-]import`
-//    toggle public:      `mulle-sde dependency mark mulle-fprintf [no-]public`
-//    toggle optional:    `mulle-sde dependency mark mulle-fprintf [no-]require`
-//    remove for platform:`mulle-sde dependency mark mulle-fprintf no-platform-<uname>`
+//    toggle public:       `mulle-sde dependency mark mulle-fprintf [no-]public`
+//    toggle optional:     `mulle-sde dependency mark mulle-fprintf [no-]require`
+//    remove for platform: `mulle-sde dependency mark mulle-fprintf no-platform-<uname>`
 //        (use `mulle-sourcetree-to-c --unames` to list known values)
 #include <mulle-fprintf/mulle-fprintf.h>   // mulle-fprintf
 

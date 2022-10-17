@@ -426,7 +426,6 @@ static void   _print_infraclass( struct _mulle_objc_infraclass *infra, FILE *fp)
    struct _mulle_objc_propertylist                  *propertylist;
    struct _mulle_objc_htmltablestyle                style;
    struct _mulle_objc_uniqueidarray                 *array;
-   mulle_objc_categoryid_t                          categoryid;
 
    cls      = _mulle_objc_infraclass_as_class( infra);
    universe = _mulle_objc_infraclass_get_universe( infra);
@@ -460,7 +459,7 @@ static void   _print_infraclass( struct _mulle_objc_infraclass *infra, FILE *fp)
    {
       pair = _mulle_objc_infraclass_get_classpair( infra);
       if( ! (_mulle_objc_infraclass_get_inheritance( infra) & MULLE_OBJC_CLASS_DONT_INHERIT_PROTOCOLS) &&
-         mulle_concurrent_pointerarray_get_count( &pair->protocolclasses))
+          mulle_concurrent_pointerarray_get_count( &pair->protocolclasses))
       {
          print_to_body( "Inherited Protocol Classes", NULL, fp);
          fprintf( fp, "<OL>\n");

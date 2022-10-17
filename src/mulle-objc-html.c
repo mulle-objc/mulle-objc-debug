@@ -53,13 +53,11 @@ static char   *html_escape( char *s)
    return( "bad-html");
 }
 
+
 static int   qsort_strcmp( const void * s1, const void * s2)
 {
     return( strcmp( *(char **) s1, *(char **) s2));
 }
-
-
-
 
 
 //
@@ -784,7 +782,14 @@ char   *mulle_objc_cache_describe_html( struct _mulle_objc_cache *cache,
    unsigned int            n;
    int                     index;
    mulle_objc_methodid_t   sel;
+   int                     colspan;
+   char                    *s;
 
+#ifdef MULLE_OBJC_CACHEENTRY_REMEMBERS_THREAD
+   colspan = 5;
+#else
+   colspan = 4;
+#endif
    n   = cache->size + 3 + 2;
    tmp = mulle_calloc( n, sizeof( char *));
 
@@ -794,17 +799,19 @@ char   *mulle_objc_cache_describe_html( struct _mulle_objc_cache *cache,
    ++i;
 
    mulle_asprintf( &tmp[ i],
-            "<TR><TD>n</TD><TD COLSPAN=\"4\">%lu</TD></TR>\n",
+            "<TR><TD>n</TD><TD COLSPAN=\"%d\">%lu</TD></TR>\n",
+            colspan,
             (long) _mulle_atomic_pointer_nonatomic_read( &cache->n));
    len += strlen( tmp[ i]);
    ++i;
    mulle_asprintf( &tmp[ i],
-            "<TR><TD>mask</TD><TD COLSPAN=\"4\">0x%lx</TD></TR>\n",
+            "<TR><TD>mask</TD><TD COLSPAN=\"%d\">0x%lx</TD></TR>\n",
+             colspan,
              (long) cache->mask);
    len += strlen( tmp[ i]);
    ++i;
 
-
+   s = "";
    for( j = 0; j < cache->size; j++)
    {
       index = 0;
@@ -812,16 +819,22 @@ char   *mulle_objc_cache_describe_html( struct _mulle_objc_cache *cache,
       if( sel)
          index = _mulle_objc_cache_find_entryindex( cache, sel);
 
+#ifdef MULLE_OBJC_CACHEENTRY_REMEMBERS_THREAD
+      mulle_asprintf( &s, "<TD>%p</TD>", cache->entries[ j].thread);
+#endif
       mulle_asprintf( &tmp[ i],
                       "<TR><TD>#%ld</TD><TD>%08x</TD><TD>%s</TD>"
-                      "<TD>%p</TD><TD>%d (%x)</TD></TR>\n",
+                      "<TD>%p</TD><TD>%d (%x)</TD>%s</TR>\n",
                       j,
                       sel,
                       _mulle_objc_universe_describe_methodid( universe, sel),
                       cache->entries[ j].value.functionpointer,
                       index,
-                      sel & cache->mask);
-
+                      sel & cache->mask,
+                      s);
+#ifdef MULLE_OBJC_CACHEENTRY_REMEMBERS_THREAD
+      mulle_free( s);
+#endif
       len += strlen( tmp[ i]);
       ++i;
    }
@@ -1080,8 +1093,8 @@ char   *mulle_objc_categories_describe_html( struct _mulle_objc_uniqueidarray *a
 
 char   *mulle_objc_fastclasstable_describe_html( struct _mulle_objc_fastclasstable *fastclasstable,
                                                  char *(row_description)( unsigned int i,
-                                                    struct _mulle_objc_infraclass *,
-                                                    struct _mulle_objc_htmltablestyle *),
+                                                                          struct _mulle_objc_infraclass *,
+                                                                          struct _mulle_objc_htmltablestyle *),
                                                  struct _mulle_objc_htmltablestyle *styling)
 
 {

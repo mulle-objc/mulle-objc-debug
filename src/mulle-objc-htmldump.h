@@ -48,7 +48,7 @@ void   mulle_objc_classpair_htmldump_to_directory( struct _mulle_objc_classpair 
 
 MULLE_OBJC_DEBUG_GLOBAL
 void   mulle_objc_universe_htmldump_to_directory( struct _mulle_objc_universe *universe,
-                                                 char *directory);
+                                                  char *directory);
 
 MULLE_OBJC_DEBUG_GLOBAL
 void   mulle_objc_class_htmldump_to_directory( struct _mulle_objc_class *cls,

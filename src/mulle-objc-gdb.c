@@ -77,7 +77,6 @@ mulle_objc_implementation_t
 
 {
    struct _mulle_objc_class        *cls;
-   struct _mulle_objc_infraclass   *super;
    mulle_objc_implementation_t     imp;
    mulle_objc_superid_t            superid;
    int                             preserve;

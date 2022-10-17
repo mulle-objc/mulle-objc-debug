@@ -45,16 +45,6 @@
 #endif
 
 
-
-static char   *html_escape( char *s)
-{
-   if( ! strchr( s, '&') && ! strchr( s, '<'))
-      return( s);
-
-   return( "bad-html");
-}
-
-
 static void
   mulle_objc_searchresult_csvdump_to_fp( struct _mulle_objc_searchresult  *result,
                                          FILE *fp)
