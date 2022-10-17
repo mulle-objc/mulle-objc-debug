@@ -604,7 +604,6 @@ static void   print_class( struct _mulle_objc_class *cls,
                            int is_meta)
 {
    char                                *label;
-   struct _mulle_objc_classpair        *pair;
    struct _mulle_objc_htmltablestyle   style;
 
    style       = is_meta ? metaclass_style : infraclass_style;
@@ -948,18 +947,18 @@ static void   mulle_objc_class_dotdump_to_file( struct _mulle_objc_class *cls,
 }
 
 
-static void   _mulle_objc_class_dotdump_to_directory( struct _mulle_objc_class *cls,
-                                                      char *directory)
-{
-   char   *path;
-
-   if( ! cls)
-      return;
-
-   path = dot_filename_for_name( _mulle_objc_class_get_name( cls), directory);
-   mulle_objc_class_dotdump_to_file( cls, directory, path);
-   mulle_free( path);
-}
+//static void   _mulle_objc_class_dotdump_to_directory( struct _mulle_objc_class *cls,
+//                                                      char *directory)
+//{
+//   char   *path;
+//
+//   if( ! cls)
+//      return;
+//
+//   path = dot_filename_for_name( _mulle_objc_class_get_name( cls), directory);
+//   mulle_objc_class_dotdump_to_file( cls, directory, path);
+//   mulle_free( path);
+//}
 
 
 

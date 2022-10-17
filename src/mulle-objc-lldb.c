@@ -47,7 +47,6 @@ struct mulle_objc_lldb_lookup_implementation_args
 };
 
 
-#pragma clang diagnostic ignored  "-Wmultichar"
 
 # pragma mark - lldb support
 
@@ -61,7 +60,6 @@ mulle_objc_implementation_t
                                           struct mulle_objc_lldb_lookup_implementation_args *args)
 {
    struct _mulle_objc_class        *cls;
-   struct _mulle_objc_infraclass   *super;
    mulle_objc_implementation_t     imp;
    mulle_objc_superid_t            superid;
    int                             preserve;
@@ -169,6 +167,7 @@ void   mulle_objc_lldb_check_object( void *obj, mulle_objc_methodid_t methodid)
 {
    struct _mulle_objc_class  *cls;
    int                        preserve;
+   size_t                     len;
 
    // fprintf( stderr, "check %p %08x %p (%d)\n", obj, methodid);
 
@@ -177,9 +176,8 @@ void   mulle_objc_lldb_check_object( void *obj, mulle_objc_methodid_t methodid)
 
    preserve = errno;
    cls      = _mulle_objc_object_get_isa( obj);
-   strlen( cls->name);    // try to crash here
-
-   if( ! _mulle_objc_class_lookup_implementation_noforward( cls, methodid))
+   len      = strlen( cls->name);    // try to crash here avoid compiler optimizer
+   if( len == (size_t) -1 || ! _mulle_objc_class_lookup_implementation_noforward( cls, methodid))
       *((volatile int *) 0) = '1848'; // force crash
 
    errno    = preserve;
@@ -258,7 +256,6 @@ void   *mulle_objc_lldb_create_staticstring( void *cfalloc,
 
    struct _mulle_objc_universe    *universe;
    struct _mulle_objc_infraclass  *infra;
-   size_t                         size;
    struct { void  *bytes; intptr_t len; }  *obj;
    void                           *extra;
    int                            preserve;
