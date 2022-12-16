@@ -1,0 +1,29 @@
+{
+   "name" : "mulle-objc-debug",
+   "version" : "0.20.2",
+   "description" : "🐞 Debug support for the mulle-objc-runtime",
+   "homepage" : "https://github.com/mulle-objc/mulle-objc-debug",
+   "bugs" : "https://github.com/mulle-objc/mulle-objc-debug/issues",
+   "keywords" : [],
+   "license" : "BSD-3-Clause",
+   "repository" : {
+      "type" : "git",
+      "url" : "mulle-objc/mulle-objc-debug"
+   },
+   "dependencies" : {
+      "mulle-objc-runtime" : "git://github.com/mulle-objc/mulle-objc-runtime",
+      "mulle-concurrent" : "git://github.com/mulle-concurrent/mulle-concurrent",
+      "mulle-aba" : "git://github.com/mulle-concurrent/mulle-aba",
+      "mulle-allocator" : "git://github.com/mulle-c/mulle-allocator",
+      "mulle-c11" : "git://github.com/mulle-c/mulle-c11",
+      "mulle-thread" : "git://github.com/mulle-concurrent/mulle-thread",
+      "mintomic" : "git://github.com/mulle-concurrent/mintomic",
+      "mulle-vararg" : "git://github.com/mulle-c/mulle-vararg",
+      "mulle-data" : "git://github.com/mulle-c/mulle-data",
+      "farmhash-c" : "git://github.com/mulle-c/farmhash-c",
+      "mulle-fprintf" : "git://github.com/mulle-core/mulle-fprintf",
+      "mulle-sprintf" : "git://github.com/mulle-core/mulle-sprintf",
+      "mulle-buffer" : "git://github.com/mulle-c/mulle-buffer",
+      "mulle-utf" : "git://github.com/mulle-c/mulle-utf"
+   }
+}
