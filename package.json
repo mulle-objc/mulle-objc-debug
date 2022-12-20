@@ -8,7 +8,7 @@
    "license" : "BSD-3-Clause",
    "repository" : {
       "type" : "git",
-      "url" : "mulle-objc/mulle-objc-debug"
+      "url" : "github:mulle-objc/mulle-objc-debug"
    },
    "dependencies" : {
       "mulle-objc-runtime" : "git://github.com/mulle-objc/mulle-objc-runtime",
