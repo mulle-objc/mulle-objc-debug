@@ -30,7 +30,6 @@ src/reflect/_mulle-objc-debug-include-private.h
 set( PUBLIC_HEADERS
 src/c-set.inc
 src/generic/include.h
-src/mulle-objc-csvdump.h
 src/mulle-objc-debug.h
 src/mulle-objc-dotdump.h
 src/mulle-objc-htmldump.h

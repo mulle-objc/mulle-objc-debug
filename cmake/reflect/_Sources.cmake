@@ -11,7 +11,6 @@ endif()
 # contents selected with patternfile ??-source--sources
 #
 set( SOURCES
-src/mulle-objc-csvdump.c
 src/mulle-objc-dotdump.c
 src/mulle-objc-gdb.c
 src/mulle-objc-html.c

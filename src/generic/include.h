@@ -21,6 +21,8 @@
 
 #include "_mulle-objc-debug-include.h"
 
+#include <mulle-c11/mulle-c11.h>
+
 #ifdef MULLE_OBJC_DEBUG_BUILD
 # define MULLE_OBJC_DEBUG_GLOBAL    MULLE_C_GLOBAL
 #else
