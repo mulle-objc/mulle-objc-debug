@@ -1,0 +1,3 @@
+Dump runtime classes as HTML or Graphviz dot files. There is also CSV
+export functionality. This library is used by MulleObjC to provide debugger
+and debugging support.

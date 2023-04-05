@@ -306,7 +306,7 @@ static void   _print_universe( struct _mulle_objc_universe *universe, FILE *fp)
             {
                cls = _mulle_atomic_pointer_nonatomic_read( &universe->fastclasstable.classes[ i].pointer);
                label = mulle_objc_class_describe_html_short( cls, &classtable_style);
-               fprintf( fp, "<TR><TH>%u</TH><TD>%s</TD></TR>\n", i, label);
+               fprintf( fp, "<TR><TH>%d</TH><TD>%s</TD></TR>\n", i, label);
                mulle_free( label);
             }
          fprintf( fp, "</TABLE>\n");

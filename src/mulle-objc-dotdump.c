@@ -561,7 +561,7 @@ static void   print_methodlists( struct _mulle_objc_class *cls,
    {
       if( methodlist->n_methods)
       {
-         fprintf( info->fp, "\"%p\" -> \"%p\"  [ label=\"methodlist #%d\" ];\n",
+         fprintf( info->fp, "\"%p\" -> \"%p\"  [ label=\"methodlist #%u\" ];\n",
                   cls, methodlist, i++);
 
          label = mulle_objc_methodlist_describe_html( methodlist,
@@ -751,7 +751,7 @@ static void   print_infraclass( struct _mulle_objc_infraclass *infra,
       {
          if( ivarlist->n_ivars)
          {
-            fprintf( info->fp, "\"%p\" -> \"%p\"  [ label=\"ivarlist #%d\" ];\n",
+            fprintf( info->fp, "\"%p\" -> \"%p\"  [ label=\"ivarlist #%u\" ];\n",
                     infra, ivarlist, i++);
 
             label = mulle_objc_ivarlist_describe_html( ivarlist, &ivarlist_style);
@@ -770,7 +770,7 @@ static void   print_infraclass( struct _mulle_objc_infraclass *infra,
       {
          if( propertylist->n_properties)
          {
-            fprintf( info->fp, "\"%p\" -> \"%p\"  [ label=\"propertylist #%d\" ];\n",
+            fprintf( info->fp, "\"%p\" -> \"%p\"  [ label=\"propertylist #%u\" ];\n",
                     infra, propertylist, i++);
 
             label = mulle_objc_propertylist_describe_html( propertylist, &propertylist_style);

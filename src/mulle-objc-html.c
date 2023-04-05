@@ -1159,7 +1159,6 @@ char   *mulle_concurrent_pointerarray_describe_html( struct mulle_concurrent_poi
    unsigned int                                     i;
    unsigned int                                     n;
    void                                             *value;
-   char                                             *null_description;
 
    count = mulle_concurrent_pointerarray_get_count( list);
 
@@ -1178,13 +1177,9 @@ char   *mulle_concurrent_pointerarray_describe_html( struct mulle_concurrent_poi
       ++i;
    }
 
-   null_description = "*null*";
-
    rover = mulle_concurrent_pointerarray_enumerate( list);
    while( value = _mulle_concurrent_pointerarrayenumerator_next( &rover))
    {
-      if( ! value)
-         value = null_description;
       tmp[ i] = (*row_description)( value, styling);
       len    += strlen( tmp[ i]);
       ++i;
