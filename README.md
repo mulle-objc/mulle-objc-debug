@@ -6,60 +6,68 @@ Dump runtime classes as HTML or Graphviz dot files. There is also CSV
 export functionality. This library is used by MulleObjC to provide debugger
 and debugging support.
 
-
-| Release Version
-|-----------------------------------
- ![Mulle kybernetiK tag](https://img.shields.io/github/tag/mulle-objc/mulle-objc-debug.svg) [![Build Status](https://github.com/mulle-objc/mulle-objc-debug/workflows/CI/badge.svg?branch=release)](//github.com/mulle-objc/mulle-objc-debug/actions)
-
-
-## Required Libraries and Tools
+| Release Version                                       | Release Notes
+|-------------------------------------------------------|--------------
+| ![Mulle kybernetiK tag](https://img.shields.io/github/tag//mulle-objc-debug.svg?branch=release) [![Build Status](https://github.com//mulle-objc-debug/workflows/CI/badge.svg?branch=release)](//github.com//mulle-objc-debug/actions)| [RELEASENOTES](RELEASENOTES.md) |
 
 
-  Name         | Release Version
----------------|---------------------------------
-[mulle-objc-runtime](//github.com/mulle-objc/mulle-objc-runtime) | ![Mulle kybernetiK tag](https://img.shields.io/github/tag/mulle-objc/objc-runtime.svg) [![Build Status](https://github.com/mulle-objc/mulle-objc-runtime/workflows.svg?branch=release)](//github.com/mulle-objc/mulle-objc-runtime/actions)
-[mulle-fprintf](//github.com/mulle-core/mulle-fprintf) | ![Mulle kybernetiK tag](https://img.shields.io/github/tag/mulle-core/mulle-fprintf.svg) [![Build Status](https://github.com/mulle-core/mulle-fprintf/workflows/CI/badge.svg?branch=release)](//github.com/mulle-core/mulle-fprintf/actions)
 
 
-### Platforms and Compilers
 
-All platforms and compilers supported by
-[mulle-c11](//github.com/mulle-c/mulle-c11/) and
-[mulle-thread](//github.com/mulle-concurrent/mulle-thread/).
+## Requirements
 
-### You are here
+|   Requirement         | Release Version  | Description
+|-----------------------|------------------|---------------
+| [mulle-objc-runtime](https://github.com/mulle-objc/mulle-objc-runtime) | ![Mulle kybernetiK tag](https://img.shields.io/github/tag//.svg) [![Build Status](https://github.com///workflows/CI/badge.svg?branch=release)](https://github.com///actions/workflows/mulle-sde-ci.yml) | ⏩ A fast, portable Objective-C runtime written 100% in C11
+| [mulle-fprintf](https://github.com/mulle-core/mulle-fprintf) | ![Mulle kybernetiK tag](https://img.shields.io/github/tag//.svg) [![Build Status](https://github.com///workflows/CI/badge.svg?branch=release)](https://github.com///actions/workflows/mulle-sde-ci.yml) | 🔢 mulle-fprintf marries mulle-sprintf to stdio.h
 
-![Overview](overview.dot.svg)
 
 ## Add
 
 Use [mulle-sde](//github.com/mulle-sde) to add mulle-objc-debug to your project:
 
 ``` sh
-mulle-sde dependency add --github mulle-objc mulle-objc-debug
+mulle-sde add github:/
 ```
 
-Executables will need to link with [mulle-objc-runtime-startup](//github.com/mulle-objc/mulle-objc-runtime-startup) as well.
+To only add the sources of mulle-objc-debug with dependency
+sources use [clib](https://github.com/clibs/clib):
+
+
+``` sh
+clib install --out src/ /
+```
+
+Add `-isystem src/` to your `CFLAGS` and compile all the sources that were downloaded with your project.
 
 
 ## Install
 
-See [mulle-objc-developer](//github.com/mulle-objc/mulle-objc-developer) for
-the preferred way to installation mulle-objc-debug.
-
-
-### mulle-sde
+### Install with mulle-sde
 
 Use [mulle-sde](//github.com/mulle-sde) to build and install mulle-objc-debug and all dependencies:
 
 ``` sh
 mulle-sde install --prefix /usr/local \
-   https://github.com/mulle-objc/mulle-objc-debug/archive/latest.tar.gz
+   https://github.com///archive/latest.tar.gz
+```
+
+### Manual Installation
+
+Install the [Requirements](#Requirements) and then
+install **mulle-objc-debug** with [cmake](https://cmake.org):
+
+``` sh
+cmake -B build \
+      -DCMAKE_INSTALL_PREFIX=/usr/local \
+      -DCMAKE_PREFIX_PATH=/usr/local \
+      -DCMAKE_BUILD_TYPE=Release &&
+cmake --build build --config Release &&
+cmake --install build --config Release
 ```
 
 ## Author
 
-[Nat!](//www.mulle-kybernetik.com/weblog) for
-[Mulle kybernetiK](//www.mulle-kybernetik.com) and
-[Codeon GmbH](//www.codeon.de)
+[Nat!](https://mulle-kybernetik.com/weblog) for Mulle kybernetiK
+
 
