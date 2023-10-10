@@ -170,7 +170,7 @@ static char   *html_escape( char *s)
 }
 
 
-static char   *html_filename_for_name( char *name, char *directory)
+static char   *filename_for_name_ext( char *name, char *ext, char *directory)
 {
    char     *buf;
    size_t   len;
@@ -182,10 +182,19 @@ static char   *html_filename_for_name( char *name, char *directory)
     separator = '/';
 #endif
 
-   len = strlen( name) + strlen( directory) + 16;
+   len = strlen( directory) + 1 + strlen( name) + strlen( ext) + 1;
    buf = mulle_malloc( len);
-   sprintf( buf, "%s%c%s.html", directory, separator, html_escape( name));
+   sprintf( buf, "%s%c%s%s", directory, separator, name, ext);
    return( buf);
+}
+
+
+static char   *html_filename_for_name( char *name, char *directory)
+{
+   char   *escaped;
+
+   escaped = html_escape( name);
+   return( filename_for_name_ext( escaped, ".html", directory));
 }
 
 
@@ -194,14 +203,40 @@ static char   *filename_for_universe( struct _mulle_objc_universe  *universe,
 {
    char     *buf;
    size_t   len;
+   char     separator;
 
+#ifdef _WIN32
+    separator = '\\';
+#else
+    separator = '/';
+#endif
    assert( directory);
 
-   len = strlen( directory) + 16;
+   len = strlen( directory) + 12;
    buf = mulle_malloc( len);
-   sprintf( buf, "%s/index.html", directory);
+   sprintf( buf, "%s%cindex.html", directory, separator);
    return( buf);
 }
+
+
+static void   write_css_if_needed( char *directory)
+{
+   FILE   *fp;
+   char   *filename;
+   static char   css[] = ""
+#include "mulle-objc.css.inc"
+;
+
+   if( getenv( "MULLE_OBJC_CSS_URL"))
+      return;
+
+   filename = filename_for_name_ext( "mulle-objc", ".css", directory);
+   fp       = fopen( filename, "w");
+   fwrite( css, sizeof( css) - 1, 1, fp);
+   fclose( fp);
+   mulle_free( filename);
+}
+
 
 
 static FILE  *open_and_print_start( char *name, char *title)
@@ -539,6 +574,7 @@ static void   _print_infraclass( struct _mulle_objc_infraclass *infra, FILE *fp)
          {
             style       = methodlisttable_style;
             style.title = _mulle_objc_methodlist_get_categoryname( methodlist);
+            style.title = style.title ? style.title : "class";
             label       = mulle_objc_methodlist_describe_hor_html( methodlist, &style);
             fprintf( fp, "%s\n", label);
             mulle_free( label);
@@ -559,6 +595,7 @@ static void   _print_infraclass( struct _mulle_objc_infraclass *infra, FILE *fp)
          {
             style       = methodlisttable_style;
             style.title = _mulle_objc_methodlist_get_categoryname( methodlist);
+            style.title = style.title ? style.title : "class";
             label       = mulle_objc_methodlist_describe_hor_html( methodlist, &style);
             fprintf( fp, "%s\n", label);
             mulle_free( label);
@@ -700,6 +737,7 @@ void
       fprintf( stderr, "Dumped HTML to \"%s\"\n", directory);
 
    c_set_done( &info.set);
+   write_css_if_needed( directory);
 }
 
 
@@ -739,6 +777,7 @@ void   mulle_objc_class_htmldump_to_directory( struct _mulle_objc_class *cls,
    }
    while( cls = _mulle_objc_class_get_superclass( cls));
 
+   write_css_if_needed( directory);
    fprintf( stderr, "Dumped HTML to \"/%s\"\n", directory);
 }
 
