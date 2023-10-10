@@ -566,15 +566,15 @@ char   *mulle_objc_descriptor_describe_html( struct _mulle_objc_descriptor *desc
                "</TABLE>";
 
    mulle_asprintf( &tmp[ 1],
-            format,
-            th, th,
-            html_escape( desc->name),
-            th, th,
-            html_escape( desc->signature),
-            th, th,
-            desc->methodid,
-            th, th,
-            desc->bits);
+                   format,
+                   th, th,
+                   html_escape( desc->name),
+                   th, th,
+                   html_escape( desc->signature),
+                   th, th,
+                   desc->methodid,
+                   th, th,
+                   desc->bits);
 
    return( final_concat_auto_tmp( tmp, 2));
 }
@@ -621,12 +621,12 @@ char   *mulle_objc_descriptor_describe_row_html( intptr_t  methodid,
                "<TD>%s</TD>"
                "</TR>\n";
    else
-      format =  "<TR>"
-                "<TD>%s</TD>"
-                "<TD>%s</TD>"
-                "<TD>%08x</TD>"
-                "<TD>0x%x</TD>"
-                "</TR>\n";
+      format = "<TR>"
+               "<TD>%s</TD>"
+               "<TD>%s</TD>"
+               "<TD>%08x</TD>"
+               "<TD>0x%x</TD>"
+               "</TR>\n";
 
    mulle_asprintf( &s,
              format,
@@ -794,20 +794,20 @@ char   *mulle_objc_cache_describe_html( struct _mulle_objc_cache *cache,
    tmp = mulle_calloc( n, sizeof( char *));
 
    i = 0;
-   asprintf_table_header_colspan( &tmp[ i], styling, 5);
+   asprintf_table_header_colspan( &tmp[ i], styling, colspan);
    len = strlen( tmp[ i]);
    ++i;
 
    mulle_asprintf( &tmp[ i],
-            "<TR><TD>n</TD><TD COLSPAN=\"%d\">%lu</TD></TR>\n",
-            colspan,
-            (long) _mulle_atomic_pointer_nonatomic_read( &cache->n));
+                   "<TR><TD>n</TD><TD COLSPAN=\"%d\">%lu</TD></TR>\n",
+                   colspan,
+                   (long) _mulle_atomic_pointer_nonatomic_read( &cache->n));
    len += strlen( tmp[ i]);
    ++i;
    mulle_asprintf( &tmp[ i],
-            "<TR><TD>mask</TD><TD COLSPAN=\"%d\">0x%lx</TD></TR>\n",
-             colspan,
-             (long) cache->mask);
+                   "<TR><TD>mask</TD><TD COLSPAN=\"%d\">0x%lx</TD></TR>\n",
+                   colspan,
+                   (long) cache->mask);
    len += strlen( tmp[ i]);
    ++i;
 
@@ -822,16 +822,15 @@ char   *mulle_objc_cache_describe_html( struct _mulle_objc_cache *cache,
 #ifdef MULLE_OBJC_CACHEENTRY_REMEMBERS_THREAD
       mulle_asprintf( &s, "<TD>%p</TD>", cache->entries[ j].thread);
 #endif
-      mulle_asprintf( &tmp[ i],
-                      "<TR><TD>#%ld</TD><TD>%08x</TD><TD>%s</TD>"
-                      "<TD>%p</TD><TD>%d (%x)</TD>%s</TR>\n",
-                      j,
-                      sel,
-                      _mulle_objc_universe_describe_methodid( universe, sel),
-                      cache->entries[ j].value.functionpointer,
-                      index,
-                      sel & cache->mask,
-                      s);
+      mulle_asprintf( &tmp[ i], "<TR><TD>#%ld</TD><TD>%08x</TD><TD>%s</TD>"
+                                "<TD>%p</TD><TD>%d (%x)</TD>%s</TR>\n",
+                                j,
+                                sel,
+                                _mulle_objc_universe_describe_methodid( universe, sel),
+                                cache->entries[ j].value.functionpointer,
+                                index,
+                                sel & cache->mask,
+                                s);
 #ifdef MULLE_OBJC_CACHEENTRY_REMEMBERS_THREAD
       mulle_free( s);
 #endif
@@ -957,11 +956,11 @@ char   *mulle_objc_methodlist_describe_hor_html( struct _mulle_objc_methodlist *
          if( styling->classprefix)
             format = "<TR>"
                         "<TH>name</TH>"
-                      "</TR>\n";
+                     "</TR>\n";
          else
-            format =  "<TR>"
+            format = "<TR>"
                         "<TD>name</TD>"
-                      "</TR>\n";
+                     "</TR>\n";
       }
       else
       {
@@ -972,7 +971,7 @@ char   *mulle_objc_methodlist_describe_hor_html( struct _mulle_objc_methodlist *
                         "<TH>methodid</TH>"
                         "<TH>bits</TH>"
                         "<TH>implementation</TH>"
-                      "</TR>\n";
+                     "</TR>\n";
          else
             format =  "<TR>"
                         "<TD>name</TD>"
@@ -1009,12 +1008,12 @@ char   *mulle_objc_methodlist_describe_hor_html( struct _mulle_objc_methodlist *
          _mulle_atomic_functionpointer_nonatomic_read( &list->methods[ j].implementation));
 
       mulle_asprintf( &tmp[ i],
-               format,
-               html_escape( list->methods[ j].descriptor.name),
-               html_escape( list->methods[ j].descriptor.signature),
-               list->methods[ j].descriptor.methodid,
-               list->methods[ j].descriptor.bits,
-               buf);
+                      format,
+                      html_escape( list->methods[ j].descriptor.name),
+                      html_escape( list->methods[ j].descriptor.signature),
+                      list->methods[ j].descriptor.methodid,
+                      list->methods[ j].descriptor.bits,
+                      buf);
       len += strlen( tmp[ i]);
       ++i;
    }
@@ -1055,9 +1054,9 @@ char   *mulle_objc_loadcategory_describe_row_html( void *value,
    char   *s;
 
    mulle_asprintf( &s, "<TR><TD>%s( %s)</TD><TD>%08x</TD></TR>\n",
-            loadcat->classname,
-            loadcat->categoryname,
-            loadcat->categoryid);
+                       loadcat->classname,
+                       loadcat->categoryname,
+                       loadcat->categoryid);
    return( s);
 }
 
