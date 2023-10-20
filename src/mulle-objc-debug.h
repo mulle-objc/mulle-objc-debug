@@ -39,7 +39,7 @@
 
 #include "include.h"
 
-#define MULLE_OBJC_DEBUG_VERSION  ((0 << 20) | (21 << 8) | 0)
+#define MULLE_OBJC_DEBUG_VERSION  ((0 << 20) | (22 << 8) | 0)
 
 
 #include "mulle-objc-dotdump.h"
