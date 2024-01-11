@@ -103,8 +103,8 @@ static char  *categoryid_describe_row_html( void *value,
    s          = _mulle_objc_universe_describe_categoryid( universe,
                                                            categoryid);
 
-   mulle_asprintf( &result, "<TR><TD>\"%s\"</TD><TD>%08x</TD></TR>\n",
-         s, categoryid);
+   mulle_asprintf( &result, "<TR><TD>\"%s\"</TD><TD>%08lx</TD></TR>\n",
+         s, (unsigned long) categoryid);
    return( result);
 }
 
@@ -120,8 +120,8 @@ static char  *protocolid_describe_row_html( void *value,
    protocolid = (mulle_objc_protocolid_t) (intptr_t) value;
    s          = _mulle_objc_universe_describe_protocolid( universe, protocolid);
 
-   mulle_asprintf( &result, "<TR><TD>\"%s\"</TD><TD>%08x</TD></TR>\n",
-         s, protocolid);
+   mulle_asprintf( &result, "<TR><TD>\"%s\"</TD><TD>%08lx</TD></TR>\n",
+         s, (unsigned long) protocolid);
    return( result);
 }
 
@@ -322,11 +322,11 @@ char   *mulle_objc_class_describe_row_html( intptr_t  classid,
    name   = html_escape( _mulle_objc_class_get_name( cls));
    prefix = _mulle_objc_class_is_metaclass( cls) ? "+" : "";
 
-   mulle_asprintf( &s, "<TR><TD><A HREF=\"%s%s.html\">%s</A></TD><TD>%08x</TD></TR>\n",
+   mulle_asprintf( &s, "<TR><TD><A HREF=\"%s%s.html\">%s</A></TD><TD>%08lx</TD></TR>\n",
             prefix,
             name,
             name,
-            _mulle_objc_class_get_classid( cls));
+            (unsigned long) _mulle_objc_class_get_classid( cls));
    return( s);
 }
 
@@ -339,9 +339,9 @@ char   *mulle_objc_infraclass_describe_row_html( intptr_t  classid,
    char   *name;
 
    name = html_escape( _mulle_objc_infraclass_get_name( cls));
-   mulle_asprintf( &s, "<TR><TD>%s</TD><TD>%08x</TD></TR>\n",
+   mulle_asprintf( &s, "<TR><TD>%s</TD><TD>%08lx</TD></TR>\n",
             name,
-            _mulle_objc_infraclass_get_classid( cls));
+            (unsigned long) _mulle_objc_infraclass_get_classid( cls));
    return( s);
 }
 
@@ -561,7 +561,7 @@ char   *mulle_objc_descriptor_describe_html( struct _mulle_objc_descriptor *desc
    else
       format = "<TR><%s>name</%s><TD>%s</TD></TR>"
                "<TR><%s>signature</%s><TD>%s</TD></TR>"
-               "<TR><%s>methodid</%s><TD>%08x</TD></TR>"
+               "<TR><%s>methodid</%s><TD>%08lx</TD></TR>"
                "<TR><%s>bits</%s><TD>0x%x</TD></TR>"
                "</TABLE>";
 
@@ -572,7 +572,7 @@ char   *mulle_objc_descriptor_describe_html( struct _mulle_objc_descriptor *desc
                    th, th,
                    html_escape( desc->signature),
                    th, th,
-                   desc->methodid,
+                   (unsigned long) desc->methodid,
                    th, th,
                    desc->bits);
 
@@ -593,7 +593,7 @@ char   *mulle_objc_descriptor_describe_hor_html( struct _mulle_objc_descriptor *
       format = "<TR>"
                "<TD>%s</TD>"
                "<TD>%s</TD>"
-               "<TD>%08x</TD>"
+               "<TD>%08lx</TD>"
                "<TD>0x%x</TD>"
                "</TR>";
 
@@ -601,7 +601,7 @@ char   *mulle_objc_descriptor_describe_hor_html( struct _mulle_objc_descriptor *
             format,
             html_escape( desc->name),
             html_escape( desc->signature),
-            desc->methodid,
+            (unsigned long) desc->methodid,
             desc->bits);
 
    return( s);
@@ -624,7 +624,7 @@ char   *mulle_objc_descriptor_describe_row_html( intptr_t  methodid,
       format = "<TR>"
                "<TD>%s</TD>"
                "<TD>%s</TD>"
-               "<TD>%08x</TD>"
+               "<TD>%08lx</TD>"
                "<TD>0x%x</TD>"
                "</TR>\n";
 
@@ -632,7 +632,7 @@ char   *mulle_objc_descriptor_describe_row_html( intptr_t  methodid,
              format,
              html_escape( desc->name),
              html_escape( desc->signature),
-             desc->methodid,
+             (unsigned long) desc->methodid,
              desc->bits);
 
    return( s);
@@ -650,10 +650,10 @@ char   *mulle_objc_category_describe_row_html( intptr_t  categoryid,
    mulle_asprintf( &s,
                    "<TR>"
                    "<TD>%s</TD>"
-                   "<TD>%08x</TD>"
+                   "<TD>%08lx</TD>"
                    "</TR>\n",
                    html_escape( value),
-                   categoryid);
+                   (unsigned long) categoryid);
 
    return( s);
 }
@@ -670,10 +670,10 @@ char   *mulle_objc_super_describe_row_html( intptr_t  superid,
    mulle_asprintf( &s,
                    "<TR>"
                    "<TD>%s</TD>"
-                   "<TD>%08x</TD>"
+                   "<TD>%08lx</TD>"
                    "</TR>\n",
                    html_escape( _mulle_objc_super_get_name( superinfo)),
-                   superid);
+                   (unsigned long) superid);
 
    return( s);
 }
@@ -691,10 +691,10 @@ char   *mulle_objc_protocol_describe_row_html( intptr_t  protocolid,
    mulle_asprintf( &s,
                    "<TR>"
                    "<TD>%s</TD>"
-                   "<TD>%08x</TD>"
+                   "<TD>%08lx</TD>"
                    "</TR>\n",
                    html_escape( _mulle_objc_protocol_get_name( protocol)),
-                   protocolid);
+                   (unsigned long) protocolid);
 
    return( s);
 }
@@ -732,11 +732,11 @@ char   *mulle_objc_propertylist_describe_html( struct _mulle_objc_propertylist *
                "<TD>"
                  "<TABLE>"
                    "<TR><TD>signature</TD><TD>%s</TD></TR>"
-                   "<TR><TD>propertyid</TD><TD>%08x</TD></TR>"
-                   "<TR><TD>ivarid</TD><TD>%08x</TD></TR>"
-                   "<TR><TD>getter</TD><TD>%08x</TD></TR>"
-                   "<TR><TD>setter</TD><TD>%08x</TD></TR>"
-                   "<TR><TD>bits</TD><TD>0x%08x</TD></TR>"
+                   "<TR><TD>propertyid</TD><TD>%08lx</TD></TR>"
+                   "<TR><TD>ivarid</TD><TD>%08lx</TD></TR>"
+                   "<TR><TD>getter</TD><TD>%08lx</TD></TR>"
+                   "<TR><TD>setter</TD><TD>%08lx</TD></TR>"
+                   "<TR><TD>bits</TD><TD>0x%08lx</TD></TR>"
                  "</TABLE>"
                "</TD>"
                "</TR>\n";
@@ -747,11 +747,11 @@ char   *mulle_objc_propertylist_describe_html( struct _mulle_objc_propertylist *
                 format,
                 html_escape( list->properties[ j].name),
                 html_escape( list->properties[ j].signature),
-                list->properties[ j].propertyid,
-                list->properties[ j].ivarid,
-                list->properties[ j].getter,
-                list->properties[ j].setter,
-                list->properties[ j].bits);
+                (unsigned long) list->properties[ j].propertyid,
+                (unsigned long) list->properties[ j].ivarid,
+                (unsigned long) list->properties[ j].getter,
+                (unsigned long) list->properties[ j].setter,
+                (unsigned long) list->properties[ j].bits);
 
       len += strlen( tmp[ i]);
       ++i;
@@ -822,11 +822,11 @@ char   *mulle_objc_cache_describe_html( struct _mulle_objc_cache *cache,
 #ifdef MULLE_OBJC_CACHEENTRY_REMEMBERS_THREAD
       mulle_asprintf( &s, "<TD>%p</TD>", cache->entries[ j].thread);
 #endif
-      mulle_asprintf( &tmp[ i], "<TR><TD>#%ld</TD><TD>%08x</TD><TD>%s</TD>"
+      mulle_asprintf( &tmp[ i], "<TR><TD>#%ld</TD><TD>%08lx</TD><TD>%s</TD>"
                                 "<TD>%p</TD><TD>%d (%x)</TD>%s</TR>\n",
                                 j,
                                 sel,
-                                _mulle_objc_universe_describe_methodid( universe, sel),
+                                (unsigned long) _mulle_objc_universe_describe_methodid( universe, sel),
                                 cache->entries[ j].value.functionpointer,
                                 index,
                                 sel & cache->mask,
@@ -888,7 +888,7 @@ char   *mulle_objc_methodlist_describe_html( struct _mulle_objc_methodlist *list
                  "<TABLE>"
                    "<TR><TD>signature</TD><TD>%s</TD></TR>"
                    "<TR><TD>methodid</TD><TD>0x%lx</TD></TR>"
-                   "<TR><TD>bits</TD><TD>0x%x</TD></TR>"
+                   "<TR><TD>bits</TD><TD>0x%lx</TD></TR>"
                    "<TR><TD>implementation</TD><TD>%s</TD></TR>"
                  "</TABLE>"
                "</TD>"
@@ -907,8 +907,8 @@ char   *mulle_objc_methodlist_describe_html( struct _mulle_objc_methodlist *list
                 format,
                 html_escape( list->methods[ j].descriptor.name),
                 html_escape( list->methods[ j].descriptor.signature),
-                (long) list->methods[ j].descriptor.methodid,
-                list->methods[ j].descriptor.bits,
+                (unsigned long) list->methods[ j].descriptor.methodid,
+                (unsigned long) list->methods[ j].descriptor.bits,
                 buf);
 
       len += strlen( tmp[ i]);
@@ -997,8 +997,8 @@ char   *mulle_objc_methodlist_describe_hor_html( struct _mulle_objc_methodlist *
       format = "<TR>"
                  "<TD>%s</TD>"
                  "<TD>%s</TD>"
-                 "<TD>%08x</TD>"
-                 "<TD>0x%x</TD>"
+                 "<TD>%08lx</TD>"
+                 "<TD>0x%lx</TD>"
                  "<TD>%s</TD>"
                "</TR>\n";
 
@@ -1011,8 +1011,8 @@ char   *mulle_objc_methodlist_describe_hor_html( struct _mulle_objc_methodlist *
                       format,
                       html_escape( list->methods[ j].descriptor.name),
                       html_escape( list->methods[ j].descriptor.signature),
-                      list->methods[ j].descriptor.methodid,
-                      list->methods[ j].descriptor.bits,
+                      (unsigned long) list->methods[ j].descriptor.methodid,
+                      (unsigned long) list->methods[ j].descriptor.bits,
                       buf);
       len += strlen( tmp[ i]);
       ++i;
@@ -1038,9 +1038,9 @@ char   *mulle_objc_loadclass_describe_row_html( void *value,
    struct _mulle_objc_loadclass   *loadcls = value;
    char   *s;
 
-   mulle_asprintf( &s, "<TR><TD>%s</TD><TD>%08x</TD></TR>\n",
+   mulle_asprintf( &s, "<TR><TD>%s</TD><TD>%08lx</TD></TR>\n",
             loadcls->classname,
-            loadcls->classid);
+            (unsigned long) loadcls->classid);
    return( s);
 }
 
@@ -1053,10 +1053,10 @@ char   *mulle_objc_loadcategory_describe_row_html( void *value,
    struct _mulle_objc_loadcategory   *loadcat = value;
    char   *s;
 
-   mulle_asprintf( &s, "<TR><TD>%s( %s)</TD><TD>%08x</TD></TR>\n",
+   mulle_asprintf( &s, "<TR><TD>%s( %s)</TD><TD>%08lx</TD></TR>\n",
                        loadcat->classname,
                        loadcat->categoryname,
-                       loadcat->categoryid);
+                       (unsigned long) loadcat->categoryid);
    return( s);
 }
 

@@ -73,8 +73,8 @@ mulle_objc_implementation_t
    }
 
    if( args->debug)
-      fprintf( stderr, "mulle_objc_lldb_lookup_implementation: %p %08x %p (%d)\n",
-                        obj, methodid, args->class_or_superid, args->calltype);
+      fprintf( stderr, "mulle_objc_lldb_lookup_implementation: %p %08lx %p (%d)\n",
+                        obj, (unsigned long) methodid, args->class_or_superid, args->calltype);
 
    // call "-class" so class initializes.. But WHY ??
    // if( ! _mulle_objc_metaclass_get_state_bit( meta, MULLE_OBJC_METACLASS_INITIALIZE_DONE))

@@ -1,3 +1,7 @@
+### 0.21.1
+
+* HTML dump with CSS for nicer default output
+
 ## 0.21.0
 
 * moved csv code back to the riuntime
