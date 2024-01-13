@@ -28,15 +28,9 @@ and debugging support.
 |   Requirement         | Release Version  | Description
 |-----------------------|------------------|---------------
 | [mulle-objc-runtime](https://github.com/mulle-objc/mulle-objc-runtime) | ![Mulle kybernetiK tag](https://img.shields.io/github/tag//.svg) [![Build Status](https://github.com///workflows/CI/badge.svg?branch=release)](https://github.com///actions/workflows/mulle-sde-ci.yml) | ⏩ A fast, portable Objective-C runtime written 100% in C11
-| [mulle-fprintf](https://github.com/mulle-core/mulle-fprintf) | ![Mulle kybernetiK tag](https://img.shields.io/github/tag//.svg) [![Build Status](https://github.com///workflows/CI/badge.svg?branch=release)](https://github.com///actions/workflows/mulle-sde-ci.yml) | 🔢 mulle-fprintf marries mulle-sprintf to stdio.h
 
 
 ## Add
-
-**This project is a component of the [mulle-core](//github.com/mulle-core/mulle-core) library. As such you usually will *not* add or install it
-individually, unless you specifically do not want to link against
-`mulle-core`.**
-
 
 ### Add as an individual component
 
