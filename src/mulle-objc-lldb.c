@@ -90,20 +90,20 @@ mulle_objc_implementation_t
    default :
    case 0  :
       cls = _mulle_objc_object_get_isa( obj);
-      imp = _mulle_objc_class_lookup_implementation_nocache( cls, methodid);
+      imp = _mulle_objc_class_lookup_implementation_noforward_nofill( cls, methodid);
       break;
 
    case 1 :
-      imp = _mulle_objc_class_lookup_implementation_nocache( args->class_or_superid,
-                                                             methodid);
+      imp = _mulle_objc_class_lookup_implementation_noforward_nofill( args->class_or_superid,
+                                                                      methodid);
       break;
 
       // doing this nofail, is bad. Tracing into [super forwardedMessage]
       // will bring grief
    case 2 :
       superid = (mulle_objc_superid_t) (uintptr_t) args->class_or_superid;
-      imp     = _mulle_objc_object_superlookup_implementation_inline_nofail( obj,
-                                                                            superid);
+      imp     = _mulle_objc_object_lookup_superimplementation_noforward_nofill( obj,
+                                                                                superid);
    }
 
    if( args->debug)

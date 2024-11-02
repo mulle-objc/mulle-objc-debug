@@ -54,7 +54,7 @@ int  main( void)
 
    universe = mulle_objc_global_get_universe( 0);
 
-   _mulle_objc_universe_set_staticstringclass( universe, [SomeString class]);
+   _mulle_objc_universe_set_staticstringclass( universe, [SomeString class], 1);
 
    s = mulle_objc_lldb_create_staticstring( NULL, "VfL Bochum 1848", 15, 0x08000100, 0);
 
