@@ -54,7 +54,7 @@ static char   *html_escape( char *s)
 }
 
 
-static int   qsort_strcmp( const void * s1, const void * s2)
+static int   strcmp_r( void * s1, void * s2, void *thunk)
 {
     return( strcmp( *(char **) s1, *(char **) s2));
 }
@@ -395,7 +395,7 @@ char   *mulle_objc_class_describe_html( struct _mulle_objc_class *cls,
 
       mulle_asprintf( &tmp[ i++],
                "<TR><TD>state</TD><TD>0x%lx</TD></TR>\n",
-               (long) _mulle_atomic_pointer_nonatomic_read( &cls->state));
+               (long) _mulle_atomic_pointer_read_nonatomic( &cls->state));
 
       if ( _mulle_objc_class_is_infraclass( cls))
       {
@@ -407,7 +407,7 @@ char   *mulle_objc_class_describe_html( struct _mulle_objc_class *cls,
                   (long) infra->ivarhash);
          mulle_asprintf( &tmp[ i++],
                   "<TR><TD>allocatedInstances</TD><TD>%ld</TD></TR>\n",
-                  (long) _mulle_atomic_pointer_nonatomic_read( &infra->allocatedInstances));
+                  (long) _mulle_atomic_pointer_read_nonatomic( &infra->allocatedInstances));
       }
 
       mulle_asprintf( &tmp[ i++],
@@ -474,7 +474,7 @@ char   *mulle_objc_ivarlist_describe_html( struct _mulle_objc_ivarlist *list,
    }
 
    /* sort by name */
-   qsort( &tmp[ i - j], j, sizeof( char *), qsort_strcmp);
+   mulle_qsort_r( &tmp[ i - j], j, sizeof( char *), strcmp_r, NULL);
 
    mulle_asprintf( &tmp[ i], "</TABLE>");
    len += strlen( tmp[ i]);
@@ -757,7 +757,7 @@ char   *mulle_objc_propertylist_describe_html( struct _mulle_objc_propertylist *
       ++i;
    }
 
-   qsort( &tmp[ i - j], j, sizeof( char *), qsort_strcmp);
+   mulle_qsort_r( &tmp[ i - j], j, sizeof( char *), strcmp_r, NULL);
 
    mulle_asprintf( &tmp[ i], "</TABLE>");
    len += strlen( tmp[ i]);
@@ -785,10 +785,10 @@ char   *mulle_objc_cache_describe_html( struct _mulle_objc_cache *cache,
    int                     colspan;
    char                    *s;
 
-#ifdef MULLE_OBJC_CACHEENTRY_REMEMBERS_THREAD
-   colspan = 5;
+#ifdef MULLE_OBJC_CACHEENTRY_REMEMBERS_THREAD_CLASS
+   colspan = 6;
 #else
-   colspan = 4;
+   colspan = 5;
 #endif
    n   = cache->size + 3 + 2;
    tmp = mulle_calloc( n, sizeof( char *));
@@ -801,7 +801,7 @@ char   *mulle_objc_cache_describe_html( struct _mulle_objc_cache *cache,
    mulle_asprintf( &tmp[ i],
                    "<TR><TD>n</TD><TD COLSPAN=\"%d\">%lu</TD></TR>\n",
                    colspan,
-                   (long) _mulle_atomic_pointer_nonatomic_read( &cache->n));
+                   (long) _mulle_atomic_pointer_read_nonatomic( &cache->n));
    len += strlen( tmp[ i]);
    ++i;
    mulle_asprintf( &tmp[ i],
@@ -817,9 +817,9 @@ char   *mulle_objc_cache_describe_html( struct _mulle_objc_cache *cache,
       index = 0;
       sel   = cache->entries[ j].key.uniqueid;
       if( sel)
-         index = _mulle_objc_cache_find_entryindex( cache, sel);
+         index = _mulle_objc_cache_probe_entryindex( cache, sel);
 
-#ifdef MULLE_OBJC_CACHEENTRY_REMEMBERS_THREAD
+#ifdef MULLE_OBJC_CACHEENTRY_REMEMBERS_THREAD_CLASS
       mulle_asprintf( &s, "<TD>%p</TD>", cache->entries[ j].thread);
 #endif
       mulle_asprintf( &tmp[ i], "<TR><TD>#%ld</TD><TD>%08lx</TD><TD>%s</TD>"
@@ -831,7 +831,7 @@ char   *mulle_objc_cache_describe_html( struct _mulle_objc_cache *cache,
                                 index,
                                 sel & cache->mask,
                                 s);
-#ifdef MULLE_OBJC_CACHEENTRY_REMEMBERS_THREAD
+#ifdef MULLE_OBJC_CACHEENTRY_REMEMBERS_THREAD_CLASS
       mulle_free( s);
 #endif
       len += strlen( tmp[ i]);
@@ -916,7 +916,7 @@ char   *mulle_objc_methodlist_describe_html( struct _mulle_objc_methodlist *list
    }
 
    /* sort by name */
-   qsort( &tmp[ i - j], j, sizeof( char *), qsort_strcmp);
+   mulle_qsort_r( &tmp[ i - j], j, sizeof( char *), strcmp_r, NULL);
 
    mulle_asprintf( &tmp[ i], "</TABLE>");
    len += strlen( tmp[ i]);
@@ -1018,7 +1018,7 @@ char   *mulle_objc_methodlist_describe_hor_html( struct _mulle_objc_methodlist *
       ++i;
    }
 
-   qsort( &tmp[ i - j], j, sizeof( char *), qsort_strcmp);
+   mulle_qsort_r( &tmp[ i - j], j, sizeof( char *), strcmp_r, NULL);
 
    mulle_asprintf( &tmp[ i], "</TABLE>");
    len += strlen( tmp[ i]);
@@ -1124,7 +1124,7 @@ char   *mulle_objc_fastclasstable_describe_html( struct _mulle_objc_fastclasstab
 
    for( j = 0; j < MULLE_OBJC_S_FASTCLASSES; j++)
    {
-      value = _mulle_atomic_pointer_nonatomic_read( &fastclasstable->classes[ j].pointer);
+      value = _mulle_atomic_pointer_read_nonatomic( &fastclasstable->classes[ j].pointer);
       tmp[ i] = (*row_description)( j, value, styling);
       len    += strlen( tmp[ i]);
       ++i;
@@ -1247,7 +1247,7 @@ char   *mulle_concurrent_hashmap_describe_html( struct mulle_concurrent_hashmap 
    }
    mulle_concurrent_hashmapenumerator_done( &rover);
 
-   qsort( &tmp[ i - j], j, sizeof( char *), qsort_strcmp);
+   mulle_qsort_r( &tmp[ i - j], j, sizeof( char *), strcmp_r, NULL);
 
    if( styling)
    {
@@ -1307,7 +1307,7 @@ char   *mulle_objc_uniqueidarray_describe_html( struct _mulle_objc_uniqueidarray
       ++i;
    }
 
-   qsort( &tmp[ i - count], count, sizeof( char *), qsort_strcmp);
+   mulle_qsort_r( &tmp[ i - count], count, sizeof( char *), strcmp_r, NULL);
 
    if( styling)
    {

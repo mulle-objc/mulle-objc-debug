@@ -84,7 +84,7 @@ static struct _mulle_objc_htmltablestyle    cachetable_style =
    "cache",
    NULL,
    NULL,
-   0
+   6
 };
 
 
@@ -125,7 +125,7 @@ static struct _mulle_objc_htmltablestyle  descriptortable_style =
    "selector",
    NULL,
    NULL,
-   0
+   4
 };
 
 
@@ -327,7 +327,7 @@ static void   _print_universe( struct _mulle_objc_universe *universe, FILE *fp)
    fprintf( fp, "\n<DIV CLASS=\"universe_fastclasses\">\n");
    {
       for( i = 0; i < MULLE_OBJC_S_FASTCLASSES; i++)
-         if( _mulle_atomic_pointer_nonatomic_read( &universe->fastclasstable.classes[ i].pointer))
+         if( _mulle_atomic_pointer_read_nonatomic( &universe->fastclasstable.classes[ i].pointer))
             break;
 
       if( i < MULLE_OBJC_S_FASTCLASSES)
@@ -337,9 +337,9 @@ static void   _print_universe( struct _mulle_objc_universe *universe, FILE *fp)
          fprintf( fp, "<TABLE CLASS=\"universe_fastclass_table\">\n");
 
          for( i = 0; i < MULLE_OBJC_S_FASTCLASSES; i++)
-            if( _mulle_atomic_pointer_nonatomic_read( &universe->fastclasstable.classes[ i].pointer))
+            if( _mulle_atomic_pointer_read_nonatomic( &universe->fastclasstable.classes[ i].pointer))
             {
-               cls = _mulle_atomic_pointer_nonatomic_read( &universe->fastclasstable.classes[ i].pointer);
+               cls = _mulle_atomic_pointer_read_nonatomic( &universe->fastclasstable.classes[ i].pointer);
                label = mulle_objc_class_describe_html_short( cls, &classtable_style);
                fprintf( fp, "<TR><TH>%d</TH><TD>%s</TD></TR>\n", i, label);
                mulle_free( label);
@@ -507,7 +507,7 @@ static void   _print_infraclass( struct _mulle_objc_infraclass *infra, FILE *fp)
             fprintf( fp, "<LI>%s\n", label);
             mulle_free( label);
          }
-         mulle_concurrent_pointerarrayenumerator_done( &rover);
+         _mulle_objc_protocolclassenumerator_done( &prover);
 
          fprintf( fp, "</OL>\n");
       }
@@ -611,8 +611,8 @@ static void   _print_infraclass( struct _mulle_objc_infraclass *infra, FILE *fp)
       if( array->n)
       {
          label = mulle_objc_protocols_describe_html( array,
-                                                        universe,
-                                                        &protocoltable_style);
+                                                     universe,
+                                                     &protocoltable_style);
          print_to_body( "Protocols", label, fp);
          mulle_free( label);
       }
@@ -636,7 +636,7 @@ static void   _print_infraclass( struct _mulle_objc_infraclass *infra, FILE *fp)
 
    fprintf( fp, "\n<DIV CLASS=\"class_cache\">\n");
    {
-      cache = _mulle_objc_cachepivot_atomicget_cache( &cls->cachepivot.pivot);
+      cache = _mulle_objc_cachepivot_get_cache_atomic( &cls->cachepivot.pivot);
       label = mulle_objc_cache_describe_html( cache, universe, &cachetable_style);
       print_to_body( "Instance Cache", label, fp);
       mulle_free( label);
@@ -645,7 +645,7 @@ static void   _print_infraclass( struct _mulle_objc_infraclass *infra, FILE *fp)
 
    fprintf( fp, "\n<DIV CLASS=\"class_cache\">\n");
    {
-      cache = _mulle_objc_cachepivot_atomicget_cache( &meta->base.cachepivot.pivot);
+      cache = _mulle_objc_cachepivot_get_cache_atomic( &meta->base.cachepivot.pivot);
       label = mulle_objc_cache_describe_html( cache, universe, &cachetable_style);
       print_to_body( "Meta Cache", label, fp);
       mulle_free( label);

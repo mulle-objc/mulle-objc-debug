@@ -423,7 +423,7 @@ static void   print_universe( struct _mulle_objc_universe *universe,
    {
       for( i = 0; i < MULLE_OBJC_S_FASTCLASSES; i++)
       {
-         if( _mulle_atomic_pointer_nonatomic_read( &universe->fastclasstable.classes[ i].pointer))
+         if( _mulle_atomic_pointer_read_nonatomic( &universe->fastclasstable.classes[ i].pointer))
             break;
       }
 
@@ -515,10 +515,10 @@ extern char   *_mulle_objc_grapviz_html_header_description( char *name, int is_m
 static void   print_protocolclasses( struct _mulle_objc_class *cls,
                                      struct dump_info *info)
 {
-   struct _mulle_objc_protocolclassenumerator       rover;
-   struct _mulle_objc_infraclass                    *prop_cls;
-   unsigned int                                     i;
-   struct _mulle_objc_classpair                     *pair;
+   struct _mulle_objc_protocolclassenumerator   rover;
+   struct _mulle_objc_infraclass                *prop_cls;
+   unsigned int                                 i;
+   struct _mulle_objc_classpair                 *pair;
 
    i     = 0;
    pair  = _mulle_objc_class_get_classpair( cls);
@@ -585,8 +585,8 @@ static void   print_cache( struct _mulle_objc_class *cls,
 
    universe = _mulle_objc_class_get_universe( cls);
 
-   cache = _mulle_objc_cachepivot_atomicget_cache( &cls->cachepivot.pivot);
-   if( _mulle_atomic_pointer_nonatomic_read( &cache->n))
+   cache = _mulle_objc_cachepivot_get_cache_atomic( &cls->cachepivot.pivot);
+   if( _mulle_atomic_pointer_read_nonatomic( &cache->n))
    {
       fprintf( info->fp, "\"%p\" -> \"%p\"  [ label=\"cache\" ];\n",
               cls, cache);
@@ -605,6 +605,45 @@ static void   print_class( struct _mulle_objc_class *cls,
 {
    char                                *label;
    struct _mulle_objc_htmltablestyle   style;
+
+
+   if( info->show & SHOW_UNIVERSE)
+   {
+      struct _mulle_objc_universe   *universe;
+
+      universe = _mulle_objc_class_get_universe( cls);
+      if( universe)
+         fprintf( info->fp, "\"%p\" -> \"%p\"  [ label=\"universe\" ];\n",
+                     cls,
+                     _mulle_objc_class_get_universe( cls));
+   }
+
+   // meta superclass is boring
+   if( info->show & SHOW_SUPERCLASS)
+   {
+      if( ! is_meta)
+      {
+         struct _mulle_objc_class   *superclass;
+
+         superclass = _mulle_objc_class_get_superclass( cls);
+         if( superclass)
+         {
+            fprintf( info->fp, "\"%p\" -> \"%p\"  [ label=\"super\"; penwidth=\"%d\" ];\n", cls, superclass,
+                    _mulle_objc_class_is_infraclass( cls)
+                    ? 3 : 1);
+
+            // also show protocolclasses of superclass
+            if( ! (_mulle_objc_class_get_inheritance( cls) & MULLE_OBJC_CLASS_DONT_INHERIT_PROTOCOLS))
+            {
+               struct dump_info   secondary_info;
+
+               secondary_info      = *info;
+               secondary_info.show = SHOW_INFRACLASS|SHOW_FILELINK;
+               print_protocolclasses( superclass, &secondary_info);
+            }
+         }
+      }
+   }
 
    style       = is_meta ? metaclass_style : infraclass_style;
    style.title = cls->name;
@@ -631,29 +670,6 @@ static void   print_class( struct _mulle_objc_class *cls,
    }
    fprintf( info->fp, " ];\n");
 
-   if( info->show & SHOW_UNIVERSE)
-   {
-      struct _mulle_objc_universe   *universe;
-
-      universe = _mulle_objc_class_get_universe( cls);
-      if( universe)
-         fprintf( info->fp, "\"%p\" -> \"%p\"  [ label=\"universe\" ];\n",
-                     cls,
-                     _mulle_objc_class_get_universe( cls));
-   }
-
-   // meta superclass is boring
-   if( info->show & SHOW_SUPERCLASS)
-      if( ! is_meta)
-      {
-         struct _mulle_objc_class   *superclass;
-
-         superclass = _mulle_objc_class_get_superclass( cls);
-         if( superclass)
-            fprintf( info->fp, "\"%p\" -> \"%p\"  [ label=\"super\"; penwidth=\"%d\" ];\n", cls, superclass,
-                    _mulle_objc_class_is_infraclass( cls)
-                    ? 3 : 1);
-      }
 
    if( info->show & SHOW_METACLASS)
    {
@@ -804,9 +820,11 @@ static void   print_hyper_infraclass( struct _mulle_objc_infraclass *infra,
    fprintf( info->fp, "\"%p\" [ label=<%s>, shape=\"box\", URL=\"file:///%s/%s.dot\" ];\n", infra, label, info->directory, style.title);
    mulle_free( label);
 
-   if( _mulle_objc_infraclass_get_universe( infra))
-      fprintf( info->fp, "\"%p\" -> \"%p\"  [ label=\"universe\" ];\n", infra,  _mulle_objc_infraclass_get_universe( infra));
+   if( info->show & SHOW_UNIVERSE)
+      if( _mulle_objc_infraclass_get_universe( infra))
+         fprintf( info->fp, "\"%p\" -> \"%p\"  [ label=\"universe\" ];\n", infra,  _mulle_objc_infraclass_get_universe( infra));
 
+   if( info->show & SHOW_SUPERCLASS)
    {
       superclass = _mulle_objc_infraclass_get_superclass( infra);
       if( superclass)
@@ -860,7 +878,7 @@ static mulle_objc_walkcommand_t   callback( struct _mulle_objc_universe *univers
 
    case mulle_objc_walkpointer_is_universe  :
       universe = p;
-      if( info->create_hyperlink)
+      if( info->universe_as_hyperlink)
          print_hyper_universe( universe, info);
       else
          print_universe( universe, info);
@@ -915,11 +933,11 @@ static void   _mulle_objc_class_dotdump_to_file( struct _mulle_objc_class *cls,
    info.fp        = fp;
    info.directory = directory;
 
-   info.show                         = SHOW_DEFAULT;
+   info.show                         = SHOW_DEFAULT & ~SHOW_UNIVERSE;
    info.protocolclasses_as_hyperlink = 1;
-   info.universe_as_hyperlink        = 1;
+   info.universe_as_hyperlink        = 0;
 
-   print_hyper_universe( _mulle_objc_class_get_universe( cls), &info);
+//   print_hyper_universe( _mulle_objc_class_get_universe( cls), &info);
 
    pair = NULL;
    do
