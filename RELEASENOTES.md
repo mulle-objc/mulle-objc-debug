@@ -1,3 +1,9 @@
+### 0.21.2
+
+
+
+* adapt to changes in mulle-objc-runtime
+
 ### 0.21.1
 
 * HTML dump with CSS for nicer default output
