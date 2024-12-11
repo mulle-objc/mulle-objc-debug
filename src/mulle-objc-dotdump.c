@@ -1191,6 +1191,9 @@ void
 }
 
 
+
+#pragma mark - hierarchy dump
+
 /*
  * Hierarchy dumper. Dump a class and all superclasses and protocol classes
  */
@@ -1336,22 +1339,22 @@ void   mulle_objc_classhierarchy_dotdump_to_stream( struct _mulle_objc_class *cl
    struct print_hierarchy_info   info;
    struct c_set                  set;
 
-   if( ! cls)
-      return;
-
    if( ! fp)
       fp = stdout;
 
    fprintf( fp, "digraph mulle_classhierarchy\n{\n");
 
-   c_set_init( &set);
+   if( cls)
+   {
+      c_set_init( &set);
 
-   print_hierarchy_info_init( &info, NULL, NULL, &set, fp);
+      print_hierarchy_info_init( &info, NULL, NULL, &set, fp);
 
-   info.is_meta = _mulle_objc_class_is_metaclass( cls);
-   print_hierarchy( cls, &info);
+      info.is_meta = _mulle_objc_class_is_metaclass( cls);
+      print_hierarchy( cls, &info);
 
-   c_set_done( &set);
+      c_set_done( &set);
+   }
 
    fprintf( fp, "}\n");
 }
@@ -1371,5 +1374,6 @@ void   mulle_objc_classhierarchy_dotdump_to_file( struct _mulle_objc_class *cls,
    mulle_objc_classhierarchy_dotdump_to_stream( cls, fp);
    fclose( fp);
 }
+
 
 
