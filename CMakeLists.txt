@@ -1,6 +1,6 @@
 cmake_minimum_required( VERSION 3.1)
 
-project( mulle-objc-debug VERSION 0.21.3 LANGUAGES C)
+project( mulle-objc-debug VERSION 0.22.0 LANGUAGES C)
 
 
 ### mulle-sde environment

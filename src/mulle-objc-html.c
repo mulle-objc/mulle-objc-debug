@@ -141,7 +141,7 @@ static void   asprintf_table_header_colspan( char **s,
                styling->title);
    else // graphviz don't like CLASS, can't deal with TH
       mulle_asprintf( s,
-               "<TABLE>\n<TR><TD BGCOLOR=\"%s\" COLSPAN=\"%u\"><FONT COLOR=\"%s\">%s</FONT></TD></TR>\n",
+               "<TABLE CELLPADDING=\"0\" CELLSPACING=\"0\">\n<TR><TD BGCOLOR=\"%s\" COLSPAN=\"%u\"><FONT COLOR=\"%s\">%s</FONT></TD></TR>\n",
                styling->bgcolor,
                colspan ? colspan : 2,
                styling->color,
@@ -449,10 +449,11 @@ char   *mulle_objc_ivarlist_describe_html( struct _mulle_objc_ivarlist *list,
                "<TD>%s</TD>"
                "</TR>\n";
    else
+      // TODO: hacky, where is the style or class name for this ???
       format = "<TR>"
                "<TD>%s</TD>"
                "<TD>"
-                 "<TABLE>"
+                 "<TABLE COLOR=\"lightgray\" CELLPADDING=\"0\" CELLSPACING=\"0\">"
                    "<TR><TD>signature</TD><TD>%s</TD></TR>"
                    "<TR><TD>methodid</TD><TD>0x%lx</TD></TR>"
                    "<TR><TD>offset</TD><TD>%d</TD></TR>"
@@ -730,7 +731,7 @@ char   *mulle_objc_propertylist_describe_html( struct _mulle_objc_propertylist *
       format = "<TR>"
                "<TD>%s</TD>"
                "<TD>"
-                 "<TABLE>"
+                 "<TABLE COLOR=\"lightgray\" CELLPADDING=\"0\" CELLSPACING=\"0\">"
                    "<TR><TD>signature</TD><TD>%s</TD></TR>"
                    "<TR><TD>propertyid</TD><TD>%08lx</TD></TR>"
                    "<TR><TD>ivarid</TD><TD>%08lx</TD></TR>"
@@ -860,7 +861,6 @@ char   *mulle_objc_methodlist_describe_html( struct _mulle_objc_methodlist *list
    unsigned int   i;
    unsigned int   j;
    unsigned int   n;
-   char           buf[ s_mulle_objc_sprintf_functionpointer_buffer];
    char           *format;
    char           *name;
 
@@ -885,7 +885,7 @@ char   *mulle_objc_methodlist_describe_html( struct _mulle_objc_methodlist *list
       format = "<TR>"
                "<TD>%s</TD>"
                "<TD>"
-                 "<TABLE>"
+                 "<TABLE COLOR=\"lightgray\" CELLPADDING=\"0\" CELLSPACING=\"0\">"
                    "<TR><TD>signature</TD><TD>%s</TD></TR>"
                    "<TR><TD>methodid</TD><TD>0x%lx</TD></TR>"
                    "<TR><TD>bits</TD><TD>0x%lx</TD></TR>"
@@ -898,21 +898,25 @@ char   *mulle_objc_methodlist_describe_html( struct _mulle_objc_methodlist *list
                "<TD COLSPAN=\"2\">%s</TD>"
                "</TR>\n";
 
-   for( j = 0; j < list->n_methods; j++)
+   mulle_buffer_do( buffer)
    {
-      mulle_objc_sprintf_functionpointer( buf,
-         _mulle_atomic_functionpointer_nonatomic_read( &list->methods[ j].implementation));
+      for( j = 0; j < list->n_methods; j++)
+      {
+         mulle_buffer_reset( buffer);
+         mulle_buffer_sprintf_functionpointer( buffer,
+                                               (mulle_functionpointer_t) &list->methods[ i].value);
 
-      mulle_asprintf( &tmp[ i],
-                format,
-                html_escape( list->methods[ j].descriptor.name),
-                html_escape( list->methods[ j].descriptor.signature),
-                (unsigned long) list->methods[ j].descriptor.methodid,
-                (unsigned long) list->methods[ j].descriptor.bits,
-                buf);
+         mulle_asprintf( &tmp[ i],
+                   format,
+                   html_escape( list->methods[ j].descriptor.name),
+                   html_escape( list->methods[ j].descriptor.signature),
+                   (unsigned long) list->methods[ j].descriptor.methodid,
+                   (unsigned long) list->methods[ j].descriptor.bits,
+                   mulle_buffer_get_string( buffer));
 
-      len += strlen( tmp[ i]);
-      ++i;
+         len += strlen( tmp[ i]);
+         ++i;
+      }
    }
 
    /* sort by name */
@@ -936,7 +940,6 @@ char   *mulle_objc_methodlist_describe_hor_html( struct _mulle_objc_methodlist *
    unsigned int   i;
    unsigned int   j;
    unsigned int   n;
-   char           buf[ s_mulle_objc_sprintf_functionpointer_buffer];
    char           *format;
 
    n   = list->n_methods + 3;
@@ -1002,20 +1005,23 @@ char   *mulle_objc_methodlist_describe_hor_html( struct _mulle_objc_methodlist *
                  "<TD>%s</TD>"
                "</TR>\n";
 
-   for( j = 0; j < list->n_methods; j++)
+   mulle_buffer_do( buffer)
    {
-      mulle_objc_sprintf_functionpointer( buf,
-         _mulle_atomic_functionpointer_nonatomic_read( &list->methods[ j].implementation));
-
-      mulle_asprintf( &tmp[ i],
-                      format,
-                      html_escape( list->methods[ j].descriptor.name),
-                      html_escape( list->methods[ j].descriptor.signature),
-                      (unsigned long) list->methods[ j].descriptor.methodid,
-                      (unsigned long) list->methods[ j].descriptor.bits,
-                      buf);
-      len += strlen( tmp[ i]);
-      ++i;
+      for( j = 0; j < list->n_methods; j++)
+      {
+         mulle_buffer_reset( buffer);
+         mulle_buffer_sprintf_functionpointer( buffer,
+                                               (mulle_functionpointer_t) &list->methods[ i].value);
+         mulle_asprintf( &tmp[ i],
+                         format,
+                         html_escape( list->methods[ j].descriptor.name),
+                         html_escape( list->methods[ j].descriptor.signature),
+                         (unsigned long) list->methods[ j].descriptor.methodid,
+                         (unsigned long) list->methods[ j].descriptor.bits,
+                         mulle_buffer_get_string( buffer));
+         len += strlen( tmp[ i]);
+         ++i;
+      }
    }
 
    mulle_qsort_r( &tmp[ i - j], j, sizeof( char *), strcmp_r, NULL);
@@ -1205,16 +1211,15 @@ char   *mulle_concurrent_hashmap_describe_html( struct mulle_concurrent_hashmap 
                                                                          struct _mulle_objc_htmltablestyle *),
                                                 struct _mulle_objc_htmltablestyle *styling)
 {
-   struct mulle_concurrent_hashmapenumerator   rover;
-   char                                        *null_description;
-   intptr_t                                    uniqueid;
-   size_t                                      count;
-   size_t                                      len;
-   char                                        **tmp;
-   unsigned int                                i;
-   unsigned int                                n;
-   unsigned int                                j;
-   void                                        *value;
+   char           *null_description;
+   intptr_t       uniqueid;
+   size_t         count;
+   size_t         len;
+   char           **tmp;
+   unsigned int   i;
+   unsigned int   n;
+   unsigned int   j;
+   void           *value;
 
    count = mulle_concurrent_hashmap_count( map);
 
@@ -1235,8 +1240,8 @@ char   *mulle_concurrent_hashmap_describe_html( struct mulle_concurrent_hashmap 
    null_description = "*null*";
 
    j = 0;
-   rover = mulle_concurrent_hashmap_enumerate( map);
-   while( _mulle_concurrent_hashmapenumerator_next( &rover, &uniqueid, &value))
+
+   mulle_concurrent_hashmap_for( map, uniqueid, value)
    {
       if( ! value)
          value = null_description;
@@ -1245,7 +1250,6 @@ char   *mulle_concurrent_hashmap_describe_html( struct mulle_concurrent_hashmap 
       ++i;
       ++j;
    }
-   mulle_concurrent_hashmapenumerator_done( &rover);
 
    mulle_qsort_r( &tmp[ i - j], j, sizeof( char *), strcmp_r, NULL);
 

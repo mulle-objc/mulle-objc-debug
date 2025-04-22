@@ -108,10 +108,12 @@ mulle_objc_implementation_t
 
    if( args->debug)
    {
-      char   buf[ s_mulle_objc_sprintf_functionpointer_buffer];
-
-      mulle_objc_sprintf_functionpointer( buf, (mulle_functionpointer_t) imp);
-      fprintf( stderr, "mulle_objc_lldb_lookup_implementation: resolved to %s\n", buf);
+      mulle_buffer_do( buffer)
+      {
+         mulle_buffer_sprintf_functionpointer( buffer, (mulle_functionpointer_t) imp);         
+         fprintf( stderr, "mulle_objc_lldb_lookup_implementation: resolved to %s\n", 
+                           mulle_buffer_get_string( buffer));
+      }
    }
 
    errno = preserve;
