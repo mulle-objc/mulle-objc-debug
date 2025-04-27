@@ -1,4 +1,4 @@
-cmake_minimum_required( VERSION 3.1)
+cmake_minimum_required( VERSION 3.5)
 
 project( mulle-objc-debug VERSION 0.22.0 LANGUAGES C)
 

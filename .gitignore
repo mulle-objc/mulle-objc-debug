@@ -74,3 +74,5 @@ coverage*.html
 *.gcda
 *.gcno
 cola/wilted/
+.mulle/etc/make/build-dir
+vgcore.*
