@@ -39,8 +39,8 @@ As long as your sources are using `#include "include-private.h"` and your header
 mulle-sde add github:mulle-objc/mulle-objc-debug
 ```
 
-To only add the sources of mulle-objc-debug with dependency
-sources use [clib](https://github.com/clibs/clib):
+To only add the sources of mulle-objc-debug with all the sources of its
+dependencies replace "github:" with [clib:](https://github.com/clibs/clib):
 
 ## Legacy adds
 
@@ -68,9 +68,6 @@ file).
 ### Add as subproject with cmake and git
 
 ``` bash
-git submodule add -f --name "mulle-core" \
-                            "https://github.com/mulle-core/mulle-core.git" \
-                            "stash/mulle-core"
 git submodule add -f --name "mulle-objc-runtime" \
                             "https://github.com/mulle-objc/mulle-objc-runtime.git" \
                             "stash/mulle-objc-runtime"
@@ -83,17 +80,13 @@ git submodule update --init --recursive
 ``` cmake
 add_subdirectory( stash/mulle-objc-debug)
 add_subdirectory( stash/mulle-objc-runtime)
-add_subdirectory( stash/mulle-core)
 
 target_link_libraries( ${PROJECT_NAME} PUBLIC mulle-objc-debug)
 target_link_libraries( ${PROJECT_NAME} PUBLIC mulle-objc-runtime)
-target_link_libraries( ${PROJECT_NAME} PUBLIC mulle-core)
 ```
 
 
 ## Install
-
-### Install with mulle-sde
 
 Use [mulle-sde](//github.com/mulle-sde) to build and install mulle-objc-debug and all dependencies:
 
@@ -102,15 +95,30 @@ mulle-sde install --prefix /usr/local \
    https://github.com/mulle-objc/mulle-objc-debug/archive/latest.tar.gz
 ```
 
-### Manual Installation
+### Legacy Installation
 
-Install the [Requirements](#Requirements) and then
-install **mulle-objc-debug** with [cmake](https://cmake.org):
+
+#### Requirements
+
+Install all requirements
+
+| Requirements                                 | Description
+|----------------------------------------------|-----------------------
+| [mulle-objc-runtime](https://github.com/mulle-objc/mulle-objc-runtime)             | ⏩ A fast, portable Objective-C runtime written 100% in C11
+
+#### Download & Install
+
+
+Download the latest [tar](https://github.com/mulle-objc/mulle-objc-debug/archive/refs/tags/latest.tar.gz) or [zip](https://github.com/mulle-objc/mulle-objc-debug/archive/refs/tags/latest.zip) archive and unpack it.
+
+Install **mulle-objc-debug** into `/usr/local` with [cmake](https://cmake.org):
 
 ``` sh
-cmake -B build \
-      -DCMAKE_INSTALL_PREFIX=/usr/local \
-      -DCMAKE_PREFIX_PATH=/usr/local \
+PREFIX_DIR="/usr/local"
+cmake -B build                               \
+      -DMULLE_SDK_PATH="${PREFIX_DIR}"       \
+      -DCMAKE_INSTALL_PREFIX="${PREFIX_DIR}" \
+      -DCMAKE_PREFIX_PATH="${PREFIX_DIR}"    \
       -DCMAKE_BUILD_TYPE=Release &&
 cmake --build build --config Release &&
 cmake --install build --config Release
