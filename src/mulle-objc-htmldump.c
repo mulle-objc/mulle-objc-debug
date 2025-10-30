@@ -88,6 +88,11 @@ static struct _mulle_objc_htmltablestyle    cachetable_style =
 };
 
 
+static char  *ivartable_headers[] =
+{
+   "name", "signature", "ivarid", "flags"
+};
+
 
 static struct _mulle_objc_htmltablestyle    ivartable_style =
 {
@@ -95,7 +100,8 @@ static struct _mulle_objc_htmltablestyle    ivartable_style =
    "ivar",
    NULL,
    NULL,
-   0
+   4,
+   ivartable_headers
 };
 
 
@@ -118,6 +124,10 @@ static struct _mulle_objc_htmltablestyle  classtable_style =
    0
 };
 
+static char  *descriptortable_headers[] =
+{
+   "name", "signature", "methodid", "flags"
+};
 
 static struct _mulle_objc_htmltablestyle  descriptortable_style =
 {
@@ -125,7 +135,8 @@ static struct _mulle_objc_htmltablestyle  descriptortable_style =
    "selector",
    NULL,
    NULL,
-   4
+   4,
+   descriptortable_headers
 };
 
 
@@ -285,8 +296,8 @@ static void   _mulle_buffer_print_universe_html( struct mulle_buffer *buffer,
 
    mulle_buffer_append_string( buffer, "\n<DIV CLASS=\"universe_values\">\n");
    {
+      mulle_buffer_append_string( buffer, "<H2>Values</H2>");
       mulle_buffer_html_universe( buffer, universe, &universe_style);
-      mulle_buffer_append_string( buffer, "Values");
    }
    mulle_buffer_append_string( buffer, "</DIV>\n");
 
@@ -294,10 +305,10 @@ static void   _mulle_buffer_print_universe_html( struct mulle_buffer *buffer,
    mulle_buffer_append_string( buffer, "\n<DIV CLASS=\"universe_classes\">\n");
    {
       mulle_buffer_html_concurrent_hashmap( buffer,
-                                                &universe->classtable,
-                                                mulle_buffer_html_class_entry,
-                                                &classtable_style,
-                                                NULL);
+                                            &universe->classtable,
+                                            mulle_buffer_html_class_entry,
+                                            &classtable_style,
+                                            NULL);
    }
    mulle_buffer_append_string( buffer, "</DIV>\n");
 
@@ -309,8 +320,7 @@ static void   _mulle_buffer_print_universe_html( struct mulle_buffer *buffer,
 
       if( i < MULLE_OBJC_S_FASTCLASSES)
       {
-         mulle_buffer_append_string( buffer, "Fast Classes");
-
+         mulle_buffer_append_string( buffer, "<H2>Fast Classes</H2>");
          mulle_buffer_append_string( buffer, "<TABLE CLASS=\"universe_fastclass_table\">\n");
 
          for( i = 0; i < MULLE_OBJC_S_FASTCLASSES; i++)
@@ -332,8 +342,8 @@ static void   _mulle_buffer_print_universe_html( struct mulle_buffer *buffer,
    {
       if( mulle_concurrent_hashmap_count( &universe->descriptortable))
       {
+         mulle_buffer_append_string( buffer, "<H2>Method Descriptors</H2>");
          mulle_buffer_append_string( buffer, "<TABLE CLASS=\"universe_descriptor_table\">\n");
-         mulle_buffer_append_string( buffer, "Method Descriptors");
          mulle_buffer_html_concurrent_hashmap( buffer,
                                                 &universe->descriptortable,
                                                 mulle_buffer_html_descriptor_entry,
@@ -348,8 +358,8 @@ static void   _mulle_buffer_print_universe_html( struct mulle_buffer *buffer,
    {
       if( mulle_concurrent_hashmap_count( &universe->protocoltable))
       {
+         mulle_buffer_append_string( buffer, "<H2>Protocols</H2>");
          mulle_buffer_append_string( buffer, "<TABLE CLASS=\"universe_protocol_table\">\n");
-         mulle_buffer_append_string( buffer, "Protocols");
          mulle_buffer_html_concurrent_hashmap( buffer,
                                                 &universe->protocoltable,
                                                 mulle_buffer_html_protocol_entry,
@@ -364,8 +374,8 @@ static void   _mulle_buffer_print_universe_html( struct mulle_buffer *buffer,
    {
       if( mulle_concurrent_hashmap_count( &universe->categorytable))
       {
+         mulle_buffer_append_string( buffer, "<H2>Categories</H2>");
          mulle_buffer_append_string( buffer, "<TABLE CLASS=\"universe_category_table\">\n");
-         mulle_buffer_append_string( buffer, "Categories");
          mulle_buffer_html_concurrent_hashmap( buffer,
                                                 &universe->categorytable,
                                                 mulle_buffer_html_loadcategory_entry,
@@ -380,8 +390,7 @@ static void   _mulle_buffer_print_universe_html( struct mulle_buffer *buffer,
    {
       if( mulle_concurrent_pointerarray_get_count( &universe->staticstrings))
       {
-         mulle_buffer_append_string( buffer, "Strings");
-
+         mulle_buffer_append_string( buffer, "<H2>Strings</H2>");
          mulle_buffer_append_string( buffer, "<TABLE CLASS=\"universe_string_table\">\n");
          rover = mulle_concurrent_pointerarray_enumerate( &universe->staticstrings);
          while( string = _mulle_concurrent_pointerarrayenumerator_next( &rover))
@@ -437,29 +446,30 @@ struct dump_info
 static void   _mulle_buffer_print_infraclass_html( struct mulle_buffer *buffer,
                                                    struct _mulle_objc_infraclass *infra)
 {
-    struct mulle_concurrent_pointerarrayenumerator rover;
-    struct _mulle_objc_protocolclassenumerator prover;
-    struct _mulle_objc_cache *cache;
-    struct _mulle_objc_class *cls;
-    struct _mulle_objc_infraclass *superclass;
-    struct _mulle_objc_metaclass *meta;
-    struct _mulle_objc_classpair *pair;
-    struct _mulle_objc_infraclass *prop_cls;
-    struct _mulle_objc_ivarlist *ivarlist;
-    struct _mulle_objc_universe *universe;
-    struct _mulle_objc_methodlist *methodlist;
-    struct _mulle_objc_propertylist *propertylist;
-    struct _mulle_objc_htmltablestyle style;
-    struct _mulle_objc_uniqueidarray *array;
+    struct mulle_concurrent_pointerarrayenumerator   rover;
+    struct _mulle_objc_protocolclassenumerator       prover;
+    struct _mulle_objc_cache                         *cache;
+    struct _mulle_objc_class                         *cls;
+    struct _mulle_objc_infraclass                    *superclass;
+    struct _mulle_objc_metaclass                     *meta;
+    struct _mulle_objc_classpair                     *pair;
+    struct _mulle_objc_infraclass                    *prop_cls;
+    struct _mulle_objc_ivarlist                      *ivarlist;
+    struct _mulle_objc_universe                      *universe;
+    struct _mulle_objc_methodlist                    *methodlist;
+    struct _mulle_objc_propertylist                  *propertylist;
+    struct _mulle_objc_htmltablestyle                style;
+    struct _mulle_objc_uniqueidarray                 *array;
+    unsigned int                                     n;
 
     // Initialize
     cls = _mulle_objc_infraclass_as_class(infra);
     universe = _mulle_objc_infraclass_get_universe(infra);
 
     // Print class name (header)
-    mulle_buffer_append_string( buffer, "<h2>");
+    mulle_buffer_append_string( buffer, "<H2>");
     mulle_buffer_append_string( buffer, cls->name);
-    mulle_buffer_append_string( buffer, "</h2>");
+    mulle_buffer_append_string( buffer, "</H2>");
 
     // Class links (universe and superclass links)
     mulle_buffer_append_string( buffer, "<DIV CLASS=\"class_links\">\n");
@@ -471,7 +481,7 @@ static void   _mulle_buffer_print_infraclass_html( struct mulle_buffer *buffer,
         mulle_buffer_append_string( buffer, "<DIV CLASS=\"class_superclass_link\">\n");
         superclass = _mulle_objc_infraclass_get_superclass(infra);
         if (superclass) {
-            mulle_buffer_append_string( buffer, "Superclass");
+            mulle_buffer_append_string( buffer, "<H2>Superclass</H2>");
             mulle_buffer_html_class_short( buffer, _mulle_objc_infraclass_as_class(superclass), &classtable_style);
         }
         mulle_buffer_append_string( buffer, "</DIV>\n");
@@ -484,7 +494,7 @@ static void   _mulle_buffer_print_infraclass_html( struct mulle_buffer *buffer,
         pair = _mulle_objc_infraclass_get_classpair(infra);
         if (!(_mulle_objc_infraclass_get_inheritance(infra) & MULLE_OBJC_CLASS_DONT_INHERIT_PROTOCOLS) &&
             mulle_concurrent_pointerarray_get_count(&pair->protocolclasses)) {
-            mulle_buffer_append_string( buffer, "Inherited Protocol Classes");
+            mulle_buffer_append_string( buffer, "<H2>Inherited Protocol Classes</H2>");
 
             mulle_buffer_append_string( buffer, "<OL>\n");
 
@@ -506,7 +516,7 @@ static void   _mulle_buffer_print_infraclass_html( struct mulle_buffer *buffer,
     {
         style = infraclass_style;
         style.title = cls->name;
-        mulle_buffer_append_string( buffer, "Values");
+        mulle_buffer_append_string( buffer, "<H2>Values</H2>");
         mulle_buffer_html_class( buffer, cls, 1, &style);
     }
     mulle_buffer_append_string( buffer, "</DIV>\n");
@@ -514,8 +524,16 @@ static void   _mulle_buffer_print_infraclass_html( struct mulle_buffer *buffer,
     // Properties section
     mulle_buffer_append_string( buffer, "<DIV CLASS=\"class_properties\">\n");
     {
-        if (infra && mulle_concurrent_pointerarray_get_count(&infra->propertylists)) {
-            mulle_buffer_append_string( buffer, "Property Lists");
+        n = mulle_concurrent_pointerarray_get_count( &infra->propertylists);
+        if( n)
+        {
+            mulle_buffer_append_string( buffer, "<H2>Property Lists</H2>");
+            if( n == 1)
+            {
+               propertylist = mulle_concurrent_pointerarray_get( &infra->propertylists, 0);
+               if( propertylist->n_properties == 0)
+                  goto skip_property_table;
+            }
 
             rover = mulle_concurrent_pointerarray_enumerate(&infra->propertylists);
             while (propertylist = _mulle_concurrent_pointerarrayenumerator_next(&rover))
@@ -523,6 +541,7 @@ static void   _mulle_buffer_print_infraclass_html( struct mulle_buffer *buffer,
                 mulle_buffer_html_propertylist( buffer, propertylist, &propertytable_style);
             }
             mulle_concurrent_pointerarrayenumerator_done(&rover);
+skip_property_table:
         }
     }
     mulle_buffer_append_string( buffer, "</DIV>\n");
@@ -530,16 +549,25 @@ static void   _mulle_buffer_print_infraclass_html( struct mulle_buffer *buffer,
     // Instance Variables section
     mulle_buffer_append_string( buffer, "<DIV CLASS=\"class_ivars\">\n");
     {
-        if (infra && mulle_concurrent_pointerarray_get_count(&infra->ivarlists)) {
-            mulle_buffer_append_string( buffer, "Instance Variable Lists");
+        n = mulle_concurrent_pointerarray_get_count(&infra->ivarlists);
+        if( n)
+        {
+            mulle_buffer_append_string( buffer, "<H2>Instance Variable Lists</H2>");
+            if( n == 1)
+            {
+               ivarlist = mulle_concurrent_pointerarray_get( &infra->ivarlists, 0);
+               if( ivarlist->n_ivars == 0)
+                  goto skip_ivar_table;
+            }
 
-            rover = mulle_concurrent_pointerarray_enumerate(&infra->ivarlists);
+            rover = mulle_concurrent_pointerarray_enumerate( &infra->ivarlists);
             while (ivarlist = _mulle_concurrent_pointerarrayenumerator_next(&rover))
             {
                 mulle_buffer_html_ivarlist_hor( buffer, ivarlist, &ivartable_style);
             }
             mulle_concurrent_pointerarrayenumerator_done(&rover);
         }
+skip_ivar_table:
     }
     mulle_buffer_append_string( buffer, "</DIV>\n");
 
@@ -547,8 +575,15 @@ static void   _mulle_buffer_print_infraclass_html( struct mulle_buffer *buffer,
     mulle_buffer_append_string( buffer, "<DIV CLASS=\"class_classmethods\">\n");
     {
         meta = _mulle_objc_infraclass_get_metaclass(infra);
-        if (mulle_concurrent_pointerarray_get_count(&meta->base.methodlists)) {
-            mulle_buffer_append_string( buffer, "+ Method Lists");
+        if( mulle_concurrent_pointerarray_get_count(&meta->base.methodlists))
+        {
+            mulle_buffer_append_string( buffer, "<H2>+ Method Lists</H2>");
+            if( n == 1)
+            {
+               methodlist = mulle_concurrent_pointerarray_get( &meta->base.methodlists, 0);
+               if( methodlist->n_methods == 0)
+                  goto skip_metamethod_table;
+            }
 
             rover = mulle_concurrent_pointerarray_enumerate(&meta->base.methodlists);
             while (methodlist = mulle_concurrent_pointerarrayenumerator_next(&rover)) {
@@ -558,6 +593,7 @@ static void   _mulle_buffer_print_infraclass_html( struct mulle_buffer *buffer,
                 mulle_buffer_html_methodlist_hor( buffer, methodlist, &style);
             }
             mulle_concurrent_pointerarrayenumerator_done(&rover);
+skip_metamethod_table:
         }
     }
     mulle_buffer_append_string( buffer, "</DIV>\n");
@@ -565,8 +601,15 @@ static void   _mulle_buffer_print_infraclass_html( struct mulle_buffer *buffer,
     // Instance Methods section
     mulle_buffer_append_string( buffer, "<DIV CLASS=\"class_instancemethods\">\n");
     {
-        if (mulle_concurrent_pointerarray_get_count(&infra->base.methodlists)) {
-            mulle_buffer_append_string( buffer, "- Method Lists");
+        if( mulle_concurrent_pointerarray_get_count(&infra->base.methodlists))
+        {
+            mulle_buffer_append_string( buffer, "<H2>- Method Lists</H2>");
+            if( n == 1)
+            {
+               methodlist = mulle_concurrent_pointerarray_get( &infra->base.methodlists, 0);
+               if( methodlist->n_methods == 0)
+                  goto skip_inframethod_table;
+            }
 
             rover = mulle_concurrent_pointerarray_enumerate(&infra->base.methodlists);
             while (methodlist = mulle_concurrent_pointerarrayenumerator_next(&rover)) {
@@ -577,6 +620,7 @@ static void   _mulle_buffer_print_infraclass_html( struct mulle_buffer *buffer,
             }
             mulle_concurrent_pointerarrayenumerator_done(&rover);
         }
+skip_inframethod_table:
     }
     mulle_buffer_append_string( buffer, "</DIV>\n");
 
@@ -585,7 +629,7 @@ static void   _mulle_buffer_print_infraclass_html( struct mulle_buffer *buffer,
     {
         array = _mulle_atomic_pointer_read(&pair->p_protocolids.pointer);
         if (array->n) {
-            mulle_buffer_append_string( buffer, "Protocols");
+            mulle_buffer_append_string( buffer, "<H2>Protocols</H2>");
             mulle_buffer_html_uniqueidarray( buffer, array,
                                                      mulle_buffer_html_protocolid_element,
                                                      &protocoltable_style,
@@ -599,7 +643,7 @@ static void   _mulle_buffer_print_infraclass_html( struct mulle_buffer *buffer,
     {
         array = _mulle_atomic_pointer_read(&pair->p_categoryids.pointer);
         if (array->n) {
-            mulle_buffer_append_string( buffer, "Categories");
+            mulle_buffer_append_string( buffer, "<H2>Categories</H2>");
             mulle_buffer_html_uniqueidarray( buffer, array,
                                                      mulle_buffer_html_categoryid_element,
                                                      &categorytable_style,
@@ -612,7 +656,7 @@ static void   _mulle_buffer_print_infraclass_html( struct mulle_buffer *buffer,
     mulle_buffer_append_string( buffer, "<DIV CLASS=\"class_cache\">\n");
     {
         cache = _mulle_objc_cachepivot_get_cache_atomic(&cls->cachepivot.pivot);
-        mulle_buffer_append_string( buffer, "Instance Cache");
+        mulle_buffer_append_string( buffer, "<H2>Instance Cache</H2>");
         mulle_buffer_html_cache( buffer, cache, universe, &cachetable_style);
     }
     mulle_buffer_append_string( buffer, "</DIV>\n");
@@ -621,7 +665,7 @@ static void   _mulle_buffer_print_infraclass_html( struct mulle_buffer *buffer,
     mulle_buffer_append_string( buffer, "<DIV CLASS=\"class_cache\">\n");
     {
         cache = _mulle_objc_cachepivot_get_cache_atomic(&meta->base.cachepivot.pivot);
-        mulle_buffer_append_string( buffer, "Meta Cache");
+        mulle_buffer_append_string( buffer, "<H2>Meta Cache</H2>");
         mulle_buffer_html_cache( buffer, cache, universe, &cachetable_style);
     }
     mulle_buffer_append_string( buffer, "</DIV>\n");

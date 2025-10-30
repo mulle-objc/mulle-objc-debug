@@ -288,10 +288,10 @@ typedef void   mulle_buffer_html_hashmap_callback_t( struct mulle_buffer *,
 
 MULLE_OBJC_DEBUG_GLOBAL
 void   mulle_buffer_html_concurrent_hashmap( struct mulle_buffer *buffer,
-                                                struct mulle_concurrent_hashmap *map,
-                                                mulle_buffer_html_hashmap_callback_t *row_description,
-                                                struct _mulle_objc_htmltablestyle *styling,
-                                                void *userinfo);
+                                             struct mulle_concurrent_hashmap *map,
+                                             mulle_buffer_html_hashmap_callback_t *row_description,
+                                             struct _mulle_objc_htmltablestyle *styling,
+                                             void *userinfo);
 
 
 typedef void   mulle_buffer_html_uniqueidarray_callback_t( struct mulle_buffer *,

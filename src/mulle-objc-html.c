@@ -161,8 +161,8 @@ static void   mulle_buffer_add_column_headers( struct mulle_buffer *buffer,
 
 
 void   mulle_buffer_add_table_header_colspan( struct mulle_buffer *buffer,
-                                                     struct _mulle_objc_htmltablestyle *styling,
-                                                     unsigned int colspan)
+                                              struct _mulle_objc_htmltablestyle *styling,
+                                              unsigned int colspan)
 {
    int   num_columns;
 
@@ -301,8 +301,8 @@ void   mulle_buffer_html_staticstring_element( struct mulle_buffer *buffer,
 #pragma mark - classes
 
 void   mulle_buffer_html_class_short( struct mulle_buffer *buffer,
-                                          struct _mulle_objc_class *cls,
-                                          struct _mulle_objc_htmltablestyle *styling)
+                                      struct _mulle_objc_class *cls,
+                                      struct _mulle_objc_htmltablestyle *styling)
 {
    char  *name;
 
@@ -317,10 +317,10 @@ void   mulle_buffer_html_class_short( struct mulle_buffer *buffer,
 
 // Updated to match mulle_buffer_html_entry_t callback signature
 void   mulle_buffer_html_class_entry( struct mulle_buffer *buffer,
-                                                  intptr_t classid,
-                                                  void *cls,
-                                                  struct _mulle_objc_htmltablestyle *styling,
-                                                  void *userinfo)
+                                      intptr_t classid,
+                                      void *cls,
+                                      struct _mulle_objc_htmltablestyle *styling,
+                                      void *userinfo)
 {
    char   *name;
    char   *prefix;
@@ -386,9 +386,9 @@ void   mulle_buffer_html_class_tiny( struct mulle_buffer *buffer,
 
 
 void   mulle_buffer_html_class( struct mulle_buffer *buffer,
-                                    struct _mulle_objc_class *cls,
-                                    int show_fields,
-                                    struct _mulle_objc_htmltablestyle *styling)
+                                struct _mulle_objc_class *cls,
+                                int show_fields,
+                                struct _mulle_objc_htmltablestyle *styling)
 {
    struct _mulle_objc_htmltablestyle  style;
 
@@ -626,10 +626,10 @@ void   mulle_buffer_html_ivarlist_hor( struct mulle_buffer *buffer,
 
 
 void   mulle_buffer_html_descriptor_entry( struct mulle_buffer *buffer,
-                                                   intptr_t  methodid,
-                                                   void *value,
-                                                   struct _mulle_objc_htmltablestyle *styling,
-                                                   void *userinfo)
+                                           intptr_t  methodid,
+                                           void *value,
+                                           struct _mulle_objc_htmltablestyle *styling,
+                                           void *userinfo)
 {
    struct _mulle_objc_descriptor    *desc = value;
    char                             *format;
@@ -662,10 +662,10 @@ void   mulle_buffer_html_descriptor_entry( struct mulle_buffer *buffer,
 
 // Callback wrapper for hashmap usage
 void   mulle_buffer_html_loadcategory_entry( struct mulle_buffer *buffer,
-                                                     intptr_t categoryid,
-                                                     void *value,
-                                                     struct _mulle_objc_htmltablestyle *styling,
-                                                     void *userinfo)
+                                             intptr_t categoryid,
+                                             void *value,
+                                             struct _mulle_objc_htmltablestyle *styling,
+                                             void *userinfo)
 {
    mulle_buffer_sprintf( buffer,
                 "<TR>"
@@ -678,10 +678,10 @@ void   mulle_buffer_html_loadcategory_entry( struct mulle_buffer *buffer,
 
 
 void   mulle_buffer_html_category_entry( struct mulle_buffer *buffer,
-                                                 intptr_t  categoryid,
-                                                 void *value,
-                                                 struct _mulle_objc_htmltablestyle *styling,
-                                                 void *userinfo)
+                                         intptr_t  categoryid,
+                                         void *value,
+                                         struct _mulle_objc_htmltablestyle *styling,
+                                         void *userinfo)
 {
    MULLE_C_UNUSED( styling);
    MULLE_C_UNUSED( userinfo);
@@ -700,10 +700,10 @@ void   mulle_buffer_html_category_entry( struct mulle_buffer *buffer,
 
 // Callback wrapper for hashmap usage
 void   mulle_buffer_html_protocol_entry( struct mulle_buffer *buffer,
-                                                            intptr_t protocolid,
-                                                            void *value,
-                                                            struct _mulle_objc_htmltablestyle *styling,
-                                                            void *userinfo)
+                                         intptr_t protocolid,
+                                         void *value,
+                                         struct _mulle_objc_htmltablestyle *styling,
+                                         void *userinfo)
 {
    struct _mulle_objc_protocol  *protocol = value;
 
@@ -718,9 +718,9 @@ void   mulle_buffer_html_protocol_entry( struct mulle_buffer *buffer,
 
 
 void   mulle_buffer_html_protocol( struct mulle_buffer *buffer,
-                                               intptr_t  protocolid,
-                                               void *value,
-                                               struct _mulle_objc_htmltablestyle *styling)
+                                   intptr_t  protocolid,
+                                   void *value,
+                                   struct _mulle_objc_htmltablestyle *styling)
 {
    struct _mulle_objc_protocol  *protocol = value;
 
@@ -740,16 +740,20 @@ void   mulle_buffer_html_protocol( struct mulle_buffer *buffer,
 #pragma mark - propertylist
 
 void   mulle_buffer_html_propertylist( struct mulle_buffer *buffer,
-                                               struct _mulle_objc_propertylist *list,
-                                               struct _mulle_objc_htmltablestyle *styling)
+                                       struct _mulle_objc_propertylist *list,
+                                       struct _mulle_objc_htmltablestyle *styling)
 {
    struct mulle_pointerarray   array;
    char                        *format;
    unsigned int                j;
+   int                         terse;
 
-   mulle_buffer_add_table_header_colspan( buffer, styling, styling->colspan);
+   terse = mulle_objc_environment_get_yes_no_default( "MULLE_OBJC_TERSE_TABLE", 0);
 
-   if( mulle_objc_environment_get_yes_no_default( "MULLE_OBJC_TERSE_TABLE", 0))
+   if( styling)
+      mulle_buffer_add_table_header_colspan( buffer, styling, styling->colspan);
+
+   if( terse)
       format = "<TR>"
                "<TD>%s</TD>"
                "</TR>\n";
@@ -954,92 +958,94 @@ void   mulle_buffer_html_methodlist_hor( struct mulle_buffer *buffer,
                                          struct _mulle_objc_htmltablestyle *styling)
 {
    char   *format;
+   int    terse;
 
+   terse = mulle_objc_environment_get_yes_no_default( "MULLE_OBJC_TERSE_TABLE", 0);
    mulle_buffer_add_table_header_colspan( buffer, styling, 5);
 
-      if( list->n_methods)
+   if( list->n_methods)
+   {
+      if( terse)
       {
-         if( mulle_objc_environment_get_yes_no_default( "MULLE_OBJC_TERSE_TABLE", 0))
-         {
-            if( styling->classprefix)
-               format = "<TR>"
-                           "<TH>name</TH>"
-                        "</TR>\n";
-            else
-               format = "<TR>"
-                           "<TD>name</TD>"
-                        "</TR>\n";
-         }
+         if( styling->classprefix)
+            format = "<TR>"
+                        "<TH COLSPAN=5>name</TH>"
+                     "</TR>\n";
          else
-         {
-            if( styling->classprefix)
-               format = "<TR>"
-                           "<TH>name</TH>"
-                           "<TH>signature</TH>"
-                           "<TH>methodid</TH>"
-                           "<TH>bits</TH>"
-                           "<TH>implementation</TH>"
-                        "</TR>\n";
-            else
-               format =  "<TR>"
-                           "<TD>name</TD>"
-                           "<TD>signature</TD>"
-                           "<TD>methodid</TD>"
-                           "<TD>bits</TD>"
-                           "<TD>implementation</TD>"
-                         "</TR>\n";
-         }
-
-         mulle_buffer_add_string( buffer, format);
+            format = "<TR>"
+                        "<TD>name</TD>"
+                     "</TR>\n";
       }
-
-      if( mulle_objc_environment_get_yes_no_default( "MULLE_OBJC_TERSE_TABLE", 0))
-         format = "<TR>"
-                    "<TD>%s</TD>"
-                  "</TR>\n";
       else
-         format = "<TR>"
-                    "<TD>%s</TD>"
-                    "<TD>%s</TD>"
-                    "<TD>%08lx</TD>"
-                    "<TD>0x%lx</TD>"
-                    "<TD>%s</TD>"
-                  "</TR>\n";
-
-      mulle_buffer_do( tmp_buffer)
       {
-         unsigned int   j;
-
-         for( j = 0; j < list->n_methods; j++)
-         {
-            char   *impl_str;
-
-            mulle_buffer_reset( tmp_buffer);
-            mulle_buffer_sprintf_functionpointer( tmp_buffer,
-                                                  (mulle_functionpointer_t) &list->methods[ j].value);
-            impl_str = mulle_buffer_get_string( tmp_buffer);
-
-            mulle_buffer_sprintf( buffer,
-                                  format,
-                                  html_escape( list->methods[ j].descriptor.name),
-                                  html_escape( list->methods[ j].descriptor.signature),
-                                  (unsigned long) list->methods[ j].descriptor.methodid,
-                                  (unsigned long) list->methods[ j].descriptor.bits,
-                                  impl_str);
-         }
+         if( styling->classprefix)
+            format = "<TR>"
+                        "<TH>name</TH>"
+                        "<TH>signature</TH>"
+                        "<TH>methodid</TH>"
+                        "<TH>bits</TH>"
+                        "<TH>implementation</TH>"
+                     "</TR>\n";
+         else
+            format =  "<TR>"
+                        "<TD>name</TD>"
+                        "<TD>signature</TD>"
+                        "<TD>methodid</TD>"
+                        "<TD>bits</TD>"
+                        "<TD>implementation</TD>"
+                      "</TR>\n";
       }
 
-      mulle_buffer_add_string( buffer, "</TABLE>");
+      mulle_buffer_add_string( buffer, format);
+   }
+
+   if( terse)
+      format = "<TR>"
+                 "<TD COLSPAN=5>%s</TD>"
+               "</TR>\n";
+   else
+      format = "<TR>"
+                 "<TD>%s</TD>"
+                 "<TD>%s</TD>"
+                 "<TD>%08lx</TD>"
+                 "<TD>0x%lx</TD>"
+                 "<TD>%s</TD>"
+               "</TR>\n";
+
+   mulle_buffer_do( tmp_buffer)
+   {
+      unsigned int   j;
+
+      for( j = 0; j < list->n_methods; j++)
+      {
+         char   *impl_str;
+
+         mulle_buffer_reset( tmp_buffer);
+         mulle_buffer_sprintf_functionpointer( tmp_buffer,
+                                               (mulle_functionpointer_t) &list->methods[ j].value);
+         impl_str = mulle_buffer_get_string( tmp_buffer);
+
+         mulle_buffer_sprintf( buffer,
+                               format,
+                               html_escape( list->methods[ j].descriptor.name),
+                               html_escape( list->methods[ j].descriptor.signature),
+                               (unsigned long) list->methods[ j].descriptor.methodid,
+                               (unsigned long) list->methods[ j].descriptor.bits,
+                               impl_str);
+      }
+   }
+
+   mulle_buffer_add_string( buffer, "</TABLE>");
 }
 
 
 #pragma mark - loadclass
 
 void   mulle_buffer_html_loadclass_element( struct mulle_buffer *buffer,
-                                                unsigned int row,
-                                                void *value,
-                                                struct _mulle_objc_htmltablestyle *styling,
-                                                void *userinfo)
+                                            unsigned int row,
+                                            void *value,
+                                            struct _mulle_objc_htmltablestyle *styling,
+                                            void *userinfo)
 {
    struct _mulle_objc_loadclass   *loadcls = value;
 
@@ -1054,10 +1060,10 @@ void   mulle_buffer_html_loadclass_element( struct mulle_buffer *buffer,
 #pragma mark - loadcategory
 
 char   *mulle_buffer_html_loadcategory_element( struct mulle_buffer *buffer,
-                                                    unsigned int row,
-                                                    void *value,
-                                                    struct _mulle_objc_htmltablestyle *styling,
-                                                    void *userinfo)
+                                                unsigned int row,
+                                                void *value,
+                                                struct _mulle_objc_htmltablestyle *styling,
+                                                void *userinfo)
 {
    struct _mulle_objc_loadcategory   *loadcat = value;
    char                              *s;
@@ -1085,10 +1091,10 @@ char   *mulle_buffer_html_loadcategory_element( struct mulle_buffer *buffer,
 #pragma mark - fastclasses
 
 void   mulle_buffer_html_fastclass_element( struct mulle_buffer *buffer,
-                                    unsigned int row,
-                                    struct _mulle_objc_infraclass *cls,
-                                    struct _mulle_objc_htmltablestyle *styling,
-                                    void *userinfo)
+                                            unsigned int row,
+                                            struct _mulle_objc_infraclass *cls,
+                                            struct _mulle_objc_htmltablestyle *styling,
+                                            void *userinfo)
 {
    mulle_buffer_sprintf( buffer,
             "<TR>"
