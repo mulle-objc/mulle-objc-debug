@@ -72,24 +72,16 @@ static char   *html_escape( char *s)
 }
 
 
-void   mulle_buffer_describe_loadclass( struct mulle_buffer *buffer,
-                                        void *value,
-                                        struct _mulle_objc_htmltablestyle *styling,
-                                        void *userinfo)
-{
-   mulle_buffer_describe_loadclass_row( buffer, value, styling, userinfo);
-}
 
-
-//// Callback wrapper for mulle_buffer_describe_pointer_t
-//static void   _mulle_objc_loadcategory_describe_buffer_entry( struct mulle_buffer *buffer,
+//// Callback wrapper for mulle_buffer_html_pointer_t
+//static void   _mulle_objc_loadcategory_html_buffer_entry( struct mulle_buffer *buffer,
 //                                                              void *value,
 //                                                              struct _mulle_objc_htmltablestyle *styling,
 //                                                              void *userinfo)
 //{
 //   char   *row;
 //
-//   row = mulle_buffer_describe_loadcategory( (intptr_t) 0, value, styling);
+//   row = mulle_buffer_html_loadcategory_element( (intptr_t) 0, value, styling);
 //   if( row)
 //   {
 //      mulle_buffer_add_string( buffer, row);
@@ -97,24 +89,6 @@ void   mulle_buffer_describe_loadclass( struct mulle_buffer *buffer,
 //   }
 //}
 
-
-void   mulle_buffer_describe_super_hashmap_entry( struct mulle_buffer *buffer,
-                                                intptr_t hash,
-                                                void *value,
-                                                struct _mulle_objc_htmltablestyle *styling,
-                                                void *userinfo)
-{
-   mulle_buffer_describe_super( buffer, hash, value, styling);
-}
-
-
-void   mulle_buffer_describe_staticstring_entry( struct mulle_buffer *buffer,
-                                                       void *value,
-                                                       struct _mulle_objc_htmltablestyle *styling,
-                                                       void *userinfo)
-{
-   mulle_buffer_describe_staticstring_row( buffer, value, styling);
-}
 
 
 static char   *dot_filename_for_name( char *name, char *directory)
@@ -334,31 +308,27 @@ static struct _mulle_objc_htmltablestyle   universe_style =
 
 # pragma mark - walker universe callback
 
-static char  *mulle_objc_loadclasslist_describe_row_html( intptr_t classid, void *value,
+static char  *mulle_objc_loadclasslist_html_row_html( intptr_t classid, void *value,
    struct _mulle_objc_htmltablestyle *styling)
 {
    struct mulle_concurrent_pointerarray   *array = value;
+   char                                   *result;
 
-   mulle_buffer_describe_concurrent_pointerarray( tmp_buffer,
-                                                array,
-                                                mulle_buffer_describe_loadclass,
-                                                NULL,
-                                                NULL);
-   return( mulle_buffer_extract_string( tmp_buffer));
+   mulle_buffer_do_string( tmp, NULL, result)
+   {
+      mulle_buffer_html_concurrent_pointerarray( tmp,
+                                                   array,
+                                                   mulle_buffer_html_loadclass_element,
+                                                   NULL,
+                                                   NULL);
+   }
+   return( result);
 }
 
 
-void   mulle_buffer_describe_fastclass( struct mulle_buffer *buffer,
-                                                         struct _mulle_objc_infraclass *cls,
-                                                         struct _mulle_objc_htmltablestyle *styling,
-                                                         void *userinfo)
-{
-   mulle_buffer_describe_fastclass_row( buffer, (intptr_t) _mulle_objc_infraclass_get_classid( cls), cls, styling);
-}
 
-
-// Callback wrapper for mulle_buffer_describe_hashmap_entry_t
-static void   _mulle_objc_loadclasslist_describe_hashmap_entry( struct mulle_buffer *buffer,
+// Callback wrapper for mulle_buffer_html_entry_t
+static void   _mulle_objc_loadclasslist_html_entry( struct mulle_buffer *buffer,
                                                                 intptr_t hash,
                                                                 void *value,
                                                                 struct _mulle_objc_htmltablestyle *styling,
@@ -366,7 +336,7 @@ static void   _mulle_objc_loadclasslist_describe_hashmap_entry( struct mulle_buf
 {
    char   *row;
 
-   row = mulle_objc_loadclasslist_describe_row_html( hash, value, styling);
+   row = mulle_objc_loadclasslist_html_row_html( hash, value, styling);
    if( row)
    {
       mulle_buffer_add_string( buffer, row);
@@ -375,14 +345,21 @@ static void   _mulle_objc_loadclasslist_describe_hashmap_entry( struct mulle_buf
 }
 
 
+
 struct dump_info
 {
-   c_set               set;
-   struct mulle_buffer *buffer;
-   char                *directory;
-
-   unsigned long       options;
+   c_set           set;
+   char            *directory;
+   unsigned long   options;
 };
+
+
+struct callback_info
+{
+   struct mulle_buffer   *buffer;
+   struct dump_info      info;
+};
+
 
 
 static void   _mulle_buffer_dot_universe( struct mulle_buffer *buffer,
@@ -392,7 +369,7 @@ static void   _mulle_buffer_dot_universe( struct mulle_buffer *buffer,
    int    i;
 
    mulle_buffer_sprintf( buffer, "\"%p\" [ label=<", universe);
-   mulle_buffer_describe_universe( buffer, universe, &universe_style);
+   mulle_buffer_html_universe( buffer, universe, &universe_style);
    mulle_buffer_sprintf( buffer, ">, shape=\"%s\", URL=\"file:///%s/overview.dot\"  ];\n",
                       "component",
                       info->directory);
@@ -404,9 +381,9 @@ static void   _mulle_buffer_dot_universe( struct mulle_buffer *buffer,
                  universe, &universe->descriptortable);
 
          mulle_buffer_sprintf( buffer, "\"%p\" [ label=<", &universe->descriptortable);
-         mulle_buffer_describe_concurrent_hashmap( buffer,
+         mulle_buffer_html_concurrent_hashmap( buffer,
                                                    &universe->descriptortable,
-                                                   mulle_buffer_describe_descriptor_hashmap_entry,
+                                                   mulle_buffer_html_descriptor_entry,
                                                    &selectortable_style,
                                                    NULL);
          mulle_buffer_sprintf( buffer, ">, shape=\"%s\" ];\n", "box");
@@ -419,9 +396,9 @@ static void   _mulle_buffer_dot_universe( struct mulle_buffer *buffer,
                  universe, &universe->protocoltable);
 
          mulle_buffer_sprintf( buffer, "\"%p\" [ label=<", &universe->protocoltable);
-         mulle_buffer_describe_concurrent_hashmap( buffer,
+         mulle_buffer_html_concurrent_hashmap( buffer,
                                                  &universe->protocoltable,
-                                                 mulle_buffer_describe_protocol_hashmap_entry,
+                                                 mulle_buffer_html_protocol_entry,
                                                  &protocoltable_style,
                                                  NULL);
          mulle_buffer_sprintf( buffer, ">, shape=\"%s\" ];\n", "box");
@@ -434,9 +411,9 @@ static void   _mulle_buffer_dot_universe( struct mulle_buffer *buffer,
                  universe, &universe->categorytable);
 
          mulle_buffer_sprintf( buffer, "\"%p\" [ label=<", &universe->categorytable);
-         mulle_buffer_describe_concurrent_hashmap( buffer,
+         mulle_buffer_html_concurrent_hashmap( buffer,
                                                  &universe->categorytable,
-                                                 mulle_buffer_describe_loadcategory_hashmap_entry,
+                                                 mulle_buffer_html_loadcategory_entry,
                                                  &categorytable_style,
                                                  NULL);
          mulle_buffer_sprintf( buffer, ">, shape=\"%s\" ];\n", "box");
@@ -449,9 +426,9 @@ static void   _mulle_buffer_dot_universe( struct mulle_buffer *buffer,
                  universe, &universe->supertable);
 
          mulle_buffer_sprintf( buffer, "\"%p\" [ label=<", &universe->supertable);
-         mulle_buffer_describe_concurrent_hashmap( buffer,
+         mulle_buffer_html_concurrent_hashmap( buffer,
                                                  &universe->supertable,
-                                                 mulle_buffer_describe_super_hashmap_entry,
+                                                 mulle_buffer_html_super_entry,
                                                  &supertable_style,
                                                  NULL);
          mulle_buffer_sprintf( buffer, ">, shape=\"%s\" ];\n", "box");
@@ -461,9 +438,9 @@ static void   _mulle_buffer_dot_universe( struct mulle_buffer *buffer,
       if( mulle_concurrent_pointerarray_get_count( &universe->staticstrings))
       {
          mulle_buffer_sprintf( buffer, "\"%p\" [ label=<", &universe->staticstrings);
-         mulle_buffer_describe_concurrent_pointerarray( buffer,
+         mulle_buffer_html_concurrent_pointerarray( buffer,
                                                       &universe->staticstrings,
-                                                      mulle_buffer_describe_staticstring_entry,
+                                                      mulle_buffer_html_staticstring_element,
                                                       &staticstringtable_title,
                                                       NULL);
          mulle_buffer_sprintf( buffer, ">, shape=\"%s\" ];\n", "box");
@@ -483,11 +460,10 @@ static void   _mulle_buffer_dot_universe( struct mulle_buffer *buffer,
                  universe, &universe->fastclasstable);
          mulle_buffer_sprintf( buffer, "\"%p\" [ label=<", &universe->fastclasstable);
 
-         mulle_buffer_describe_fastclasstable( buffer,
-                                                 &universe->fastclasstable,
-                                                 mulle_buffer_describe_fastclass,
-                                                 &fastclasstable_title,
-                                                 NULL);
+         mulle_buffer_html_fastclasstable( buffer, &universe->fastclasstable,
+                                                   mulle_buffer_html_fastclass_element,
+                                                   &fastclasstable_title,
+                                                   NULL);
 
          mulle_buffer_sprintf( buffer, ">, shape=\"%s\" ];\n", "box");
       }
@@ -501,9 +477,9 @@ static void   _mulle_buffer_dot_universe( struct mulle_buffer *buffer,
 
          mulle_buffer_sprintf( buffer, "\"%p\" [ label=<", &universe->classtable);
 
-         mulle_buffer_describe_concurrent_hashmap( buffer,
+         mulle_buffer_html_concurrent_hashmap( buffer,
                                                 &universe->classtable,
-                                                mulle_buffer_describe_class_hashmap_entry,
+                                                mulle_buffer_html_class_entry,
                                                 &classtable_style,
                                                 NULL);
 
@@ -519,9 +495,9 @@ static void   _mulle_buffer_dot_universe( struct mulle_buffer *buffer,
 
          mulle_buffer_sprintf( buffer, "\"%p\" [ label=<", &universe->waitqueues.classestoload);
 
-         mulle_buffer_describe_concurrent_hashmap( buffer,
+         mulle_buffer_html_concurrent_hashmap( buffer,
                                                 &universe->waitqueues.classestoload,
-                                                _mulle_objc_loadclasslist_describe_hashmap_entry,
+                                                _mulle_objc_loadclasslist_html_entry,
                                                 &classestoload_style,
                                                 NULL);
 
@@ -535,9 +511,9 @@ static void   _mulle_buffer_dot_universe( struct mulle_buffer *buffer,
 
          mulle_buffer_sprintf( buffer, "\"%p\" [ label=<", &universe->waitqueues.categoriestoload);
 
-         mulle_buffer_describe_concurrent_hashmap( buffer,
+         mulle_buffer_html_concurrent_hashmap( buffer,
                                                 &universe->waitqueues.categoriestoload,
-                                                mulle_buffer_describe_loadcategory_hashmap_entry,
+                                                mulle_buffer_html_loadcategory_entry,
                                                 &categoriestoload_style,
                                                 NULL);
 
@@ -553,7 +529,7 @@ static void   _mulle_buffer_dot_hyper_universe( struct mulle_buffer *buffer,
                                                 struct dump_info *info)
 {
    mulle_buffer_sprintf( buffer, "\"%p\" [ label=<", universe);
-   mulle_buffer_describe_universe( buffer, universe, &universe_style);
+   mulle_buffer_html_universe( buffer, universe, &universe_style);
    mulle_buffer_sprintf( buffer, ">, shape=\"%s\", URL=\"file:///%s/universe.dot\"  ];\n",
       "component", info->directory);
 }
@@ -630,7 +606,7 @@ static void   _mulle_buffer_dot_methodlists( struct mulle_buffer *buffer,
                   cls, methodlist, i++);
 
          mulle_buffer_sprintf( buffer, "\"%p\" [ label=<", methodlist);
-         mulle_buffer_describe_methodlist( buffer,
+         mulle_buffer_html_methodlist( buffer,
                                            methodlist,
                                            universe,
                                            info->options & MULLE_OBJC_SHOW_METHODLISTFIELDS,
@@ -658,7 +634,7 @@ static void   _mulle_buffer_dot_cache( struct mulle_buffer *buffer,
               cls, cache);
 
       mulle_buffer_sprintf( buffer, "\"%p\" [ label=<", cache);
-      mulle_buffer_describe_cache( buffer, cache, universe, &cachetable_style);
+      mulle_buffer_html_cache( buffer, cache, universe, &cachetable_style);
       mulle_buffer_sprintf( buffer, ">, shape=\"none\" ];\n");
    }
 }
@@ -715,7 +691,7 @@ static void   _mulle_buffer_dot_class( struct mulle_buffer *buffer,
    style.title = cls->name;
 
    mulle_buffer_sprintf( buffer, "\"%p\" [ label=<", cls);
-   mulle_buffer_describe_class( buffer, cls, info->options & MULLE_OBJC_SHOW_CLASSFIELDS, &style);
+   mulle_buffer_html_class( buffer, cls, info->options & MULLE_OBJC_SHOW_CLASSFIELDS, &style);
    mulle_buffer_sprintf( buffer, ">, shape=\"%s\"", is_meta ? "component" : "box");
 
    if( info->options & MULLE_OBJC_SHOW_FILELINK)
@@ -796,9 +772,10 @@ static void   _mulle_buffer_dot_classpair( struct mulle_buffer *buffer,
               cls, array);
 
       mulle_buffer_sprintf( buffer, "\"%p\" [ label=<", array);
-      mulle_buffer_describe_protocolids( buffer, array,
-                                          universe,
-                                          &protocoltable_style);
+      mulle_buffer_html_uniqueidarray( buffer, array,
+                                               mulle_buffer_html_protocolid_element,
+                                               &protocoltable_style,
+                                               universe);
       mulle_buffer_sprintf( buffer, ">, shape=\"none\" ];\n");
    }
 
@@ -809,9 +786,10 @@ static void   _mulle_buffer_dot_classpair( struct mulle_buffer *buffer,
               cls, array);
 
       mulle_buffer_sprintf( buffer, "\"%p\" [ label=<", array);
-      mulle_buffer_describe_categoryids( buffer, array,
-                                           universe,
-                                           &categorytable_style);
+      mulle_buffer_html_uniqueidarray( buffer, array,
+                                               mulle_buffer_html_categoryid_element,
+                                               &categorytable_style,
+                                               universe);
       mulle_buffer_sprintf( buffer, ">, shape=\"none\" ];\n");
    }
 }
@@ -840,7 +818,7 @@ static void   _mulle_buffer_dot_infraclass( struct mulle_buffer *buffer,
                     infra, ivarlist, i++);
 
             mulle_buffer_sprintf( buffer, "\"%p\" [ label=<", ivarlist);
-            mulle_buffer_describe_ivarlist_hor( buffer, ivarlist, &ivarlist_style);
+            mulle_buffer_html_ivarlist_hor( buffer, ivarlist, &ivarlist_style);
             mulle_buffer_sprintf( buffer, ">, shape=\"none\" ];\n");
          }
       }
@@ -859,7 +837,7 @@ static void   _mulle_buffer_dot_infraclass( struct mulle_buffer *buffer,
                     infra, propertylist, i++);
 
             mulle_buffer_sprintf( buffer, "\"%p\" [ label=<", propertylist);
-            mulle_buffer_describe_propertylist( buffer, propertylist, &propertylist_style);
+            mulle_buffer_html_propertylist( buffer, propertylist, &propertylist_style);
             mulle_buffer_sprintf( buffer, ">, shape=\"none\" ];\n");
          }
       }
@@ -885,7 +863,7 @@ static void   _mulle_buffer_dot_hyper_infraclass( struct mulle_buffer *buffer,
    style.title = html_escape( infra->base.name);
 
    mulle_buffer_sprintf( buffer, "\"%p\" [ label=<", infra);
-   mulle_buffer_describe_class_tiny( buffer, _mulle_objc_infraclass_as_class( infra), &style);
+   mulle_buffer_html_class_tiny( buffer, _mulle_objc_infraclass_as_class( infra), &style);
    mulle_buffer_sprintf( buffer, ">, shape=\"box\", URL=\"file:///%s/%s.dot\" ];\n", info->directory, style.title);
 
    if( info->options & MULLE_OBJC_SHOW_UNIVERSE)
@@ -925,16 +903,19 @@ static mulle_objc_walkcommand_t
                      void *parent,
                      void *userinfo)
 {
+   struct callback_info            *cinfo  = userinfo;
    struct _mulle_objc_infraclass   *infra;
    struct _mulle_objc_metaclass    *meta;
    struct dump_info                *info;
+   struct mulle_buffer             *buffer;
+
+   info   = &cinfo->info;
+   buffer = cinfo->buffer;
 
    assert( p);
 
    if( key)
       return( mulle_objc_walk_ok);
-
-   info = userinfo;
 
    if( c_set_member( &info->set, p))
       return( mulle_objc_walk_dont_descend);
@@ -952,9 +933,9 @@ static mulle_objc_walkcommand_t
       {
          universe = p;
          if( info->options & MULLE_OBJC_SHOW_UNIVERSE_HYPERLINK)
-            _mulle_buffer_dot_hyper_universe( info->buffer, universe, info);
+            _mulle_buffer_dot_hyper_universe( buffer, universe, info);
          else
-            _mulle_buffer_dot_universe( info->buffer, universe, info);
+            _mulle_buffer_dot_universe( buffer, universe, info);
       }
       break;
 
@@ -963,9 +944,9 @@ static mulle_objc_walkcommand_t
       if( info->options & MULLE_OBJC_SHOW_INFRACLASS)
       {
          if( info->options & MULLE_OBJC_SHOW_CLASS_HYPERLINK)
-            _mulle_buffer_dot_hyper_infraclass( info->buffer, infra, info);
+            _mulle_buffer_dot_hyper_infraclass( buffer, infra, info);
          else
-            _mulle_buffer_dot_infraclass( info->buffer, infra, info);
+            _mulle_buffer_dot_infraclass( buffer, infra, info);
       }
       break;
 
@@ -974,7 +955,7 @@ static mulle_objc_walkcommand_t
       if( info->options & MULLE_OBJC_SHOW_METACLASS)
       {
          if( ! (info->options & MULLE_OBJC_SHOW_CLASS_HYPERLINK))
-            _mulle_buffer_dot_metaclass( info->buffer, meta, info);
+            _mulle_buffer_dot_metaclass( buffer, meta, info);
       }
       break;
 
@@ -996,32 +977,34 @@ static void   _mulle_objc_class_dotdump_to_buffer( struct _mulle_objc_class *cls
                                                    unsigned long options)
 {
    struct _mulle_objc_classpair    *pair;
-   struct dump_info                info;
+   struct callback_info            cinfo;
 
-   memset( &info, 0, sizeof( info));
+   memset( &cinfo, 0, sizeof( cinfo));
 
    mulle_buffer_sprintf( buffer, "digraph mulle_objc_class\n{\n");
 
-   c_set_init( &info.set);
-   info.buffer    = buffer;
-   info.directory = directory;
-   info.options   = options ? options : (MULLE_OBJC_SHOW_DEFAULT & ~MULLE_OBJC_SHOW_UNIVERSE);
-   info.options  &= ~MULLE_OBJC_SHOW_CLASS_HYPERLINK;
+   cinfo.buffer = buffer;
+
+   c_set_init( &cinfo.info.set);
+
+   cinfo.info.directory = directory;
+   cinfo.info.options   = options ? options : (MULLE_OBJC_SHOW_DEFAULT & ~MULLE_OBJC_SHOW_UNIVERSE);
+   cinfo.info.options  &= ~MULLE_OBJC_SHOW_CLASS_HYPERLINK;
 
    pair = NULL;
    do
    {
       pair = _mulle_objc_class_get_classpair( cls);
-      mulle_objc_classpair_walk( pair, dotdump_callback, &info);
+      mulle_objc_classpair_walk( pair, dotdump_callback, &cinfo);
 
       // turn on hyperlink class on demand
-      info.options |= (options & MULLE_OBJC_SHOW_CLASS_HYPERLINK);
+      cinfo.info.options |= (options & MULLE_OBJC_SHOW_CLASS_HYPERLINK);
    }
    while( cls = _mulle_objc_class_get_superclass( cls));
 
    mulle_buffer_sprintf( buffer, "}\n");
 
-   c_set_done( &info.set);
+   c_set_done( &cinfo.info.set);
 }
 
 
@@ -1083,21 +1066,22 @@ static void
                                                     char *directory,
                                                     struct mulle_buffer *buffer)
 {
-   struct dump_info   info;
+   struct callback_info   cinfo;
 
-   c_set_init( &info.set);
+   memset( &cinfo, 0, sizeof( cinfo));
 
-   memset( &info, 0, sizeof( info));
+   cinfo.buffer                = buffer;
 
-   info.buffer           = buffer;
-   info.directory        = directory;
-   info.options          = MULLE_OBJC_SHOW_DEFAULT|MULLE_OBJC_SHOW_HYPERLINK;
+   c_set_init( &cinfo.info.set);
+
+   cinfo.info.directory        = directory;
+   cinfo.info.options          = MULLE_OBJC_SHOW_DEFAULT|MULLE_OBJC_SHOW_HYPERLINK;
 
    mulle_buffer_sprintf( buffer, "digraph mulle_objc_universe\n{\n");
-   mulle_objc_universe_walk( universe, dotdump_callback, &info);
+   mulle_objc_universe_walk( universe, dotdump_callback, &cinfo);
    mulle_buffer_sprintf( buffer, "}\n");
 
-   c_set_done( &info.set);
+   c_set_done( &cinfo.info.set);
 }
 
 
@@ -1189,13 +1173,13 @@ static void   _mulle_objc_universe_dotdump_to_buffer( struct _mulle_objc_univers
 {
    struct dump_info   info;
 
-   c_set_init( &info.set);
-
    memset( &info, 0, sizeof( info));
 
-   info.buffer         = buffer;
-   info.directory      = directory;
-   info.options           = MULLE_OBJC_SHOW_DEFAULT;
+   c_set_init( &info.set);
+
+   info.directory = directory;
+   info.options   = MULLE_OBJC_SHOW_DEFAULT;
+
    if( mulle_objc_environment_get_yes_no_default( "MULLE_OBJC_DRAW_STRING_TABLE", 0))
       info.options |= MULLE_OBJC_SHOW_STRINGS;
    if( mulle_objc_environment_get_yes_no_default( "MULLE_OBJC_DRAW_SELECTOR_TABLE", 0))
@@ -1366,6 +1350,7 @@ static void   _mulle_buffer_dot_hierarchy( struct mulle_buffer *buffer,
 
    if( ! cls)
       return;
+
    /* output each class only once */
    if( c_set_member( info->class_set, cls))
       return;
@@ -1411,7 +1396,6 @@ static void   _mulle_buffer_dot_hierarchy( struct mulle_buffer *buffer,
     */
    memset( &dumpinfo, 0, sizeof( dumpinfo));
 
-   dumpinfo.buffer   = info->buffer;
    dumpinfo.options = MULLE_OBJC_SHOW_METHODLISTS|MULLE_OBJC_SHOW_PROPERTYLIST;
 
    if( _mulle_objc_class_is_metaclass( cls))
@@ -1424,17 +1408,17 @@ static void   _mulle_buffer_dot_hierarchy( struct mulle_buffer *buffer,
       if( info->counter)
       {
          mulle_buffer_sprintf( buffer, "\"%p\" -> \"%p\" [ label=\" %s #%d\" dir=\"back\" ]\n",
-                     cls,
-                     info->other,
-                     info->relationship,
-                     info->counter - 1);
+                                       cls,
+                                       info->other,
+                                       info->relationship,
+                                       info->counter - 1);
          ++info->counter;
       }
       else
          mulle_buffer_sprintf( buffer, "\"%p\" -> \"%p\" [ label=\" %s\" dir=\"back\" ]\n",
-                     cls,
-                     info->other,
-                     info->relationship);
+                                       cls,
+                                       info->other,
+                                       info->relationship);
    }
 }
 

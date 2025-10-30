@@ -1,0 +1,6 @@
+<TABLE CLASS="test_table">
+<TR CLASS="test_table_header"><TH COLSPAN="4">Test Table with Headers</TH></TR>
+<TR CLASS="test_table_subheader"><TH>Name</TH><TH>Signature</TH><TH>ID</TH><TH>Offset</TH></TR>
+<TR><TD>item1</TD><TD>signature1</TD><TD>0x01</TD><TD>10</TD></TR>
+<TR><TD>item2</TD><TD>signature2</TD><TD>0x02</TD><TD>20</TD></TR>
+</TABLE>

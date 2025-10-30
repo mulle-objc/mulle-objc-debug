@@ -1,0 +1,19 @@
+Test 1: Basic table without classprefix
+<TABLE CELLPADDING="0" CELLSPACING="0">
+<TR><TD BGCOLOR="blue" COLSPAN="2"><FONT COLOR="white">Basic Table</FONT></TD></TR>
+<TR><TD>Test</TD><TD>Data</TD></TR>
+</TABLE>
+
+Test 2: Table with classprefix
+<TABLE CLASS="test_table">
+<TR CLASS="test_table_header"><TH COLSPAN="3">Styled Table</TH></TR>
+<TR><TD>Test</TD><TD>Data</TD><TD>More</TD></TR>
+</TABLE>
+
+Test 3: Table with headers
+<TABLE CLASS="test_table">
+<TR CLASS="test_table_header"><TH COLSPAN="3">Table with Headers</TH></TR>
+<TR CLASS="test_table_subheader"><TH>Name</TH><TH>Value</TH><TH>Description</TH></TR>
+<TR><TD>Item1</TD><TD>100</TD><TD>First item</TD></TR>
+<TR><TD>Item2</TD><TD>200</TD><TD>Second item</TD></TR>
+</TABLE>

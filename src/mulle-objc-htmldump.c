@@ -251,7 +251,7 @@ static void  _mulle_buffer_print_start( struct mulle_buffer *buffer, char *title
    if( ! cssurl)
       cssurl = "mulle-objc.css";
 
-   mulle_buffer_fprintf( buffer,
+   mulle_buffer_sprintf( buffer,
                          "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\">\n" // pedantic
                          "<HTML>\n"
                          "<HEAD>\n"
@@ -261,21 +261,6 @@ static void  _mulle_buffer_print_start( struct mulle_buffer *buffer, char *title
                          "<BODY>\n",
                          title,
                          cssurl);
-}
-
-
-static void  _mulle_buffer_print_to_body_with_level( struct mulle_buffer *buffer, char *title, char *s, int level)
-{
-   if( title)
-      mulle_buffer_sprintf( buffer, "\n<H%d>%s</H%d>\n", level, title, level);
-   if( s)
-      mulle_buffer_sprintf( buffer, "%s\n", s);
-}
-
-
-static void  _mulle_buffer_print_to_body( struct mulle_buffer *buffer, char *title, char *s)
-{
-   _mulle_buffer_print_to_body_with_level( buffer,  title, s, 2);
 }
 
 
@@ -298,28 +283,25 @@ static void   _mulle_buffer_print_universe_html( struct mulle_buffer *buffer,
    struct _mulle_objc_class                         *cls;
    struct mulle_concurrent_pointerarrayenumerator   rover;
 
-   mulle_buffer_append_string(buffer, "\n<DIV CLASS=\"universe_values\">\n");
+   mulle_buffer_append_string( buffer, "\n<DIV CLASS=\"universe_values\">\n");
    {
-      mulle_buffer_describe_universe( buffer, universe, &universe_style);
-      mulle_buffer_append_string(buffer, "Values");
-      mulle_buffer_append_string(buffer, mulle_buffer_extract_string(buffer));
+      mulle_buffer_html_universe( buffer, universe, &universe_style);
+      mulle_buffer_append_string( buffer, "Values");
    }
-   mulle_buffer_append_string(buffer, "</DIV>\n");
+   mulle_buffer_append_string( buffer, "</DIV>\n");
 
    // need to sort this in the future
-   mulle_buffer_append_string(buffer, "\n<DIV CLASS=\"universe_classes\">\n");
+   mulle_buffer_append_string( buffer, "\n<DIV CLASS=\"universe_classes\">\n");
    {
-      mulle_buffer_describe_concurrent_hashmap( buffer,
+      mulle_buffer_html_concurrent_hashmap( buffer,
                                                 &universe->classtable,
-                                                mulle_buffer_describe_class_hashmap_entry,
+                                                mulle_buffer_html_class_entry,
                                                 &classtable_style,
                                                 NULL);
-      mulle_buffer_append_string(buffer, "Classes");
-      mulle_buffer_append_string(buffer, mulle_buffer_extract_string(buffer));
    }
-   mulle_buffer_append_string(buffer, "</DIV>\n");
+   mulle_buffer_append_string( buffer, "</DIV>\n");
 
-   mulle_buffer_append_string(buffer, "\n<DIV CLASS=\"universe_fastclasses\">\n");
+   mulle_buffer_append_string( buffer, "\n<DIV CLASS=\"universe_fastclasses\">\n");
    {
       for( i = 0; i < MULLE_OBJC_S_FASTCLASSES; i++)
          if( _mulle_atomic_pointer_read_nonatomic( &universe->fastclasstable.classes[ i].pointer))
@@ -327,102 +309,97 @@ static void   _mulle_buffer_print_universe_html( struct mulle_buffer *buffer,
 
       if( i < MULLE_OBJC_S_FASTCLASSES)
       {
-         mulle_buffer_append_string(buffer, "Fast Classes");
+         mulle_buffer_append_string( buffer, "Fast Classes");
 
-         mulle_buffer_append_string(buffer, "<TABLE CLASS=\"universe_fastclass_table\">\n");
+         mulle_buffer_append_string( buffer, "<TABLE CLASS=\"universe_fastclass_table\">\n");
 
          for( i = 0; i < MULLE_OBJC_S_FASTCLASSES; i++)
             if( _mulle_atomic_pointer_read_nonatomic( &universe->fastclasstable.classes[ i].pointer))
             {
                cls = _mulle_atomic_pointer_read_nonatomic( &universe->fastclasstable.classes[ i].pointer);
-               mulle_buffer_describe_class_short( buffer, cls, &classtable_style);
-               mulle_buffer_append_string(buffer, "<TR><TH>");
-               mulle_buffer_sprintf(buffer, "%d", i);
-               mulle_buffer_append_string(buffer, "</TH><TD>");
-               mulle_buffer_append_string(buffer, mulle_buffer_extract_string(buffer));
-               mulle_buffer_append_string(buffer, "</TD></TR>\n");
+               mulle_buffer_append_string( buffer, "<TR><TH>");
+               mulle_buffer_sprintf( buffer, "%d", i);
+               mulle_buffer_append_string( buffer, "</TH><TD>");
+               mulle_buffer_html_class_short( buffer, cls, &classtable_style);
+               mulle_buffer_append_string( buffer, "</TD></TR>\n");
             }
-         mulle_buffer_append_string(buffer, "</TABLE>\n");
+         mulle_buffer_append_string( buffer, "</TABLE>\n");
       }
    }
-   mulle_buffer_append_string(buffer, "</DIV>\n");
+   mulle_buffer_append_string( buffer, "</DIV>\n");
 
-   mulle_buffer_append_string(buffer, "\n<DIV CLASS=\"universe_descriptors\">\n");
+   mulle_buffer_append_string( buffer, "\n<DIV CLASS=\"universe_descriptors\">\n");
    {
       if( mulle_concurrent_hashmap_count( &universe->descriptortable))
       {
-         mulle_buffer_append_string(buffer, "<TABLE CLASS=\"universe_descriptor_table\">\n");
-         mulle_buffer_describe_concurrent_hashmap( buffer,
+         mulle_buffer_append_string( buffer, "<TABLE CLASS=\"universe_descriptor_table\">\n");
+         mulle_buffer_append_string( buffer, "Method Descriptors");
+         mulle_buffer_html_concurrent_hashmap( buffer,
                                                 &universe->descriptortable,
-                                                mulle_buffer_describe_descriptor_hashmap_entry,
+                                                mulle_buffer_html_descriptor_entry,
                                                 &descriptortable_style,
                                                 NULL);
-         mulle_buffer_append_string(buffer, "Method Descriptors");
-         mulle_buffer_append_string(buffer, mulle_buffer_extract_string(buffer));
-         mulle_buffer_append_string(buffer, "</TABLE>\n");
+         mulle_buffer_append_string( buffer, "</TABLE>\n");
       }
    }
-   mulle_buffer_append_string(buffer, "</DIV>\n");
+   mulle_buffer_append_string( buffer, "</DIV>\n");
 
-   mulle_buffer_append_string(buffer, "\n<DIV CLASS=\"universe_protocols\">\n");
+   mulle_buffer_append_string( buffer, "\n<DIV CLASS=\"universe_protocols\">\n");
    {
       if( mulle_concurrent_hashmap_count( &universe->protocoltable))
       {
-         mulle_buffer_append_string(buffer, "<TABLE CLASS=\"universe_protocol_table\">\n");
-         mulle_buffer_describe_concurrent_hashmap( buffer,
+         mulle_buffer_append_string( buffer, "<TABLE CLASS=\"universe_protocol_table\">\n");
+         mulle_buffer_append_string( buffer, "Protocols");
+         mulle_buffer_html_concurrent_hashmap( buffer,
                                                 &universe->protocoltable,
-                                                mulle_buffer_describe_protocol_hashmap_entry,
+                                                mulle_buffer_html_protocol_entry,
                                                 &protocoltable_style,
                                                 NULL);
-         mulle_buffer_append_string(buffer, "Protocols");
-         mulle_buffer_append_string(buffer, mulle_buffer_extract_string(buffer));
-         mulle_buffer_append_string(buffer, "</TABLE>\n");
+         mulle_buffer_append_string( buffer, "</TABLE>\n");
       }
    }
-   mulle_buffer_append_string(buffer, "</DIV>\n");
+   mulle_buffer_append_string( buffer, "</DIV>\n");
 
-   mulle_buffer_append_string(buffer, "\n<DIV CLASS=\"universe_categories\">\n");
+   mulle_buffer_append_string( buffer, "\n<DIV CLASS=\"universe_categories\">\n");
    {
       if( mulle_concurrent_hashmap_count( &universe->categorytable))
       {
-         mulle_buffer_append_string(buffer, "<TABLE CLASS=\"universe_category_table\">\n");
-         mulle_buffer_describe_concurrent_hashmap( buffer,
+         mulle_buffer_append_string( buffer, "<TABLE CLASS=\"universe_category_table\">\n");
+         mulle_buffer_append_string( buffer, "Categories");
+         mulle_buffer_html_concurrent_hashmap( buffer,
                                                 &universe->categorytable,
-                                                mulle_buffer_describe_loadcategory_hashmap_entry,
+                                                mulle_buffer_html_loadcategory_entry,
                                                 &categorytable_style,
                                                 NULL);
-         mulle_buffer_append_string(buffer, "Categories");
-         mulle_buffer_append_string(buffer, mulle_buffer_extract_string(buffer));
-         mulle_buffer_append_string(buffer, "</TABLE>\n");
+         mulle_buffer_append_string( buffer, "</TABLE>\n");
       }
    }
-   mulle_buffer_append_string(buffer, "</DIV>\n");
+   mulle_buffer_append_string( buffer, "</DIV>\n");
 
-   mulle_buffer_append_string(buffer, "\n<DIV CLASS=\"universe_strings\">\n");
+   mulle_buffer_append_string( buffer, "\n<DIV CLASS=\"universe_strings\">\n");
    {
       if( mulle_concurrent_pointerarray_get_count( &universe->staticstrings))
       {
-         mulle_buffer_append_string(buffer, "Strings");
+         mulle_buffer_append_string( buffer, "Strings");
 
-         mulle_buffer_append_string(buffer, "<TABLE CLASS=\"universe_string_table\">\n");
+         mulle_buffer_append_string( buffer, "<TABLE CLASS=\"universe_string_table\">\n");
          rover = mulle_concurrent_pointerarray_enumerate( &universe->staticstrings);
          while( string = _mulle_concurrent_pointerarrayenumerator_next( &rover))
          {
-            mulle_buffer_describe_staticstring( buffer, string, &stringtable_style);
-            mulle_buffer_append_string(buffer, "<li>");
-            mulle_buffer_append_string(buffer, mulle_buffer_extract_string(buffer));
-            mulle_buffer_append_string(buffer, "\n");
+            mulle_buffer_append_string( buffer, "<li>");
+            mulle_buffer_html_staticstring( buffer, string, &stringtable_style);
+            mulle_buffer_append_string( buffer, "\n");
          }
          mulle_concurrent_pointerarrayenumerator_done( &rover);
-         mulle_buffer_append_string(buffer, "</TABLE>\n");
+         mulle_buffer_append_string( buffer, "</TABLE>\n");
       }
    }
-   mulle_buffer_append_string(buffer, "</DIV>\n");
+   mulle_buffer_append_string( buffer, "</DIV>\n");
 }
 
 
-static void   print_universe( struct _mulle_objc_universe *universe,
-                             char *directory)
+static void   _mulle_objc_universe_print_to_directory( struct _mulle_objc_universe *universe,
+                                                       char *directory)
 {
    char   *path;
    FILE   *fp;
@@ -480,168 +457,174 @@ static void   _mulle_buffer_print_infraclass_html( struct mulle_buffer *buffer,
     universe = _mulle_objc_infraclass_get_universe(infra);
 
     // Print class name (header)
-    mulle_buffer_append_string(buffer, "<h2>");
-    mulle_buffer_append_string(buffer, cls->name);
-    mulle_buffer_append_string(buffer, "</h2>");
+    mulle_buffer_append_string( buffer, "<h2>");
+    mulle_buffer_append_string( buffer, cls->name);
+    mulle_buffer_append_string( buffer, "</h2>");
 
     // Class links (universe and superclass links)
-    mulle_buffer_append_string(buffer, "<DIV CLASS=\"class_links\">\n");
+    mulle_buffer_append_string( buffer, "<DIV CLASS=\"class_links\">\n");
     {
-        mulle_buffer_append_string(buffer, "<DIV CLASS=\"class_universe_link\">\n");
-        mulle_buffer_append_string(buffer, "<A HREF=\"index.html\">Universe</a>");
-        mulle_buffer_append_string(buffer, "</DIV>\n");
+        mulle_buffer_append_string( buffer, "<DIV CLASS=\"class_universe_link\">\n");
+        mulle_buffer_append_string( buffer, "<A HREF=\"index.html\">Universe</a>");
+        mulle_buffer_append_string( buffer, "</DIV>\n");
 
-        mulle_buffer_append_string(buffer, "<DIV CLASS=\"class_superclass_link\">\n");
+        mulle_buffer_append_string( buffer, "<DIV CLASS=\"class_superclass_link\">\n");
         superclass = _mulle_objc_infraclass_get_superclass(infra);
         if (superclass) {
-            mulle_buffer_append_string(buffer, "Superclass");
-            mulle_buffer_describe_class_short(buffer, _mulle_objc_infraclass_as_class(superclass), &classtable_style);
+            mulle_buffer_append_string( buffer, "Superclass");
+            mulle_buffer_html_class_short( buffer, _mulle_objc_infraclass_as_class(superclass), &classtable_style);
         }
-        mulle_buffer_append_string(buffer, "</DIV>\n");
+        mulle_buffer_append_string( buffer, "</DIV>\n");
     }
-    mulle_buffer_append_string(buffer, "</DIV>\n");
+    mulle_buffer_append_string( buffer, "</DIV>\n");
 
     // Protocol class links
-    mulle_buffer_append_string(buffer, "<DIV CLASS=\"class_protocolclass_links\">\n");
+    mulle_buffer_append_string( buffer, "<DIV CLASS=\"class_protocolclass_links\">\n");
     {
         pair = _mulle_objc_infraclass_get_classpair(infra);
         if (!(_mulle_objc_infraclass_get_inheritance(infra) & MULLE_OBJC_CLASS_DONT_INHERIT_PROTOCOLS) &&
             mulle_concurrent_pointerarray_get_count(&pair->protocolclasses)) {
-            mulle_buffer_append_string(buffer, "Inherited Protocol Classes");
+            mulle_buffer_append_string( buffer, "Inherited Protocol Classes");
 
-            mulle_buffer_append_string(buffer, "<OL>\n");
+            mulle_buffer_append_string( buffer, "<OL>\n");
 
             prover = _mulle_objc_classpair_enumerate_protocolclasses(pair);
             while (prop_cls = _mulle_objc_protocolclassenumerator_next(&prover)) {
-                mulle_buffer_append_string(buffer, "<LI>");
-                mulle_buffer_describe_class_short(buffer, _mulle_objc_infraclass_as_class(prop_cls), &classtable_style);
-                mulle_buffer_append_string(buffer, "</LI>\n");
+                mulle_buffer_append_string( buffer, "<LI>");
+                mulle_buffer_html_class_short( buffer, _mulle_objc_infraclass_as_class(prop_cls), &classtable_style);
+                mulle_buffer_append_string( buffer, "</LI>\n");
             }
             _mulle_objc_protocolclassenumerator_done(&prover);
 
-            mulle_buffer_append_string(buffer, "</OL>\n");
+            mulle_buffer_append_string( buffer, "</OL>\n");
         }
     }
-    mulle_buffer_append_string(buffer, "</DIV>\n");
+    mulle_buffer_append_string( buffer, "</DIV>\n");
 
     // Class values section
-    mulle_buffer_append_string(buffer, "<DIV CLASS=\"class_values\">\n");
+    mulle_buffer_append_string( buffer, "<DIV CLASS=\"class_values\">\n");
     {
         style = infraclass_style;
         style.title = cls->name;
-        mulle_buffer_append_string(buffer, "Values");
-        mulle_buffer_describe_class(buffer, cls, 1, &style);
+        mulle_buffer_append_string( buffer, "Values");
+        mulle_buffer_html_class( buffer, cls, 1, &style);
     }
-    mulle_buffer_append_string(buffer, "</DIV>\n");
+    mulle_buffer_append_string( buffer, "</DIV>\n");
 
     // Properties section
-    mulle_buffer_append_string(buffer, "<DIV CLASS=\"class_properties\">\n");
+    mulle_buffer_append_string( buffer, "<DIV CLASS=\"class_properties\">\n");
     {
         if (infra && mulle_concurrent_pointerarray_get_count(&infra->propertylists)) {
-            mulle_buffer_append_string(buffer, "Property Lists");
+            mulle_buffer_append_string( buffer, "Property Lists");
 
             rover = mulle_concurrent_pointerarray_enumerate(&infra->propertylists);
             while (propertylist = _mulle_concurrent_pointerarrayenumerator_next(&rover))
             {
-                mulle_buffer_describe_propertylist(buffer, propertylist, &propertytable_style);
+                mulle_buffer_html_propertylist( buffer, propertylist, &propertytable_style);
             }
             mulle_concurrent_pointerarrayenumerator_done(&rover);
         }
     }
-    mulle_buffer_append_string(buffer, "</DIV>\n");
+    mulle_buffer_append_string( buffer, "</DIV>\n");
 
     // Instance Variables section
-    mulle_buffer_append_string(buffer, "<DIV CLASS=\"class_ivars\">\n");
+    mulle_buffer_append_string( buffer, "<DIV CLASS=\"class_ivars\">\n");
     {
         if (infra && mulle_concurrent_pointerarray_get_count(&infra->ivarlists)) {
-            mulle_buffer_append_string(buffer, "Instance Variable Lists");
+            mulle_buffer_append_string( buffer, "Instance Variable Lists");
 
             rover = mulle_concurrent_pointerarray_enumerate(&infra->ivarlists);
             while (ivarlist = _mulle_concurrent_pointerarrayenumerator_next(&rover))
             {
-                mulle_buffer_describe_ivarlist_hor(buffer, ivarlist, &ivartable_style);
+                mulle_buffer_html_ivarlist_hor( buffer, ivarlist, &ivartable_style);
             }
             mulle_concurrent_pointerarrayenumerator_done(&rover);
         }
     }
-    mulle_buffer_append_string(buffer, "</DIV>\n");
+    mulle_buffer_append_string( buffer, "</DIV>\n");
 
     // Class Methods section
-    mulle_buffer_append_string(buffer, "<DIV CLASS=\"class_classmethods\">\n");
+    mulle_buffer_append_string( buffer, "<DIV CLASS=\"class_classmethods\">\n");
     {
         meta = _mulle_objc_infraclass_get_metaclass(infra);
         if (mulle_concurrent_pointerarray_get_count(&meta->base.methodlists)) {
-            mulle_buffer_append_string(buffer, "+ Method Lists");
+            mulle_buffer_append_string( buffer, "+ Method Lists");
 
             rover = mulle_concurrent_pointerarray_enumerate(&meta->base.methodlists);
             while (methodlist = mulle_concurrent_pointerarrayenumerator_next(&rover)) {
                 style = methodlisttable_style;
                 style.title = _mulle_objc_methodlist_get_categoryname(methodlist);
                 style.title = style.title ? style.title : "class";
-                mulle_buffer_describe_methodlist_hor(buffer, methodlist, &style);
+                mulle_buffer_html_methodlist_hor( buffer, methodlist, &style);
             }
             mulle_concurrent_pointerarrayenumerator_done(&rover);
         }
     }
-    mulle_buffer_append_string(buffer, "</DIV>\n");
+    mulle_buffer_append_string( buffer, "</DIV>\n");
 
     // Instance Methods section
-    mulle_buffer_append_string(buffer, "<DIV CLASS=\"class_instancemethods\">\n");
+    mulle_buffer_append_string( buffer, "<DIV CLASS=\"class_instancemethods\">\n");
     {
         if (mulle_concurrent_pointerarray_get_count(&infra->base.methodlists)) {
-            mulle_buffer_append_string(buffer, "- Method Lists");
+            mulle_buffer_append_string( buffer, "- Method Lists");
 
             rover = mulle_concurrent_pointerarray_enumerate(&infra->base.methodlists);
             while (methodlist = mulle_concurrent_pointerarrayenumerator_next(&rover)) {
                 style = methodlisttable_style;
                 style.title = _mulle_objc_methodlist_get_categoryname(methodlist);
                 style.title = style.title ? style.title : "class";
-                mulle_buffer_describe_methodlist_hor(buffer, methodlist, &style);
+                mulle_buffer_html_methodlist_hor( buffer, methodlist, &style);
             }
             mulle_concurrent_pointerarrayenumerator_done(&rover);
         }
     }
-    mulle_buffer_append_string(buffer, "</DIV>\n");
+    mulle_buffer_append_string( buffer, "</DIV>\n");
 
     // Protocols section
-    mulle_buffer_append_string(buffer, "<DIV CLASS=\"class_protocols\">\n");
+    mulle_buffer_append_string( buffer, "<DIV CLASS=\"class_protocols\">\n");
     {
         array = _mulle_atomic_pointer_read(&pair->p_protocolids.pointer);
         if (array->n) {
-            mulle_buffer_append_string(buffer, "Protocols");
-            mulle_buffer_describe_protocolids(buffer, array, universe, &protocoltable_style);
+            mulle_buffer_append_string( buffer, "Protocols");
+            mulle_buffer_html_uniqueidarray( buffer, array,
+                                                     mulle_buffer_html_protocolid_element,
+                                                     &protocoltable_style,
+                                                     universe);
         }
     }
-    mulle_buffer_append_string(buffer, "</DIV>\n");
+    mulle_buffer_append_string( buffer, "</DIV>\n");
 
     // Categories section
-    mulle_buffer_append_string(buffer, "<DIV CLASS=\"class_categories\">\n");
+    mulle_buffer_append_string( buffer, "<DIV CLASS=\"class_categories\">\n");
     {
         array = _mulle_atomic_pointer_read(&pair->p_categoryids.pointer);
         if (array->n) {
-            mulle_buffer_append_string(buffer, "Categories");
-            mulle_buffer_describe_categoryids(buffer, array, universe, &categorytable_style);
+            mulle_buffer_append_string( buffer, "Categories");
+            mulle_buffer_html_uniqueidarray( buffer, array,
+                                                     mulle_buffer_html_categoryid_element,
+                                                     &categorytable_style,
+                                                     universe);
         }
     }
-    mulle_buffer_append_string(buffer, "</DIV>\n");
+    mulle_buffer_append_string( buffer, "</DIV>\n");
 
     // Instance Cache section
-    mulle_buffer_append_string(buffer, "<DIV CLASS=\"class_cache\">\n");
+    mulle_buffer_append_string( buffer, "<DIV CLASS=\"class_cache\">\n");
     {
         cache = _mulle_objc_cachepivot_get_cache_atomic(&cls->cachepivot.pivot);
-        mulle_buffer_append_string(buffer, "Instance Cache");
-        mulle_buffer_describe_cache(buffer, cache, universe, &cachetable_style);
+        mulle_buffer_append_string( buffer, "Instance Cache");
+        mulle_buffer_html_cache( buffer, cache, universe, &cachetable_style);
     }
-    mulle_buffer_append_string(buffer, "</DIV>\n");
+    mulle_buffer_append_string( buffer, "</DIV>\n");
 
     // Meta Cache section
-    mulle_buffer_append_string(buffer, "<DIV CLASS=\"class_cache\">\n");
+    mulle_buffer_append_string( buffer, "<DIV CLASS=\"class_cache\">\n");
     {
         cache = _mulle_objc_cachepivot_get_cache_atomic(&meta->base.cachepivot.pivot);
-        mulle_buffer_append_string(buffer, "Meta Cache");
-        mulle_buffer_describe_cache(buffer, cache, universe, &cachetable_style);
+        mulle_buffer_append_string( buffer, "Meta Cache");
+        mulle_buffer_html_cache( buffer, cache, universe, &cachetable_style);
     }
-    mulle_buffer_append_string(buffer, "</DIV>\n");
+    mulle_buffer_append_string( buffer, "</DIV>\n");
 }
 
 
@@ -703,7 +686,7 @@ static mulle_objc_walkcommand_t   callback( struct _mulle_objc_universe *univers
 
    case mulle_objc_walkpointer_is_universe  :
       universe = p;
-      print_universe( universe, directory);
+      _mulle_objc_universe_print_to_directory( universe, directory);
       break;
 
    case mulle_objc_walkpointer_is_infraclass :
