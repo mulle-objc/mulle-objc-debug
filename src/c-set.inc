@@ -126,7 +126,7 @@ static void   *c_set_member2( c_set *set, void *p)
 
    if( ! set->sorted)
    {
-      mulle_qsort_r( set->storage, set->n, sizeof( void *), (int (*)()) _pointer_compare, NULL);
+      mulle_qsort_r( set->storage, set->n, sizeof( void *), _pointer_compare, NULL);
       set->sorted = 1;
    }
    result = voidptr_bsearch( set->storage, set->n, p);

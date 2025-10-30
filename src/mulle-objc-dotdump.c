@@ -47,20 +47,20 @@
 #include "c-set.inc"
 
 
-static void   mulle_buffer_write_to_file( struct mulle_buffer *buffer, FILE *fp)
-{
-   if( buffer && fp)
-   {
-      size_t   len;
-      char     *data;
-
-      len  = mulle_buffer_get_length( buffer);
-      data = mulle_buffer_get_bytes( buffer);
-
-      if( len > 0 && data)
-         fwrite( data, 1, len, fp);
-   }
-}
+// static void   mulle_buffer_write_to_file( struct mulle_buffer *buffer, FILE *fp)
+// {
+//    if( buffer && fp)
+//    {
+//       size_t   len;
+//       char     *data;
+//
+//       len  = mulle_buffer_get_length( buffer);
+//       data = mulle_buffer_get_bytes( buffer);
+//
+//       if( len > 0 && data)
+//          fwrite( data, 1, len, fp);
+//    }
+// }
 
 
 static char   *html_escape( char *s)
@@ -91,9 +91,10 @@ static char   *html_escape( char *s)
 
 
 
-static char   *dot_filename_for_name( char *name, char *directory)
+static void   mulle_buffer_append_dot_filename_for_name( struct mulle_buffer *buffer,
+                                                         char *name,
+                                                         char *directory)
 {
-   char   *s;
    char   separator;
 
 #ifdef _WIN32
@@ -102,43 +103,7 @@ static char   *dot_filename_for_name( char *name, char *directory)
     separator = '/';
 #endif
 
-   mulle_buffer_do_string( buffer, NULL, s)
-   {
-      mulle_buffer_sprintf( buffer, "%s%c%s.dot", directory, separator, html_escape( name));
-   }
-   return( s);
-}
-
-
-//
-// just don't output stuff with ampersands for now
-// What is this used for ? (apparently the debugger ?)
-//
-void   mulle_objc_methodlist_dump( struct _mulle_objc_methodlist *list)
-{
-   unsigned int   i;
-
-   mulle_buffer_do( buffer)
-   {
-      for( i = 0; i < list->n_methods; i++)
-      {
-         mulle_buffer_reset( buffer);
-         mulle_buffer_sprintf_functionpointer( buffer, (mulle_functionpointer_t) &list->methods[ i].implementation);
-
-         printf( "{ "
-                 "name = \"%s\""
-                 "signature = \"%s\""
-                 "methodid = %08lx"
-                 "bits = 0x%x"
-                 "implementation = %s"
-                 " }",
-                  list->methods[ i].descriptor.name,
-                  list->methods[ i].descriptor.signature,
-                  (unsigned long) list->methods[ i].descriptor.methodid,
-                  list->methods[ i].descriptor.bits,
-                  mulle_buffer_get_string( buffer));
-      }
-   }
+   mulle_buffer_sprintf( buffer, "%s%c%s.dot", directory, separator, html_escape( name));
 }
 
 
@@ -205,13 +170,19 @@ static struct _mulle_objc_htmltablestyle   propertylist_style =
 };
 
 
-static struct _mulle_objc_htmltablestyle   selectortable_style =
+static char  *descriptortable_headers[] =
 {
-   "method descriptors",
+   "name", "signature", "methodid", "flags"
+};
+
+static struct _mulle_objc_htmltablestyle  descriptortable_style =
+{
+   "selectors",
+   "selector",
    NULL,
-   "white",
-   "purple",
-   5
+   NULL,
+   4,
+   descriptortable_headers
 };
 
 
@@ -365,7 +336,7 @@ static void   _mulle_buffer_dot_universe( struct mulle_buffer *buffer,
          mulle_buffer_html_concurrent_hashmap( buffer,
                                                &universe->descriptortable,
                                                mulle_buffer_html_descriptor_entry,
-                                               &selectortable_style,
+                                               &descriptortable_style,
                                                NULL);
          mulle_buffer_sprintf( buffer, ">, shape=\"%s\" ];\n", "box");
       }
@@ -994,8 +965,7 @@ static void   _mulle_objc_class_dotdump_to_file( struct _mulle_objc_class *cls,
                                                  char *filename,
                                                  unsigned long options)
 {
-   FILE                  *fp;
-   struct mulle_buffer   buffer;
+   FILE   *fp;
 
    fp = fopen( filename, "w");
    if( ! fp)
@@ -1004,12 +974,11 @@ static void   _mulle_objc_class_dotdump_to_file( struct _mulle_objc_class *cls,
       return;
    }
 
-   mulle_buffer_init( &buffer, 0, NULL);
-
-   _mulle_objc_class_dotdump_to_buffer( cls, directory, &buffer, options);
-   mulle_buffer_write_to_file( &buffer, fp);
-
-   mulle_buffer_done( &buffer);
+   mulle_flushablebuffer_do_FILE( buffer, fp)
+   {
+      _mulle_objc_class_dotdump_to_buffer( cls, directory, buffer, options);
+      //mulle_buffer_write_to_file( buffer, fp);
+   }
    fclose( fp);
 }
 
@@ -1071,14 +1040,11 @@ static void
                                                 char *directory,
                                                 FILE *fp)
 {
-   struct mulle_buffer   buffer;
-
-   mulle_buffer_init( &buffer, 0, NULL);
-
-   _mulle_objc_universe_dotdump_overview_to_buffer( universe, directory, &buffer);
-   mulle_buffer_write_to_file( &buffer, fp);
-
-   mulle_buffer_done( &buffer);
+   mulle_flushablebuffer_do_FILE( buffer, fp)
+   {
+      _mulle_objc_universe_dotdump_overview_to_buffer( universe, directory, buffer);
+//      mulle_buffer_write_to_file( buffer, fp);
+   }
 }
 
 
@@ -1088,18 +1054,20 @@ static void
 static void   _mulle_objc_universe_dotdump_classes_to_directory( struct _mulle_objc_universe *universe,
                                                                  char *directory)
 {
-   char                            *path;
    intptr_t                        classid;
    struct _mulle_objc_infraclass   *infra;
 
-   mulle_concurrent_hashmap_for( &universe->classtable, classid, infra)
+   mulle_buffer_do( filename_buffer)
    {
-      path = dot_filename_for_name( infra->base.name, directory);
-      _mulle_objc_class_dotdump_to_file( _mulle_objc_infraclass_as_class( infra),
-                                         directory,
-                                         path,
-                                         MULLE_OBJC_SHOW_ALL|MULLE_OBJC_SHOW_HYPERLINK);
-      mulle_free( path);
+      mulle_concurrent_hashmap_for( &universe->classtable, classid, infra)
+      {
+         mulle_buffer_reset( filename_buffer);
+         mulle_buffer_append_dot_filename_for_name( filename_buffer, infra->base.name, directory);
+         _mulle_objc_class_dotdump_to_file( _mulle_objc_infraclass_as_class( infra),
+                                            directory,
+                                            mulle_buffer_get_string( filename_buffer),
+                                            MULLE_OBJC_SHOW_ALL|MULLE_OBJC_SHOW_HYPERLINK);
+      }
    }
 }
 
@@ -1137,11 +1105,13 @@ static void
 static void   _mulle_objc_universe_dotdump_overview_to_directory( struct _mulle_objc_universe *universe,
                                                                   char *directory)
 {
-   char   *path;
-
-   path = dot_filename_for_name( "overview", directory);
-   _mulle_objc_universe_dotdump_overview_to_file( universe, directory, path);
-   mulle_free( path);
+   mulle_buffer_do( filename_buffer)
+   {
+      mulle_buffer_append_dot_filename_for_name( filename_buffer, "overview", directory);
+      _mulle_objc_universe_dotdump_overview_to_file( universe,
+                                                     directory,
+                                                     mulle_buffer_get_string( filename_buffer));
+   }
 }
 
 
@@ -1178,14 +1148,11 @@ static void   _mulle_objc_universe_dotdump_to_fp( struct _mulle_objc_universe *u
                                                   char *directory,
                                                   FILE *fp)
 {
-   struct mulle_buffer   buffer;
-
-   mulle_buffer_init( &buffer, 0, NULL);
-
-   _mulle_objc_universe_dotdump_to_buffer( universe, directory, &buffer);
-   mulle_buffer_write_to_file( &buffer, fp);
-
-   mulle_buffer_done( &buffer);
+   mulle_flushablebuffer_do_FILE( buffer, fp)
+   {
+      _mulle_objc_universe_dotdump_to_buffer( universe, directory, buffer);
+//      mulle_buffer_write_to_file( buffer, fp);
+   }
 }
 
 
@@ -1221,11 +1188,14 @@ static void   _mulle_objc_universe_dotdump_to_directory( struct _mulle_objc_univ
                                                          char *directory,
                                                          int log)
 {
-   char   *path;
-
-   path = dot_filename_for_name( "universe", directory);
-   mulle_objc_universe_dotdump_to_file( universe, directory, path, log);
-   mulle_free( path);
+   mulle_buffer_do( filename_buffer)
+   {
+      mulle_buffer_append_dot_filename_for_name( filename_buffer, "universe", directory);
+      mulle_objc_universe_dotdump_to_file( universe,
+                                           directory,
+                                           mulle_buffer_get_string( filename_buffer),
+                                           log);
+   }
 }
 
 
@@ -1245,14 +1215,19 @@ void   mulle_objc_class_dotdump_to_directory( struct _mulle_objc_class *cls,
                                               char *directory,
                                               unsigned long options)
 {
-   char   *path;
-
    if( ! cls || ! directory)
       return;
 
-   path = dot_filename_for_name( _mulle_objc_class_get_name( cls), directory);
-   mulle_objc_class_dotdump_to_file( cls, directory, path, options);
-   mulle_free( path);
+   mulle_buffer_do( filename_buffer)
+   {
+      mulle_buffer_append_dot_filename_for_name( filename_buffer,
+                                                 _mulle_objc_class_get_name( cls),
+                                                 directory);
+      mulle_objc_class_dotdump_to_file( cls,
+                                        directory,
+                                        mulle_buffer_get_string( filename_buffer),
+                                        options);
+   }
 }
 
 
@@ -1306,7 +1281,6 @@ static inline void   print_hierarchy_info_init( struct print_hierarchy_info *inf
                                                 struct c_set *set,
                                                 struct mulle_buffer *buffer)
 {
-
    info->other        = other;
    info->counter      = 0;
    info->is_meta      = 0;
@@ -1457,17 +1431,14 @@ static void   _mulle_objc_classhierarchy_dotdump_to_buffer( struct _mulle_objc_c
 void   mulle_objc_classhierarchy_dotdump_to_stream( struct _mulle_objc_class *cls,
                                                     FILE *fp)
 {
-   struct mulle_buffer   buffer;
-
    if( ! fp)
       fp = stdout;
 
-   mulle_buffer_init( &buffer, 0, NULL);
-
-   _mulle_objc_classhierarchy_dotdump_to_buffer( cls, &buffer);
-   mulle_buffer_write_to_file( &buffer, fp);
-
-   mulle_buffer_done( &buffer);
+   mulle_flushablebuffer_do_FILE( buffer, fp)
+   {
+      _mulle_objc_classhierarchy_dotdump_to_buffer( cls, buffer);
+//      mulle_buffer_write_to_file( buffer, fp);
+   }
 }
 
 
@@ -1485,3 +1456,37 @@ void   mulle_objc_classhierarchy_dotdump_to_file( struct _mulle_objc_class *cls,
    mulle_objc_classhierarchy_dotdump_to_stream( cls, fp);
    fclose( fp);
 }
+
+
+
+//
+// just don't output stuff with ampersands for now
+// What is this used for ? (apparently the debugger ?)
+//
+void   mulle_objc_methodlist_dump( struct _mulle_objc_methodlist *list)
+{
+   unsigned int   i;
+
+   mulle_buffer_do( buffer)
+   {
+      for( i = 0; i < list->n_methods; i++)
+      {
+         mulle_buffer_reset( buffer);
+         mulle_buffer_sprintf_functionpointer( buffer, (mulle_functionpointer_t) &list->methods[ i].implementation);
+
+         printf( "{ "
+                 "name = \"%s\""
+                 "signature = \"%s\""
+                 "methodid = %08lx"
+                 "bits = 0x%x"
+                 "implementation = %s"
+                 " }",
+                  list->methods[ i].descriptor.name,
+                  list->methods[ i].descriptor.signature,
+                  (unsigned long) list->methods[ i].descriptor.methodid,
+                  list->methods[ i].descriptor.bits,
+                  mulle_buffer_get_string( buffer));
+      }
+   }
+}
+

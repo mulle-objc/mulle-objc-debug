@@ -411,8 +411,8 @@ void   mulle_buffer_html_class( struct mulle_buffer *buffer,
       mulle_buffer_add_string( buffer, "</TD></TR>\n");
 
       mulle_buffer_sprintf( buffer,
-               "<TR><TD>state</TD><TD>0x%lx</TD></TR>\n",
-               (long) _mulle_atomic_pointer_read_nonatomic( &cls->state));
+               "<TR><TD>state</TD><TD>%p</TD></TR>\n",
+               _mulle_atomic_pointer_read_nonatomic( &cls->state));
 
       if ( _mulle_objc_class_is_infraclass( cls))
       {
@@ -423,13 +423,9 @@ void   mulle_buffer_html_class( struct mulle_buffer *buffer,
                   "<TR><TD>ivarhash</TD><TD>0x%lx</TD></TR>\n",
                   (long) infra->ivarhash);
          mulle_buffer_sprintf( buffer,
-                  "<TR><TD>allocatedInstances</TD><TD>%ld</TD></TR>\n",
-                  (long) _mulle_atomic_pointer_read_nonatomic( &infra->allocatedInstances));
+                  "<TR><TD>allocatedInstances</TD><TD>%td</TD></TR>\n",
+                  (intptr_t) _mulle_atomic_pointer_read_nonatomic( &infra->allocatedInstances));
       }
-
-      mulle_buffer_sprintf( buffer,
-               "<TR><TD>preloads</TD><TD>%u</TD></TR>\n",
-               cls->preloads);
    }
    mulle_buffer_add_string( buffer, "</TABLE>");
 }
@@ -747,6 +743,7 @@ void   mulle_buffer_html_propertylist( struct mulle_buffer *buffer,
    char                        *format;
    unsigned int                j;
    int                         terse;
+   char                        *s;
 
    terse = mulle_objc_environment_get_yes_no_default( "MULLE_OBJC_TERSE_TABLE", 0);
 
@@ -775,9 +772,7 @@ void   mulle_buffer_html_propertylist( struct mulle_buffer *buffer,
    mulle_pointerarray_init( &array, 0, NULL);
    for( j = 0; j < list->n_properties; j++)
    {
-      char   *row;
-
-      mulle_buffer_do_string( tmp_buffer, NULL, row)
+      mulle_buffer_do_string( tmp_buffer, NULL, s)
       {
          mulle_buffer_sprintf( tmp_buffer,
                    format,
@@ -789,7 +784,7 @@ void   mulle_buffer_html_propertylist( struct mulle_buffer *buffer,
                    (unsigned long) list->properties[ j].setter,
                    (unsigned long) list->properties[ j].bits);
       }
-      mulle_pointerarray_add( &array, row);
+      mulle_pointerarray_add( &array, s);
    }
 
    mulle_qsort_r( _mulle_pointerarray_get_storage( &array),
@@ -798,14 +793,10 @@ void   mulle_buffer_html_propertylist( struct mulle_buffer *buffer,
                   strcmp_r,
                   NULL);
 
+   mulle_pointerarray_for( &array, s)
    {
-      char   *row;
-
-      mulle_pointerarray_for( &array, row)
-      {
-         mulle_buffer_add_string( buffer, row);
-         mulle_free( row);
-      }
+      mulle_buffer_add_string( buffer, s);
+      mulle_free( s);
    }
 
    mulle_pointerarray_done( &array);
@@ -834,9 +825,9 @@ void   mulle_buffer_html_cache( struct mulle_buffer *buffer,
    mulle_buffer_add_table_header_colspan( buffer, styling, colspan);
 
    mulle_buffer_sprintf( buffer,
-                   "<TR><TD>n</TD><TD COLSPAN=\"%d\">%lu</TD></TR>\n",
+                   "<TR><TD>n</TD><TD COLSPAN=\"%d\">%tu</TD></TR>\n",
                    colspan,
-                   (long) _mulle_atomic_pointer_read_nonatomic( &cache->n));
+                   (uintptr_t) _mulle_atomic_pointer_read_nonatomic( &cache->n));
    mulle_buffer_sprintf( buffer,
                    "<TR><TD>mask</TD><TD COLSPAN=\"%d\">0x%lx</TD></TR>\n",
                    colspan,
@@ -878,6 +869,7 @@ void   mulle_buffer_html_methodlist( struct mulle_buffer *buffer,
    struct mulle_pointerarray   array;
    char                        *format;
    char                        *name;
+   char                        *s;
    unsigned int                j;
 
    // create single lines for each method and two for head/tail
@@ -910,13 +902,11 @@ void   mulle_buffer_html_methodlist( struct mulle_buffer *buffer,
    {
       for( j = 0; j < list->n_methods; j++)
       {
-         char   *row;
-
          mulle_buffer_reset( tmp_buffer);
          mulle_buffer_sprintf_functionpointer( tmp_buffer,
                                                (mulle_functionpointer_t) &list->methods[ j].value);
 
-         mulle_buffer_do_string( tmp_buffer2, NULL, row)
+         mulle_buffer_do_string( tmp_buffer2, NULL, s)
          {
             mulle_buffer_sprintf( tmp_buffer2,
                       format,
@@ -926,7 +916,7 @@ void   mulle_buffer_html_methodlist( struct mulle_buffer *buffer,
                       (unsigned long) list->methods[ j].descriptor.bits,
                       mulle_buffer_get_string( tmp_buffer));
          }
-         mulle_pointerarray_add( &array, row);
+         mulle_pointerarray_add( &array, s);
       }
    }
 
@@ -937,14 +927,10 @@ void   mulle_buffer_html_methodlist( struct mulle_buffer *buffer,
                   strcmp_r,
                   NULL);
 
+   mulle_pointerarray_for( &array, s)
    {
-      char   *row;
-
-      mulle_pointerarray_for( &array, row)
-      {
-         mulle_buffer_add_string( buffer, row);
-         mulle_free( row);
-      }
+      mulle_buffer_add_string( buffer, s);
+      mulle_free( s);
    }
 
    mulle_pointerarray_done( &array);

@@ -222,7 +222,6 @@ static void  mulle_buffer_add_filename_for_universe( struct mulle_buffer *buffer
 static void   write_css_if_needed( char *directory)
 {
    FILE   *fp;
-   char   *filename;
    static char   css[] = ""
 #include "mulle-objc.css.inc"
 ;
@@ -230,14 +229,14 @@ static void   write_css_if_needed( char *directory)
    if( getenv( "MULLE_OBJC_CSS_URL"))
       return;
 
-   mulle_buffer_do_string( buffer, NULL, filename)
+   mulle_buffer_do( filename_buffer)
    {
-      mulle_buffer_add_filename_for_name_ext( buffer, "mulle-objc", ".css", directory);
+      mulle_buffer_add_filename_for_name_ext( filename_buffer, "mulle-objc", ".css", directory);
+
+      fp = fopen( mulle_buffer_get_string( filename_buffer), "w");
+      fwrite( css, sizeof( css) - 1, 1, fp);
+      fclose( fp);
    }
-   fp = fopen( filename, "w");
-   fwrite( css, sizeof( css) - 1, 1, fp);
-   fclose( fp);
-   mulle_free( filename);
 }
 
 
@@ -410,27 +409,25 @@ static void   _mulle_buffer_print_universe_html( struct mulle_buffer *buffer,
 static void   _mulle_objc_universe_print_to_directory( struct _mulle_objc_universe *universe,
                                                        char *directory)
 {
-   char   *path;
    FILE   *fp;
 
-   mulle_buffer_do_string( buffer, NULL, path)
+   mulle_buffer_do( filename_buffer)
    {
-      mulle_buffer_add_filename_for_universe( buffer, universe, directory);
-   }
+      mulle_buffer_add_filename_for_universe( filename_buffer, universe, directory);
 
-   fp = open_for_write( path);
-   if( fp)
-   {
-      mulle_buffer_do( buffer)
+      fp = open_for_write( mulle_buffer_get_string( filename_buffer));
+      if( fp)
       {
-         _mulle_buffer_print_start( buffer, "universe");
-   	   _mulle_buffer_print_universe_html( buffer, universe);
-         _mulle_buffer_html_body_end( buffer);
-         mulle_fprintf( fp, "%s\n", mulle_buffer_get_string( buffer));
-      }
-      fclose( fp);
-	}
-   mulle_free( path);
+         mulle_flushablebuffer_do_FILE( buffer, fp)
+         {
+            _mulle_buffer_print_start( buffer, "universe");
+      	   _mulle_buffer_print_universe_html( buffer, universe);
+            _mulle_buffer_html_body_end( buffer);
+            // mulle_fprintf( fp, "%s\n", mulle_buffer_get_string( buffer));
+         }
+         fclose( fp);
+   	}
+   }
 }
 
 
@@ -542,6 +539,7 @@ static void   _mulle_buffer_print_infraclass_html( struct mulle_buffer *buffer,
             }
             mulle_concurrent_pointerarrayenumerator_done(&rover);
 skip_property_table:
+            ;
         }
     }
     mulle_buffer_append_string( buffer, "</DIV>\n");
@@ -568,6 +566,7 @@ skip_property_table:
             mulle_concurrent_pointerarrayenumerator_done(&rover);
         }
 skip_ivar_table:
+        ;
     }
     mulle_buffer_append_string( buffer, "</DIV>\n");
 
@@ -594,6 +593,7 @@ skip_ivar_table:
             }
             mulle_concurrent_pointerarrayenumerator_done(&rover);
 skip_metamethod_table:
+            ;
         }
     }
     mulle_buffer_append_string( buffer, "</DIV>\n");
@@ -621,6 +621,7 @@ skip_metamethod_table:
             mulle_concurrent_pointerarrayenumerator_done(&rover);
         }
 skip_inframethod_table:
+        ;
     }
     mulle_buffer_append_string( buffer, "</DIV>\n");
 
@@ -674,27 +675,25 @@ skip_inframethod_table:
 
 static void   infraclass_dump( struct _mulle_objc_infraclass *infra, char *directory)
 {
-   char   *path;
    FILE   *fp;
 
-   mulle_buffer_do_string( buffer, NULL, path)
+   mulle_buffer_do( filename_buffer)
    {
-      mulle_buffer_add_html_filename_for_name( buffer, infra->base.name, directory);
-   }
+      mulle_buffer_add_html_filename_for_name( filename_buffer, infra->base.name, directory);
 
-   fp = open_for_write( path);
-   if( fp)
-   {
-      mulle_buffer_do( buffer)
+      fp = open_for_write( mulle_buffer_get_string( filename_buffer));
+      if( fp)
       {
-         _mulle_buffer_print_start( buffer, infra->base.name);
-   	  _mulle_buffer_print_infraclass_html( buffer, infra);
-         _mulle_buffer_html_body_end( buffer);
-        mulle_fprintf( fp, "%s\n", mulle_buffer_get_string( buffer));
+         mulle_flushablebuffer_do_FILE( buffer, fp)
+         {
+            _mulle_buffer_print_start( buffer, infra->base.name);
+      	  _mulle_buffer_print_infraclass_html( buffer, infra);
+            _mulle_buffer_html_body_end( buffer);
+           // mulle_fprintf( fp, "%s\n", mulle_buffer_get_string( buffer));
+         }
+         fclose( fp);
       }
-      fclose( fp);
    }
-   mulle_free( path);
 }
 
 

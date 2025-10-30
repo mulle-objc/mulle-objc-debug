@@ -18,12 +18,11 @@
    Here the prefix is harmless and serves disambiguation. If you have no
    sourcetree, then you don't need it.
  */
+#include <mulle-c11/mulle-c11.h>  // need this as only dependency is private
 
 #include "_mulle-objc-debug-include.h"
 
-#include <mulle-c11/mulle-c11.h>
-
-#ifdef MULLE_OBJC_DEBUG_BUILD
+#ifdef MULLE__OBJC__DEBUG_BUILD
 # define MULLE_OBJC_DEBUG_GLOBAL    MULLE_C_GLOBAL
 #else
 # if defined( MULLE_OBJC_DEBUG_INCLUDE_DYNAMIC) || (defined( MULLE_INCLUDE_DYNAMIC) && ! defined( MULLE_OBJC_DEBUG_INCLUDE_STATIC))
