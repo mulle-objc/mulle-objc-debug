@@ -13,12 +13,21 @@
 @interface Proto < Proto>
 @end
 @implementation Proto
+- (void) aMethod
+{
+}
 @end
 
 
 @interface A : Root < Proto>
+@property int  aProperty;
 @end
 @implementation A
+- (int) aMethodWithAnArgument:(int) x
+{
+   [super aMethod];
+   return( x);
+}
 @end
 
 
