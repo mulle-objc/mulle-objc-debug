@@ -73,7 +73,7 @@ static inline void   c_set_add( c_set *set, void *p)
 }
 
 
-static int  _pointer_compare( void *p_a, void *p_b)
+static int  _pointer_compare( void *p_a, void *p_b, void *unused)
 {
    intptr_t   a;
    intptr_t   b;
@@ -126,7 +126,7 @@ static void   *c_set_member2( c_set *set, void *p)
 
    if( ! set->sorted)
    {
-      qsort( set->storage, set->n, sizeof( void *), (int (*)()) _pointer_compare);
+      mulle_qsort_r( set->storage, set->n, sizeof( void *), (int (*)()) _pointer_compare, NULL);
       set->sorted = 1;
    }
    result = voidptr_bsearch( set->storage, set->n, p);
