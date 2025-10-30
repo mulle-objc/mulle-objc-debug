@@ -14,6 +14,19 @@
 #ifndef _mulle_objc_debug_include_h__
 #define _mulle_objc_debug_include_h__
 
-/* no headers */
+// To remove the following dependency (headers and library) completely:
+//   `mulle-sde dependency remove mulle-core`
+// (Use AC777917-4B40-4E3C-8204-497F70308FA4 instead of mulle-core, if there are duplicate entries)
+//
+// You can tweak the following #include with these commands:
+//    remove #include: `mulle-sde dependency mark mulle-core no-header`
+//    rename              : `mulle-sde dependency|library set mulle-core include whatever.h`
+//    reorder             : `mulle-sde dependency move mulle-core <up|down>`
+//    toggle #include: `mulle-sde dependency mark mulle-core [no-]import`
+//    toggle public       : `mulle-sde dependency mark mulle-core [no-]public`
+//    toggle optional     : `mulle-sde dependency mark mulle-core [no-]require`
+//    remove for platform : `mulle-sde dependency mark mulle-core no-platform-<uname>`
+//        (use `mulle-sourcetree-to-c --unames` to list known values)
+#include <mulle-core/mulle-core.h>   // mulle-core
 
 #endif

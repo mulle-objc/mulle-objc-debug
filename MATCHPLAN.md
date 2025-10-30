@@ -10,7 +10,7 @@ To avoid past mistakes and ensure a successful refactoring, the following princi
 
 1.  **API Stability is Paramount:**
     *   **DO NOT** change the function signatures of any non-static (public API) functions declared in `src/mulle-objc-html.h` (or any other public header). These functions *must* continue to return `char *` as they did originally.
-    *   **DO NOT** change the function signatures of any callbacks passed to public API functions (e.g., `row_description` function pointers in `mulle_concurrent_pointerarray_describe_html`). These must also remain stable.
+    *   **DO NOT** change the function signatures of any callbacks passed to public API functions (e.g., `row_description` function pointers in `mulle_buffer_describe_concurrent_pointerarray`). These must also remain stable.
 
 2.  **Internal Refactoring Only:**
     *   All `mulle-buffer` integration will occur within `static` helper functions.
@@ -26,7 +26,7 @@ To avoid past mistakes and ensure a successful refactoring, the following princi
     *   **Temporary Internal Buffers:** If an internal static function needs a temporary buffer that is not part of the main output, it will use `mulle_buffer_do( tmp_buffer) { ... }`.
 
 4.  **Sorting Strategy with `mulle_pointerarray`:**
-    *   For functions that require sorting (e.g., `mulle_objc_ivarlist_describe_html`, `mulle_concurrent_pointerarray_describe_html`), the following pattern will be used:
+    *   For functions that require sorting (e.g., `mulle_buffer_describe_ivarlist`, `mulle_buffer_describe_concurrent_pointerarray`), the following pattern will be used:
         *   We store the string there for comparison.
         *   **Sort `mulle_pointerarray`:** The `mulle_pointerarray` will be sorted using `mulle_qsort_r` with a custom comparison function (e.g., `strcmp_row_data_r`).
         *   **Append to Main Buffer:** After sorting, iterate through the `mulle_pointerarray`, append each stored `char *` to the main `mulle_buffer` (passed from the public function), and then `mulle_free` the individual `char *`
@@ -57,16 +57,16 @@ For each of the following `static` functions, modify their signature to accept `
 2.  `static void asprintf_table_header( struct mulle_buffer *buffer, ...)`
 3.  `static void categoryid_describe_row_html( struct mulle_buffer *buffer, ...)`
 4.  `static void protocolid_describe_row_html( struct mulle_buffer *buffer, ...)`
-5.  `static void mulle_objc_staticstring_describe_row_html( struct mulle_buffer *buffer, ...)`
-6.  `static void mulle_objc_fastclassentry_describe_row_html( struct mulle_buffer *buffer, ...)`
-7.  `static void mulle_objc_class_describe_row_html( struct mulle_buffer *buffer, ...)`
-8.  `static void mulle_objc_infraclass_describe_row_html( struct mulle_buffer *buffer, ...)`
-9.  `static void mulle_objc_descriptor_describe_row_html( struct mulle_buffer *buffer, ...)`
-10. `static void mulle_objc_category_describe_row_html( struct mulle_buffer *buffer, ...)`
-11. `static void mulle_objc_protocol_describe_row_html( struct mulle_buffer *buffer, ...)`
-12. `static void mulle_objc_super_describe_row_html( struct mulle_buffer *buffer, ...)`
-13. `static void mulle_objc_loadclass_describe_row_html( struct mulle_buffer *buffer, ...)`
-14. `static void mulle_objc_loadcategory_describe_row_html( struct mulle_buffer *buffer, ...)`
+5.  `static void mulle_buffer_describe_staticstring_row( struct mulle_buffer *buffer, ...)`
+6.  `static void mulle_buffer_describe_fastclass_row( struct mulle_buffer *buffer, ...)`
+7.  `static void mulle_buffer_describe_class_row( struct mulle_buffer *buffer, ...)`
+8.  `static void mulle_buffer_describe_infraclass_row( struct mulle_buffer *buffer, ...)`
+9.  `static void mulle_buffer_describe_descriptor( struct mulle_buffer *buffer, ...)`
+10. `static void mulle_buffer_describe_category( struct mulle_buffer *buffer, ...)`
+11. `static void mulle_buffer_describe_protocol( struct mulle_buffer *buffer, ...)`
+12. `static void mulle_buffer_describe_super( struct mulle_buffer *buffer, ...)`
+13. `static void mulle_buffer_describe_loadclass_row( struct mulle_buffer *buffer, ...)`
+14. `static void mulle_buffer_describe_loadcategory( struct mulle_buffer *buffer, ...)`
 
 ### Phase 2: Refactor Public API Functions (Maintain Signature + Call Static Helpers)
 
@@ -76,26 +76,26 @@ For each of the following public API functions, maintain their original `char *`
 3.  For functions requiring sorting, use the `mulle_pointerarray` approach described in "Core Principles".
 4.  Return `s`.
 
-1.  `char *mulle_objc_universe_describe_html(...)`
-2.  `char *mulle_objc_staticstring_describe_html(...)`
-3.  `char *mulle_objc_staticstring_describe_hor_html(...)`
-4.  `char *mulle_objc_class_describe_html_short(...)`
-5.  `char *mulle_objc_class_describe_html_tiny(...)`
-6.  `char *mulle_objc_class_describe_html(...)`
-7.  `char *mulle_objc_ivarlist_describe_html(...)`
-8.  `char *mulle_objc_ivarlist_describe_hor_html(...)`
-9.  `char *mulle_objc_propertylist_describe_html(...)`
-10. `char *mulle_objc_cache_describe_html(...)`
-11. `char *mulle_objc_descriptor_describe_html(...)`
-12. `char *mulle_objc_descriptor_describe_hor_html(...)`
-13. `char *mulle_objc_methodlist_describe_html(...)`
-14. `char *mulle_objc_methodlist_describe_hor_html(...)`
-15. `char *mulle_objc_protocols_describe_html(...)`
-16. `char *mulle_objc_categories_describe_html(...)`
-17. `char *mulle_objc_fastclasstable_describe_html(...)`
-18. `char *mulle_concurrent_pointerarray_describe_html(...)`
-19. `char *mulle_concurrent_hashmap_describe_html(...)`
-20. `char *mulle_objc_uniqueidarray_describe_html(...)`
+1.  `char *mulle_buffer_describe_universe(...)`
+2.  `char *mulle_buffer_describe_staticstring(...)`
+3.  `char *mulle_buffer_describe_staticstring_hor(...)`
+4.  `char *mulle_buffer_describe_class_short(...)`
+5.  `char *mulle_buffer_describe_class_tiny(...)`
+6.  `char *mulle_buffer_describe_class(...)`
+7.  `char *mulle_buffer_describe_ivarlist(...)`
+8.  `char *mulle_buffer_describe_ivarlist_hor(...)`
+9.  `char *mulle_buffer_describe_propertylist(...)`
+10. `char *mulle_buffer_describe_cache(...)`
+11. `char *mulle_buffer_describe_descriptor_html(...)`
+12. `char *mulle_buffer_describe_descriptor_hor(...)`
+13. `char *mulle_buffer_describe_methodlist(...)`
+14. `char *mulle_buffer_describe_methodlist_hor(...)`
+15. `char *mulle_buffer_describe_protocolids(...)`
+16. `char *mulle_buffer_describe_categoryids(...)`
+17. `char *mulle_buffer_describe_fastclasstable(...)`
+18. `char *mulle_buffer_describe_concurrent_pointerarray(...)`
+19. `char *mulle_buffer_describe_concurrent_hashmap(...)`
+20. `char *mulle_buffer_describe_uniqueidarray(...)`
 
 ### Phase 3: Cleanup
 

@@ -38,7 +38,9 @@
 #include "include-private.h"
 
 
+// this is just dead as mulle-lldb is dead
 
+#if 0
 struct mulle_objc_lldb_lookup_implementation_args
 {
    void   *class_or_superid;
@@ -299,3 +301,4 @@ void   mulle_objc_reference_lldb_functions( void)
    mulle_objc_lldb_lookup_descriptor_by_name( 0);
 }
 
+#endif

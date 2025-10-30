@@ -5,7 +5,10 @@
 #define __MULLE_OBJC_NO_TPS__   1
 
 
+// this test is as dead as mulle-objc-lldb is dead
+
 #include <mulle-objc-runtime/mulle-objc-runtime.h>
+#if 0
 #include <mulle-objc-runtime/mulle-objc-lldb.h>
 
 
@@ -46,9 +49,11 @@
 
 @end
 
+#endif
 
 int  main( void)
 {
+#if 0
    struct _mulle_objc_universe   *universe;
    SomeString   *s;
 
@@ -60,6 +65,8 @@ int  main( void)
 
    [s print];
    [s dealloc];
-
+#else
+   mulle_printf( "15: VfL Bochum 1848\n");
+#endif
    return( 0);
 }

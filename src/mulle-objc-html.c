@@ -65,91 +65,126 @@ static int   strcmp_r( void * s1, void * s2, void *thunk)
 // symbols or dick around with linker options
 //
 
-static char  *inheritance_description( unsigned int inheritance)
+static void  mulle_buffer_add_inheritance_description( struct mulle_buffer *buffer, unsigned int inheritance)
 {
-   char     *tmp;
-   size_t   len;
+   int   first = 1;
 
-   tmp = mulle_malloc( 128);
-   if( ! tmp)
-      return( tmp);
-
-   tmp[ 0] = 0;
    if( ! (inheritance & MULLE_OBJC_CLASS_DONT_INHERIT_SUPERCLASS))
-      strcat( tmp, "superclass ");
+   {
+      mulle_buffer_add_string( buffer, "superclass");
+      first = 0;
+   }
    if( ! (inheritance & MULLE_OBJC_CLASS_DONT_INHERIT_CATEGORIES))
-      strcat( tmp, "categories ");
+   {
+      if( ! first)
+         mulle_buffer_add_string( buffer, " ");
+      mulle_buffer_add_string( buffer, "categories");
+      first = 0;
+   }
    if( ! (inheritance & MULLE_OBJC_CLASS_DONT_INHERIT_PROTOCOLS))
-      strcat( tmp, "protocols ");
+   {
+      if( ! first)
+         mulle_buffer_add_string( buffer, " ");
+      mulle_buffer_add_string( buffer, "protocols");
+      first = 0;
+   }
    if( ! (inheritance & MULLE_OBJC_CLASS_DONT_INHERIT_PROTOCOL_CATEGORIES))
-      strcat( tmp, "protocol_categories ");
-
-   len = strlen( tmp);
-   if( len)
-      tmp[ len - 1] = 0;
-   return( tmp);
+   {
+      if( ! first)
+         mulle_buffer_add_string( buffer, " ");
+      mulle_buffer_add_string( buffer, "protocol_categories");
+   }
 }
 
 
-static void  categoryid_describe_row_html( struct mulle_buffer *buffer,
-                                            void *value,
-                                            struct _mulle_objc_universe *universe,
-                                            struct _mulle_objc_htmltablestyle *styling)
+
+static void   mulle_buffer_describe_categoryid_t( struct mulle_buffer *buffer,
+                                                 mulle_objc_uniqueid_t categoryid,
+                                                 struct _mulle_objc_htmltablestyle *styling,
+                                                 void *userinfo)
 {
-   mulle_objc_categoryid_t   categoryid;
-   char                      *s;
+   struct _mulle_objc_universe   *universe = userinfo;
+   char                          *s;
 
-   categoryid = (mulle_objc_categoryid_t) (intptr_t) value;
-   s          = _mulle_objc_universe_describe_categoryid( universe,
-                                                           categoryid);
-
+   s = _mulle_objc_universe_describe_categoryid( universe, categoryid);
    mulle_buffer_sprintf( buffer, "<TR><TD>\"%s\"</TD><TD>%08lx</TD></TR>\n",
          s, (unsigned long) categoryid);
 }
 
 
-static void  protocolid_describe_row_html( struct mulle_buffer *buffer,
-                                            void *value,
-                                            struct _mulle_objc_universe *universe,
-                                            struct _mulle_objc_htmltablestyle *styling)
+
+static void   mulle_buffer_describe_protocolid_t( struct mulle_buffer *buffer,
+                                                 mulle_objc_uniqueid_t protocolid,
+                                                 struct _mulle_objc_htmltablestyle *styling,
+                                                 void *userinfo)
 {
-   mulle_objc_protocolid_t   protocolid;
-   char                      *s;
+   struct _mulle_objc_universe *universe = userinfo;
+   char                        *s;
 
-   protocolid = (mulle_objc_protocolid_t) (intptr_t) value;
-   s          = _mulle_objc_universe_describe_protocolid( universe, protocolid);
-
+   s = _mulle_objc_universe_describe_protocolid( universe, protocolid);
    mulle_buffer_sprintf( buffer, "<TR><TD>\"%s\"</TD><TD>%08lx</TD></TR>\n",
          s, (unsigned long) protocolid);
 }
 
 
+
 #pragma mark - universe
 
-static void   asprintf_table_header_colspan( struct mulle_buffer *buffer,
-                                             struct _mulle_objc_htmltablestyle *styling,
-                                             unsigned int colspan)
+static void   mulle_buffer_add_column_headers( struct mulle_buffer *buffer, struct _mulle_objc_htmltablestyle *styling, int num_columns)
 {
+   char   **header;
+   char   *th;
+   int    i;
+
+   if( ! styling->headers || num_columns <= 2)
+      return;
+
+   th = styling->classprefix ? "TH" : "TD";
+
+   mulle_buffer_add_string( buffer, "<TR>");
+
+   for( i = 0, header = styling->headers; i < num_columns && *header; i++, header++)
+   {
+      if( styling->classprefix)
+         mulle_buffer_sprintf( buffer, "<%s>%s</%s>", th, *header, th);
+      else
+         mulle_buffer_sprintf( buffer, "<TD>%s</TD>", *header);
+   }
+
+   mulle_buffer_add_string( buffer, "</TR>\n");
+}
+
+
+static void   mulle_buffer_add_table_header_colspan( struct mulle_buffer *buffer,
+                                                     struct _mulle_objc_htmltablestyle *styling,
+                                                     unsigned int colspan)
+{
+   int   num_columns;
+
+   num_columns = colspan ? colspan : 2;
+
    if( styling->classprefix)
       mulle_buffer_sprintf( buffer,
                "<TABLE CLASS=\"%s_table\">\n<TR CLASS=\"%s_table_header\"><TH COLSPAN=\"%u\">%s</TH></TR>\n",
                styling->classprefix,
                styling->classprefix,
-               colspan ? colspan : 2,
+               num_columns,
                styling->title);
    else // graphviz don't like CLASS, can't deal with TH
       mulle_buffer_sprintf( buffer,
                "<TABLE CELLPADDING=\"0\" CELLSPACING=\"0\">\n<TR><TD BGCOLOR=\"%s\" COLSPAN=\"%u\"><FONT COLOR=\"%s\">%s</FONT></TD></TR>\n",
                styling->bgcolor,
-               colspan ? colspan : 2,
+               num_columns,
                styling->color,
                styling->title);
+
+   mulle_buffer_add_column_headers( buffer, styling, num_columns);
 }
 
 
-static void   asprintf_table_header( struct mulle_buffer *buffer, struct _mulle_objc_htmltablestyle *styling)
+static void   mulle_buffer_add_table_header( struct mulle_buffer *buffer, struct _mulle_objc_htmltablestyle *styling)
 {
-   asprintf_table_header_colspan( buffer, styling, styling->colspan);
+   mulle_buffer_add_table_header_colspan( buffer, styling, styling->colspan);
 }
 
 
@@ -159,22 +194,17 @@ static void   asprintf_table_header( struct mulle_buffer *buffer, struct _mulle_
 
 
 
-char   *mulle_objc_universe_describe_html( struct _mulle_objc_universe *universe,
+void   mulle_buffer_describe_universe( struct mulle_buffer *buffer,
+                                           struct _mulle_objc_universe *universe,
                                            struct _mulle_objc_htmltablestyle *styling)
 {
-   char   *s;
+   // create single lines for each method and two for head/tail
+   mulle_buffer_add_table_header( buffer, styling);
 
-   mulle_buffer_do_string( buffer, NULL, s)
-   {
-      // create single lines for each method and two for head/tail
-      asprintf_table_header( buffer, styling);
-
-      mulle_buffer_sprintf( buffer,
-               "<TR><TD>version</TD><TD>0x%x</TD></TR>\n",
-               universe->version);
-      mulle_buffer_add_string( buffer, "</TABLE>");
-   }
-   return( s);
+   mulle_buffer_sprintf( buffer,
+            "<TR><TD>version</TD><TD>0x%x</TD></TR>\n",
+            universe->version);
+   mulle_buffer_add_string( buffer, "</TABLE>");
 }
 
 
@@ -182,33 +212,29 @@ char   *mulle_objc_universe_describe_html( struct _mulle_objc_universe *universe
 #pragma mark - static strings
 
 
-char  *mulle_objc_staticstring_describe_html( struct _mulle_objc_staticstring *string,
+void  mulle_buffer_describe_staticstring( struct mulle_buffer *buffer,
+                                              struct _mulle_objc_staticstring *string,
                                               struct _mulle_objc_htmltablestyle *styling)
 {
-   char   *s;
    char   *th;
 
-   mulle_buffer_do_string( buffer, NULL, s)
-   {
-      th = styling->classprefix ? "TH" : "TD";
-      // create single lines for each method and two for head/tail
-      asprintf_table_header( buffer, styling);
+   th = styling->classprefix ? "TH" : "TD";
+   // create single lines for each method and two for head/tail
+   mulle_buffer_add_table_header( buffer, styling);
 
-      mulle_buffer_sprintf( buffer,
-               "<TR><%s>_s</%s><TD>%s</TD></TR>\n",
-                  th, th,
-                  html_escape( string->_s ? string->_s : "*null*"));
-      mulle_buffer_sprintf( buffer,
-               "<TR><%s>_len</%s><TD>%d</TD></TR>\n",
-                  th, th,
-                  string->_len);
-      mulle_buffer_add_string( buffer, "</TABLE>");
-   }
-   return( s);
+   mulle_buffer_sprintf( buffer,
+            "<TR><%s>_s</%s><TD>%s</TD></TR>\n",
+               th, th,
+               html_escape( string->_s ? string->_s : "*null*"));
+   mulle_buffer_sprintf( buffer,
+            "<TR><%s>_len</%s><TD>%d</TD></TR>\n",
+               th, th,
+               string->_len);
+   mulle_buffer_add_string( buffer, "</TABLE>");
 }
 
 
-char  *mulle_objc_staticstring_describe_hor_html( struct _mulle_objc_staticstring *string,
+char  *mulle_buffer_describe_staticstring_hor( struct _mulle_objc_staticstring *string,
                                                   struct _mulle_objc_htmltablestyle *styling)
 {
    char *s;
@@ -221,9 +247,9 @@ char  *mulle_objc_staticstring_describe_hor_html( struct _mulle_objc_staticstrin
 }
 
 
-static void  mulle_objc_staticstring_describe_row_html( struct mulle_buffer *buffer,
-                                                        void *value,
-                                                        struct _mulle_objc_htmltablestyle *styling)
+static void  _mulle_objc_staticstring_describe_row_html( struct mulle_buffer *buffer,
+                                                         void *value,
+                                                         struct _mulle_objc_htmltablestyle *styling)
 {
    struct _mulle_objc_staticstring *string = value;
 
@@ -234,164 +260,169 @@ static void  mulle_objc_staticstring_describe_row_html( struct mulle_buffer *buf
             html_escape( string->_s ? string->_s : "*null*"));
 }
 
-
-char  *mulle_objc_fastclassentry_describe_row_html( unsigned int i,
-                                                    struct _mulle_objc_infraclass *infra,
-                                                    struct _mulle_objc_htmltablestyle *styling)
+void   mulle_buffer_describe_staticstring_row( struct mulle_buffer *buffer,
+                                                   void *value,
+                                                   struct _mulle_objc_htmltablestyle *styling)
 {
-   char   *s;
+   _mulle_objc_staticstring_describe_row_html( buffer, value, styling);
+}
 
-   mulle_buffer_do_string( buffer, NULL, s)
-   {
-      mulle_buffer_sprintf( buffer,
-               "<TR>"
-               "<TD>%u</TD>"
-               "<TD>%s</TD>"
-               "</TR>\n",
-               i,
-               html_escape( infra ? _mulle_objc_infraclass_get_name( infra) : "*null*"));
-   }
-   return( s);
+
+void   mulle_buffer_describe_fastclass_row( struct mulle_buffer *buffer,
+                                                     unsigned int i,
+                                                     struct _mulle_objc_infraclass *infra,
+                                                     struct _mulle_objc_htmltablestyle *styling)
+{
+   mulle_buffer_sprintf( buffer,
+            "<TR>"
+            "<TD>%u</TD>"
+            "<TD>%s</TD>"
+            "</TR>\n",
+            i,
+            html_escape( infra ? _mulle_objc_infraclass_get_name( infra) : "*null*"));
 }
 
 #pragma mark - classes
 
-char   *mulle_objc_class_describe_html_short( struct _mulle_objc_class *cls,
-                                              struct _mulle_objc_htmltablestyle *styling)
+void   mulle_buffer_describe_class_short( struct mulle_buffer *buffer,
+                                          struct _mulle_objc_class *cls,
+                                          struct _mulle_objc_htmltablestyle *styling)
 {
-   char  *s;
    char  *name;
 
-   mulle_buffer_do_string( buffer, NULL, s)
-   {
-      name = html_escape( cls->name);
-      mulle_buffer_sprintf( buffer, "<a href=\"%s.html\">%s</a>\n",
-               name,
-               name);
-   }
-   return( s);
+   MULLE_C_UNUSED( styling);
+
+   name = html_escape( cls->name);
+   mulle_buffer_sprintf( buffer, "<a href=\"%s.html\">%s</a>\n",
+            name,
+            name);
 }
 
 
-char   *mulle_objc_class_describe_row_html( intptr_t  classid,
-                                            void *cls,
-                                            struct _mulle_objc_htmltablestyle *styling)
+// Updated to match mulle_buffer_describe_hashmap_entry_t callback signature
+void   mulle_buffer_describe_class_hashmap_entry( struct mulle_buffer *buffer,
+                                                  intptr_t classid,
+                                                  void *cls,
+                                                  struct _mulle_objc_htmltablestyle *styling,
+                                                  void *userinfo)
 {
-   char   *s;
    char   *name;
    char   *prefix;
 
-   mulle_buffer_do_string( buffer, NULL, s)
-   {
-      name   = html_escape( _mulle_objc_class_get_name( cls));
-      prefix = _mulle_objc_class_is_metaclass( cls) ? "+" : "";
+   name   = html_escape( _mulle_objc_class_get_name( cls));
+   prefix = _mulle_objc_class_is_metaclass( cls) ? "+" : "";
 
-      mulle_buffer_sprintf( buffer, "<TR><TD><A HREF=\"%s%s.html\">%s</A></TD><TD>%08lx</TD></TR>\n",
-               prefix,
-               name,
-               name,
-               (unsigned long) _mulle_objc_class_get_classid( cls));
-   }
-   return( s);
+   mulle_buffer_sprintf( buffer,
+            "<TR><TD><A HREF=\"%s%s.html\">%s</A></TD><TD>%08lx</TD></TR>\n",
+            prefix,
+            name,
+            name,
+            (unsigned long) _mulle_objc_class_get_classid( cls));
 }
 
 
-char   *mulle_objc_infraclass_describe_row_html( intptr_t  classid,
+void   mulle_buffer_describe_class_row( struct mulle_buffer *buffer,
+                                            intptr_t  classid,
+                                            void *cls,
+                                            struct _mulle_objc_htmltablestyle *styling)
+{
+   char   *name;
+   char   *prefix;
+
+   MULLE_C_UNUSED( classid);
+   MULLE_C_UNUSED( styling);
+
+   name   = html_escape( _mulle_objc_class_get_name( cls));
+   prefix = _mulle_objc_class_is_metaclass( cls) ? "+" : "";
+
+   mulle_buffer_sprintf( buffer, "<TR><TD><A HREF=\"%s%s.html\">%s</A></TD><TD>%08lx</TD></TR>\n",
+            prefix,
+            name,
+            name,
+            (unsigned long) _mulle_objc_class_get_classid( cls));
+}
+
+
+void   mulle_buffer_describe_infraclass_row( struct mulle_buffer *buffer,
+                                                 intptr_t  classid,
                                                  void *cls,
                                                  struct _mulle_objc_htmltablestyle *styling)
 {
-   char   *s;
    char   *name;
 
-   mulle_buffer_do_string( buffer, NULL, s)
-   {
-      name = html_escape( _mulle_objc_infraclass_get_name( cls));
-      mulle_buffer_sprintf( buffer, "<TR><TD>%s</TD><TD>%08lx</TD></TR>\n",
-               name,
-               (unsigned long) _mulle_objc_infraclass_get_classid( cls));
-   }
-   return( s);
+   MULLE_C_UNUSED( classid);
+   MULLE_C_UNUSED( styling);
+
+   name = html_escape( _mulle_objc_infraclass_get_name( cls));
+   mulle_buffer_sprintf( buffer, "<TR><TD>%s</TD><TD>%08lx</TD></TR>\n",
+            name,
+            (unsigned long) _mulle_objc_infraclass_get_classid( cls));
 }
 
 
-char   *mulle_objc_class_describe_html_tiny( struct _mulle_objc_class *cls,
-                                             struct _mulle_objc_htmltablestyle *styling)
+void   mulle_buffer_describe_class_tiny( struct mulle_buffer *buffer,
+                                            struct _mulle_objc_class *cls,
+                                            struct _mulle_objc_htmltablestyle *styling)
 {
-   char   *s;
-
-   mulle_buffer_do_string( buffer, NULL, s)
-   {
-      asprintf_table_header( buffer, styling);
-      mulle_buffer_add_string( buffer, "</TABLE>");
-   }
-   return( s);
+   mulle_buffer_add_table_header( buffer, styling);
+   mulle_buffer_add_string( buffer, "</TABLE>");
 }
 
 
-char   *mulle_objc_class_describe_html( struct _mulle_objc_class *cls,
-                                        int show_fields,
-                                        struct _mulle_objc_htmltablestyle *styling)
+void   mulle_buffer_describe_class( struct mulle_buffer *buffer,
+                                    struct _mulle_objc_class *cls,
+                                    int show_fields,
+                                    struct _mulle_objc_htmltablestyle *styling)
 {
-   char                               *s;
    struct _mulle_objc_htmltablestyle  style;
 
-   mulle_buffer_do_string( buffer, NULL, s)
+   style       = *styling;
+   style.title = html_escape( cls->name);
+
+   // create single lines for each method and two for head/tail
+   // fummel for graphviz
+   mulle_buffer_add_table_header( buffer, &style);
+
+   if( show_fields)
    {
-      style       = *styling;
-      style.title = html_escape( cls->name);
+      mulle_buffer_sprintf( buffer,
+               "<TR><TD>allocationsize</TD><TD>%lu</TD></TR>\n",
+               cls->allocationsize);
 
-      // create single lines for each method and two for head/tail
-      // fummel for graphviz
-      asprintf_table_header( buffer, &style);
+      mulle_buffer_sprintf( buffer,
+               "<TR><TD>inheritance</TD><TD>");
+      mulle_buffer_add_inheritance_description( buffer, _mulle_objc_class_get_inheritance( cls));
+      mulle_buffer_add_string( buffer, "</TD></TR>\n");
 
-      if( show_fields)
+      mulle_buffer_sprintf( buffer,
+               "<TR><TD>state</TD><TD>0x%lx</TD></TR>\n",
+               (long) _mulle_atomic_pointer_read_nonatomic( &cls->state));
+
+      if ( _mulle_objc_class_is_infraclass( cls))
       {
+         struct _mulle_objc_infraclass   *infra;
+
+         infra = _mulle_objc_class_as_infraclass( cls);
          mulle_buffer_sprintf( buffer,
-                  "<TR><TD>allocationsize</TD><TD>%lu</TD></TR>\n",
-                  cls->allocationsize);
-
-         mulle_buffer_do( tmp_buffer)
-         {
-            char  *inheritance;
-
-            inheritance = inheritance_description( _mulle_objc_class_get_inheritance( cls));
-            mulle_buffer_sprintf( buffer,
-                     "<TR><TD>inheritance</TD><TD>%s</TD></TR>\n",
-                     inheritance);
-            mulle_free( inheritance);
-         }
-
+                  "<TR><TD>ivarhash</TD><TD>0x%lx</TD></TR>\n",
+                  (long) infra->ivarhash);
          mulle_buffer_sprintf( buffer,
-                  "<TR><TD>state</TD><TD>0x%lx</TD></TR>\n",
-                  (long) _mulle_atomic_pointer_read_nonatomic( &cls->state));
-
-         if ( _mulle_objc_class_is_infraclass( cls))
-         {
-            struct _mulle_objc_infraclass   *infra;
-
-            infra = _mulle_objc_class_as_infraclass( cls);
-            mulle_buffer_sprintf( buffer,
-                     "<TR><TD>ivarhash</TD><TD>0x%lx</TD></TR>\n",
-                     (long) infra->ivarhash);
-            mulle_buffer_sprintf( buffer,
-                     "<TR><TD>allocatedInstances</TD><TD>%ld</TD></TR>\n",
-                     (long) _mulle_atomic_pointer_read_nonatomic( &infra->allocatedInstances));
-         }
-
-         mulle_buffer_sprintf( buffer,
-                  "<TR><TD>preloads</TD><TD>%u</TD></TR>\n",
-                  cls->preloads);
+                  "<TR><TD>allocatedInstances</TD><TD>%ld</TD></TR>\n",
+                  (long) _mulle_atomic_pointer_read_nonatomic( &infra->allocatedInstances));
       }
-      mulle_buffer_add_string( buffer, "</TABLE>");
+
+      mulle_buffer_sprintf( buffer,
+               "<TR><TD>preloads</TD><TD>%u</TD></TR>\n",
+               cls->preloads);
    }
-   return( s);
+   mulle_buffer_add_string( buffer, "</TABLE>");
 }
 
 
 #pragma mark - ivarlist
 
-char   *mulle_objc_ivarlist_describe_html( struct _mulle_objc_ivarlist *list,
-                                           struct _mulle_objc_htmltablestyle *styling)
+char   *mulle_buffer_describe_ivarlist( struct _mulle_objc_ivarlist *list,
+                                        struct _mulle_objc_htmltablestyle *styling)
 {
    char   *s;
 
@@ -400,10 +431,8 @@ char   *mulle_objc_ivarlist_describe_html( struct _mulle_objc_ivarlist *list,
       struct mulle_pointerarray   array;
       char                        *format;
       unsigned int                j;
-      char                        **p;
-      char                        **sentinel;
 
-      asprintf_table_header( buffer, styling);
+      mulle_buffer_add_table_header( buffer, styling);
 
       if( mulle_objc_environment_get_yes_no_default( "MULLE_OBJC_TERSE_TABLE", 0))
          format = "<TR>"
@@ -428,29 +457,33 @@ char   *mulle_objc_ivarlist_describe_html( struct _mulle_objc_ivarlist *list,
       {
          char   *row;
 
-         mulle_asprintf( &row,
-                   format,
-                   html_escape( list->ivars[ j].descriptor.name),
-                   html_escape( list->ivars[ j].descriptor.signature),
-                   (long) list->ivars[ j].descriptor.ivarid,
-                   list->ivars[ j].offset);
+         mulle_buffer_do_string( tmp_buffer, NULL, row)
+         {
+            mulle_buffer_sprintf( tmp_buffer,
+                      format,
+                      html_escape( list->ivars[ j].descriptor.name),
+                      html_escape( list->ivars[ j].descriptor.signature),
+                      (long) list->ivars[ j].descriptor.ivarid,
+                      list->ivars[ j].offset);
+         }
          mulle_pointerarray_add( &array, row);
       }
 
       /* sort by name */
-      mulle_qsort_r( mulle_pointerarray_get_all( &array),
+      mulle_qsort_r( _mulle_pointerarray_get_storage( &array),
                      mulle_pointerarray_get_count( &array),
                      sizeof( char *),
                      strcmp_r,
                      NULL);
 
-      p        = mulle_pointerarray_get_all( &array);
-      sentinel = &p[ mulle_pointerarray_get_count( &array)];
-      while( p < sentinel)
       {
-         mulle_buffer_add_string( buffer, *p);
-         mulle_free( *p);
-         p++;
+         char   *row;
+
+         mulle_pointerarray_for( &array, row)
+         {
+            mulle_buffer_add_string( buffer, row);
+            mulle_free( row);
+         }
       }
 
       mulle_pointerarray_done( &array);
@@ -462,24 +495,13 @@ char   *mulle_objc_ivarlist_describe_html( struct _mulle_objc_ivarlist *list,
 }
 
 
-char   *mulle_objc_ivarlist_describe_hor_html( struct _mulle_objc_ivarlist *list,
+void   mulle_buffer_describe_ivarlist_hor( struct mulle_buffer *buffer,
+                                               struct _mulle_objc_ivarlist *list,
                                                struct _mulle_objc_htmltablestyle *styling)
 {
-   size_t         len;
-   char           **tmp;
-   unsigned int   i;
-   unsigned int   j;
-   unsigned int   n;
-   char           *format;
+   char   *format;
 
-   n   = list->n_ivars + 2;
-   tmp = mulle_calloc( n, sizeof( char *));
-
-   // create single lines for each method and two for head/tail
-   i = 0;
-   asprintf_table_header_colspan( &tmp[ i], styling, 4);
-   len = strlen( tmp[ i]);
-   ++i;
+   mulle_buffer_add_table_header_colspan( buffer, styling, 4);
 
    if( mulle_objc_environment_get_yes_no_default( "MULLE_OBJC_TERSE_TABLE", 0))
       format = "<TR>"
@@ -493,32 +515,30 @@ char   *mulle_objc_ivarlist_describe_hor_html( struct _mulle_objc_ivarlist *list
                  "<TD>%d</TD>"
                "</TR>\n";
 
-   for( j = 0; j < list->n_ivars; j++)
+   mulle_buffer_do( tmp_buffer)
    {
-      mulle_asprintf( &tmp[ i],
-               format,
-               html_escape( list->ivars[ j].descriptor.name),
-               html_escape( list->ivars[ j].descriptor.signature),
-               list->ivars[ j].descriptor.ivarid,
-               list->ivars[ j].offset);
-      len += strlen( tmp[ i]);
-      ++i;
+      unsigned int   j;
+
+      for( j = 0; j < list->n_ivars; j++)
+      {
+         mulle_buffer_sprintf( tmp_buffer,
+                  format,
+                  html_escape( list->ivars[ j].descriptor.name),
+                  html_escape( list->ivars[ j].descriptor.signature),
+                  list->ivars[ j].descriptor.ivarid,
+                  list->ivars[ j].offset);
+      }
+      mulle_buffer_add_string( buffer, mulle_buffer_get_string( tmp_buffer));
    }
 
-   mulle_asprintf( &tmp[ i], "</TABLE>");
-   len += strlen( tmp[ i]);
-   ++i;
-
-   assert( i <= n);
-
-   return( final_concat_malloced_tmp_known_len( tmp, i, len));
+   mulle_buffer_add_string( buffer, "</TABLE>");
 }
 
 
 #pragma mark - descriptor
 
 
-char   *mulle_objc_descriptor_describe_html( struct _mulle_objc_descriptor *desc,
+char   *mulle_buffer_describe_descriptor_html( struct _mulle_objc_descriptor *desc,
                                              struct _mulle_objc_htmltablestyle *styling)
 {
    char   *s;
@@ -529,7 +549,7 @@ char   *mulle_objc_descriptor_describe_html( struct _mulle_objc_descriptor *desc
    {
       th = styling->classprefix ? "TH" : "TD";
 
-      asprintf_table_header( buffer, styling);
+      mulle_buffer_add_table_header( buffer, styling);
 
       if( mulle_objc_environment_get_yes_no_default( "MULLE_OBJC_TERSE_TABLE", 0))
          format = "<TR>"
@@ -558,7 +578,7 @@ char   *mulle_objc_descriptor_describe_html( struct _mulle_objc_descriptor *desc
 }
 
 
-char   *mulle_objc_descriptor_describe_hor_html( struct _mulle_objc_descriptor *desc)
+char   *mulle_buffer_describe_descriptor_hor( struct _mulle_objc_descriptor *desc)
 {
    char   *s;
    char   *format;
@@ -588,149 +608,205 @@ char   *mulle_objc_descriptor_describe_hor_html( struct _mulle_objc_descriptor *
 }
 
 
-char   *mulle_objc_descriptor_describe_row_html( intptr_t  methodid,
+// Callback wrapper for hashmap usage
+void   mulle_buffer_describe_descriptor_hashmap_entry( struct mulle_buffer *buffer,
+                                                             intptr_t methodid,
+                                                             void *value,
+                                                             struct _mulle_objc_htmltablestyle *styling,
+                                                             void *userinfo)
+{
+   struct _mulle_objc_descriptor    *desc = value;
+   char                             *format;
+
+   if( mulle_objc_environment_get_yes_no_default( "MULLE_OBJC_TERSE_TABLE", 0))
+      format = "<TR>"
+               "<TD>%s</TD>"
+               "</TR>\n";
+   else
+      format = "<TR>"
+               "<TD>%s</TD>"
+               "<TD>%s</TD>"
+               "<TD>%08lx</TD>"
+               "<TD>0x%x</TD>"
+               "</TR>\n";
+
+   mulle_buffer_sprintf( buffer,
+             format,
+             html_escape( desc->name),
+             html_escape( desc->signature),
+             (unsigned long) desc->methodid,
+             desc->bits);
+}
+
+
+void   mulle_buffer_describe_descriptor( struct mulle_buffer *buffer,
+                                                 intptr_t  methodid,
                                                  void *value,
                                                  struct _mulle_objc_htmltablestyle *styling)
 {
    struct _mulle_objc_descriptor    *desc = value;
-   char                             *s;
    char                             *format;
 
-   mulle_buffer_do_string( buffer, NULL, s)
-   {
-      if( mulle_objc_environment_get_yes_no_default( "MULLE_OBJC_TERSE_TABLE", 0))
-         format = "<TR>"
-                  "<TD>%s</TD>"
-                  "</TR>\n";
-      else
-         format = "<TR>"
-                  "<TD>%s</TD>"
-                  "<TD>%s</TD>"
-                  "<TD>%08lx</TD>"
-                  "<TD>0x%x</TD>"
-                  "</TR>\n";
+   MULLE_C_UNUSED( methodid);
+   MULLE_C_UNUSED( styling);
 
-      mulle_buffer_sprintf( buffer,
-                format,
-                html_escape( desc->name),
-                html_escape( desc->signature),
-                (unsigned long) desc->methodid,
-                desc->bits);
-   }
-   return( s);
+   if( mulle_objc_environment_get_yes_no_default( "MULLE_OBJC_TERSE_TABLE", 0))
+      format = "<TR>"
+               "<TD>%s</TD>"
+               "</TR>\n";
+   else
+      format = "<TR>"
+               "<TD>%s</TD>"
+               "<TD>%s</TD>"
+               "<TD>%08lx</TD>"
+               "<TD>0x%x</TD>"
+               "</TR>\n";
+
+   mulle_buffer_sprintf( buffer,
+             format,
+             html_escape( desc->name),
+             html_escape( desc->signature),
+             (unsigned long) desc->methodid,
+             desc->bits);
 }
 
 
 #pragma mark - categories
 
-char   *mulle_objc_category_describe_row_html( intptr_t  categoryid,
+// Callback wrapper for hashmap usage
+void   mulle_buffer_describe_loadcategory_hashmap_entry( struct mulle_buffer *buffer,
+                                                            intptr_t categoryid,
+                                                            void *value,
+                                                            struct _mulle_objc_htmltablestyle *styling,
+                                                            void *userinfo)
+{
+   mulle_buffer_sprintf( buffer,
+                "<TR>"
+                "<TD>%s</TD>"
+                "<TD>%08lx</TD>"
+                "</TR>\n",
+                html_escape( value),
+                (unsigned long) categoryid);
+}
+
+
+void   mulle_buffer_describe_category( struct mulle_buffer *buffer,
+                                               intptr_t  categoryid,
                                                void *value,
                                                struct _mulle_objc_htmltablestyle *styling)
 {
-   char  *s;
+   MULLE_C_UNUSED( styling);
 
-   mulle_buffer_do_string( buffer, NULL, s)
-   {
-      mulle_buffer_sprintf( buffer,
-                   "<TR>"
-                   "<TD>%s</TD>"
-                   "<TD>%08lx</TD>"
-                   "</TR>\n",
-                   html_escape( value),
-                   (unsigned long) categoryid);
-   }
-   return( s);
+   mulle_buffer_sprintf( buffer,
+                "<TR>"
+                "<TD>%s</TD>"
+                "<TD>%08lx</TD>"
+                "</TR>\n",
+                html_escape( value),
+                (unsigned long) categoryid);
 }
 
 #pragma mark - supers
 
-char   *mulle_objc_super_describe_row_html( intptr_t  superid,
+void   mulle_buffer_describe_super( struct mulle_buffer *buffer,
+                                            intptr_t  superid,
                                             void *value,
                                             struct _mulle_objc_htmltablestyle *styling)
 {
    struct _mulle_objc_super  *superinfo = value;
-   char                      *s;
 
-   mulle_buffer_do_string( buffer, NULL, s)
-   {
-      mulle_buffer_sprintf( buffer,
-                   "<TR>"
-                   "<TD>%s</TD>"
-                   "<TD>%08lx</TD>"
-                   "</TR>\n",
-                   html_escape( _mulle_objc_super_get_name( superinfo)),
-                   (unsigned long) superid);
-   }
-   return( s);
+   MULLE_C_UNUSED( styling);
+
+   mulle_buffer_sprintf( buffer,
+                "<TR>"
+                "<TD>%s</TD>"
+                "<TD>%08lx</TD>"
+                "</TR>\n",
+                html_escape( _mulle_objc_super_get_name( superinfo)),
+                (unsigned long) superid);
 }
 
 
 #pragma mark - protocols
 
-char   *mulle_objc_protocol_describe_row_html( intptr_t  protocolid,
+// Callback wrapper for hashmap usage
+void   mulle_buffer_describe_protocol_hashmap_entry( struct mulle_buffer *buffer,
+                                                            intptr_t protocolid,
+                                                            void *value,
+                                                            struct _mulle_objc_htmltablestyle *styling,
+                                                            void *userinfo)
+{
+   struct _mulle_objc_protocol  *protocol = value;
+
+   mulle_buffer_sprintf( buffer,
+                "<TR>"
+                "<TD>%s</TD>"
+                "<TD>%08lx</TD>"
+                "</TR>\n",
+                html_escape( _mulle_objc_protocol_get_name( protocol)),
+                (unsigned long) protocolid);
+}
+
+
+void   mulle_buffer_describe_protocol( struct mulle_buffer *buffer,
+                                               intptr_t  protocolid,
                                                void *value,
                                                struct _mulle_objc_htmltablestyle *styling)
 {
    struct _mulle_objc_protocol  *protocol = value;
-   char                         *s;
 
-   mulle_buffer_do_string( buffer, NULL, s)
-   {
-      mulle_buffer_sprintf( buffer,
-                   "<TR>"
-                   "<TD>%s</TD>"
-                   "<TD>%08lx</TD>"
-                   "</TR>\n",
-                   html_escape( _mulle_objc_protocol_get_name( protocol)),
-                   (unsigned long) protocolid);
-   }
-   return( s);
+   MULLE_C_UNUSED( styling);
+
+   mulle_buffer_sprintf( buffer,
+                "<TR>"
+                "<TD>%s</TD>"
+                "<TD>%08lx</TD>"
+                "</TR>\n",
+                html_escape( _mulle_objc_protocol_get_name( protocol)),
+                (unsigned long) protocolid);
 }
 
 
 
 #pragma mark - propertylist
 
-char   *mulle_objc_propertylist_describe_html( struct _mulle_objc_propertylist *list,
+void   mulle_buffer_describe_propertylist( struct mulle_buffer *buffer,
+                                               struct _mulle_objc_propertylist *list,
                                                struct _mulle_objc_htmltablestyle *styling)
 {
-   char   *s;
+   struct mulle_pointerarray   array;
+   char                        *format;
+   unsigned int                j;
 
-   mulle_buffer_do_string( buffer, NULL, s)
+   mulle_buffer_add_table_header( buffer, styling);
+
+   if( mulle_objc_environment_get_yes_no_default( "MULLE_OBJC_TERSE_TABLE", 0))
+      format = "<TR>"
+               "<TD>%s</TD>"
+               "</TR>\n";
+   else
+      format = "<TR>"
+               "<TD>%s</TD>"
+               "<TD>"
+                 "<TABLE COLOR=\"lightgray\" CELLPADDING=\"0\" CELLSPACING=\"0\">"
+                   "<TR><TD>signature</TD><TD>%s</TD></TR>"
+                   "<TR><TD>propertyid</TD><TD>%08lx</TD></TR>"
+                   "<TR><TD>ivarid</TD><TD>%08lx</TD></TR>"
+                   "<TR><TD>getter</TD><TD>%08lx</TD></TR>"
+                   "<TR><TD>setter</TD><TD>%08lx</TD></TR>"
+                   "<TR><TD>bits</TD><TD>0x%08lx</TD></TR>"
+                 "</TABLE>"
+               "</TD>"
+               "</TR>\n";
+
+   mulle_pointerarray_init( &array, 0, NULL);
+   for( j = 0; j < list->n_properties; j++)
    {
-      struct mulle_pointerarray   array;
-      char                        *format;
-      unsigned int                j;
-      char                        **p;
-      char                        **sentinel;
+      char   *row;
 
-      asprintf_table_header( buffer, styling);
-
-      if( mulle_objc_environment_get_yes_no_default( "MULLE_OBJC_TERSE_TABLE", 0))
-         format = "<TR>"
-                  "<TD>%s</TD>"
-                  "</TR>\n";
-      else
-         format = "<TR>"
-                  "<TD>%s</TD>"
-                  "<TD>"
-                    "<TABLE COLOR=\"lightgray\" CELLPADDING=\"0\" CELLSPACING=\"0\">"
-                      "<TR><TD>signature</TD><TD>%s</TD></TR>"
-                      "<TR><TD>propertyid</TD><TD>%08lx</TD></TR>"
-                      "<TR><TD>ivarid</TD><TD>%08lx</TD></TR>"
-                      "<TR><TD>getter</TD><TD>%08lx</TD></TR>"
-                      "<TR><TD>setter</TD><TD>%08lx</TD></TR>"
-                      "<TR><TD>bits</TD><TD>0x%08lx</TD></TR>"
-                    "</TABLE>"
-                  "</TD>"
-                  "</TR>\n";
-
-      mulle_pointerarray_init( &array, 0, NULL);
-      for( j = 0; j < list->n_properties; j++)
+      mulle_buffer_do_string( tmp_buffer, NULL, row)
       {
-         char   *row;
-
-         mulle_asprintf( &row,
+         mulle_buffer_sprintf( tmp_buffer,
                    format,
                    html_escape( list->properties[ j].name),
                    html_escape( list->properties[ j].signature),
@@ -739,308 +815,283 @@ char   *mulle_objc_propertylist_describe_html( struct _mulle_objc_propertylist *
                    (unsigned long) list->properties[ j].getter,
                    (unsigned long) list->properties[ j].setter,
                    (unsigned long) list->properties[ j].bits);
-         mulle_pointerarray_add( &array, row);
       }
-
-      mulle_qsort_r( mulle_pointerarray_get_all( &array),
-                     mulle_pointerarray_get_count( &array),
-                     sizeof( char *),
-                     strcmp_r,
-                     NULL);
-
-      p        = mulle_pointerarray_get_all( &array);
-      sentinel = &p[ mulle_pointerarray_get_count( &array)];
-      while( p < sentinel)
-      {
-         mulle_buffer_add_string( buffer, *p);
-         mulle_free( *p);
-         p++;
-      }
-
-      mulle_pointerarray_done( &array);
-
-      mulle_buffer_add_string( buffer, "</TABLE>");
+      mulle_pointerarray_add( &array, row);
    }
-   return( s);
+
+   mulle_qsort_r( _mulle_pointerarray_get_storage( &array),
+                  mulle_pointerarray_get_count( &array),
+                  sizeof( char *),
+                  strcmp_r,
+                  NULL);
+
+   {
+      char   *row;
+
+      mulle_pointerarray_for( &array, row)
+      {
+         mulle_buffer_add_string( buffer, row);
+         mulle_free( row);
+      }
+   }
+
+   mulle_pointerarray_done( &array);
+
+   mulle_buffer_add_string( buffer, "</TABLE>");
 }
 
 
 #pragma mark - cache
 
-char   *mulle_objc_cache_describe_html( struct _mulle_objc_cache *cache,
+void   mulle_buffer_describe_cache( struct mulle_buffer *buffer,
+                                        struct _mulle_objc_cache *cache,
                                         struct _mulle_objc_universe *universe,
                                         struct _mulle_objc_htmltablestyle *styling)
 {
-   char   *s;
-
-   mulle_buffer_do_string( buffer, NULL, s)
-   {
-      unsigned int            j;
-      int                     index;
-      mulle_objc_methodid_t   sel;
-      int                     colspan;
+   unsigned int            j;
+   int                     index;
+   mulle_objc_methodid_t   sel;
+   int                     colspan;
 
 #ifdef MULLE_OBJC_CACHEENTRY_REMEMBERS_THREAD_CLASS
-      colspan = 6;
+   colspan = 6;
 #else
-      colspan = 5;
+   colspan = 5;
 #endif
-      asprintf_table_header_colspan( buffer, styling, colspan);
+   mulle_buffer_add_table_header_colspan( buffer, styling, colspan);
 
-      mulle_buffer_sprintf( buffer,
-                      "<TR><TD>n</TD><TD COLSPAN=\"%d\">%lu</TD></TR>\n",
-                      colspan,
-                      (long) _mulle_atomic_pointer_read_nonatomic( &cache->n));
-      mulle_buffer_sprintf( buffer,
-                      "<TR><TD>mask</TD><TD COLSPAN=\"%d\">0x%lx</TD></TR>\n",
-                      colspan,
-                      (long) cache->mask);
+   mulle_buffer_sprintf( buffer,
+                   "<TR><TD>n</TD><TD COLSPAN=\"%d\">%lu</TD></TR>\n",
+                   colspan,
+                   (long) _mulle_atomic_pointer_read_nonatomic( &cache->n));
+   mulle_buffer_sprintf( buffer,
+                   "<TR><TD>mask</TD><TD COLSPAN=\"%d\">0x%lx</TD></TR>\n",
+                   colspan,
+                   (long) cache->mask);
 
-      for( j = 0; j < cache->size; j++)
-      {
-         index = 0;
-         sel   = cache->entries[ j].key.uniqueid;
-         if( sel)
-            index = _mulle_objc_cache_probe_entryindex( cache, sel);
+   for( j = 0; j < cache->size; j++)
+   {
+      index = 0;
+      sel   = cache->entries[ j].key.uniqueid;
+      if( sel)
+         index = _mulle_objc_cache_probe_entryindex( cache, sel);
 
-         mulle_buffer_sprintf( buffer, "<TR><TD>#%ld</TD><TD>%08lx</TD><TD>%s</TD>"
-                                   "<TD>%p</TD><TD>%d (%x)</TD>",
-                                   j,
-                                   sel,
-                                   (unsigned long) _mulle_objc_universe_describe_methodid( universe, sel),
-                                   cache->entries[ j].value.functionpointer,
-                                   index,
-                                   sel & cache->mask);
+      mulle_buffer_sprintf( buffer, "<TR><TD>#%ld</TD><TD>%08lx</TD><TD>%s</TD>"
+                                "<TD>%p</TD><TD>%d (%x)</TD>",
+                                j,
+                                sel,
+                                (unsigned long) _mulle_objc_universe_describe_methodid( universe, sel),
+                                cache->entries[ j].value.functionpointer,
+                                index,
+                                sel & cache->mask);
 #ifdef MULLE_OBJC_CACHEENTRY_REMEMBERS_THREAD_CLASS
-         mulle_buffer_sprintf( buffer, "<TD>%p</TD>", cache->entries[ j].thread);
+      mulle_buffer_sprintf( buffer, "<TD>%p</TD>", cache->entries[ j].thread);
 #endif
-         mulle_buffer_add_string( buffer, "</TR>\n");
-      }
-
-      mulle_buffer_add_string( buffer, "</TABLE>");
+      mulle_buffer_add_string( buffer, "</TR>\n");
    }
-   return( s);
+
+   mulle_buffer_add_string( buffer, "</TABLE>");
 }
 
 
 #pragma mark - methodlist
 
-char   *mulle_objc_methodlist_describe_html( struct _mulle_objc_methodlist *list,
+void   mulle_buffer_describe_methodlist( struct mulle_buffer *buffer,
+                                             struct _mulle_objc_methodlist *list,
                                              struct _mulle_objc_universe *universe,
                                              int show_fields,
                                              struct _mulle_objc_htmltablestyle *styling)
 {
-   char   *s;
+   struct mulle_pointerarray   array;
+   char                        *format;
+   char                        *name;
+   unsigned int                j;
 
-   mulle_buffer_do_string( buffer, NULL, s)
+   // create single lines for each method and two for head/tail
+   mulle_buffer_add_table_header( buffer, styling);
+
+   name = _mulle_objc_methodlist_get_categoryname( list);
+   if( name)
+      mulle_buffer_sprintf( buffer, "<TR><TD>category</TD><TD>%s</TD></TR>\n", name);
+
+   if( show_fields)
+      format = "<TR>"
+               "<TD>%s</TD>"
+               "<TD>"
+                 "<TABLE COLOR=\"lightgray\" CELLPADDING=\"0\" CELLSPACING=\"0\">"
+                   "<TR><TD>signature</TD><TD>%s</TD></TR>"
+                   "<TR><TD>methodid</TD><TD>0x%lx</TD></TR>"
+                   "<TR><TD>bits</TD><TD>0x%lx</TD></TR>"
+                   "<TR><TD>implementation</TD><TD>%s</TD></TR>"
+                 "</TABLE>"
+               "</TD>"
+               "</TR>\n";
+   else
+      format = "<TR>"
+               "<TD COLSPAN=\"2\">%s</TD>"
+               "</TR>\n";
+
+   mulle_pointerarray_init( &array, 0, NULL);
+
+   mulle_buffer_do( tmp_buffer)
    {
-      struct mulle_pointerarray   array;
-      char                        *format;
-      char                        *name;
-      unsigned int                j;
-      char                        **p;
-      char                        **sentinel;
-
-      // create single lines for each method and two for head/tail
-      asprintf_table_header( buffer, styling);
-
-      name = _mulle_objc_methodlist_get_categoryname( list);
-      if( name)
-         mulle_buffer_sprintf( buffer, "<TR><TD>category</TD><TD>%s</TD></TR>\n", name);
-
-      if( show_fields)
-         format = "<TR>"
-                  "<TD>%s</TD>"
-                  "<TD>"
-                    "<TABLE COLOR=\"lightgray\" CELLPADDING=\"0\" CELLSPACING=\"0\">"
-                      "<TR><TD>signature</TD><TD>%s</TD></TR>"
-                      "<TR><TD>methodid</TD><TD>0x%lx</TD></TR>"
-                      "<TR><TD>bits</TD><TD>0x%lx</TD></TR>"
-                      "<TR><TD>implementation</TD><TD>%s</TD></TR>"
-                    "</TABLE>"
-                  "</TD>"
-                  "</TR>\n";
-      else
-         format = "<TR>"
-                  "<TD COLSPAN=\"2\">%s</TD>"
-                  "</TR>\n";
-
-      mulle_pointerarray_init( &array, 0, NULL);
-
-      mulle_buffer_do( tmp_buffer)
+      for( j = 0; j < list->n_methods; j++)
       {
-         for( j = 0; j < list->n_methods; j++)
+         char   *row;
+
+         mulle_buffer_reset( tmp_buffer);
+         mulle_buffer_sprintf_functionpointer( tmp_buffer,
+                                               (mulle_functionpointer_t) &list->methods[ j].value);
+
+         mulle_buffer_do_string( tmp_buffer2, NULL, row)
          {
-            char   *row;
-
-            mulle_buffer_reset( tmp_buffer);
-            mulle_buffer_sprintf_functionpointer( tmp_buffer,
-                                                  (mulle_functionpointer_t) &list->methods[ j].value);
-
-            mulle_asprintf( &row,
+            mulle_buffer_sprintf( tmp_buffer2,
                       format,
                       html_escape( list->methods[ j].descriptor.name),
                       html_escape( list->methods[ j].descriptor.signature),
                       (unsigned long) list->methods[ j].descriptor.methodid,
                       (unsigned long) list->methods[ j].descriptor.bits,
                       mulle_buffer_get_string( tmp_buffer));
-            mulle_pointerarray_add( &array, row);
          }
+         mulle_pointerarray_add( &array, row);
       }
-
-      /* sort by name */
-      mulle_qsort_r( mulle_pointerarray_get_all( &array),
-                     mulle_pointerarray_get_count( &array),
-                     sizeof( char *),
-                     strcmp_r,
-                     NULL);
-
-      p        = mulle_pointerarray_get_all( &array);
-      sentinel = &p[ mulle_pointerarray_get_count( &array)];
-      while( p < sentinel)
-      {
-         mulle_buffer_add_string( buffer, *p);
-         mulle_free( *p);
-         p++;
-      }
-
-      mulle_pointerarray_done( &array);
-
-      mulle_buffer_add_string( buffer, "</TABLE>");
    }
-   return( s);
+
+   /* sort by name */
+   mulle_qsort_r( _mulle_pointerarray_get_storage( &array),
+                  mulle_pointerarray_get_count( &array),
+                  sizeof( char *),
+                  strcmp_r,
+                  NULL);
+
+   {
+      char   *row;
+
+      mulle_pointerarray_for( &array, row)
+      {
+         mulle_buffer_add_string( buffer, row);
+         mulle_free( row);
+      }
+   }
+
+   mulle_pointerarray_done( &array);
+
+   mulle_buffer_add_string( buffer, "</TABLE>");
 }
 
 
-char   *mulle_objc_methodlist_describe_hor_html( struct _mulle_objc_methodlist *list,
-                                                 struct _mulle_objc_htmltablestyle *styling)
+void   mulle_buffer_describe_methodlist_hor( struct mulle_buffer *buffer,
+                                                struct _mulle_objc_methodlist *list,
+                                                struct _mulle_objc_htmltablestyle *styling)
 {
-   size_t         len;
-   char           **tmp;
-   unsigned int   i;
-   unsigned int   j;
-   unsigned int   n;
-   char           *format;
+   char   *format;
 
-   n   = list->n_methods + 3;
-   tmp = mulle_calloc( n, sizeof( char *));
+   mulle_buffer_add_table_header_colspan( buffer, styling, 5);
 
-   // create single lines for each method and two for head/tail
-   i = 0;
-   asprintf_table_header_colspan( &tmp[ i], styling, 5);
-   len = strlen( tmp[ i]);
-   ++i;
+      if( list->n_methods)
+      {
+         if( mulle_objc_environment_get_yes_no_default( "MULLE_OBJC_TERSE_TABLE", 0))
+         {
+            if( styling->classprefix)
+               format = "<TR>"
+                           "<TH>name</TH>"
+                        "</TR>\n";
+            else
+               format = "<TR>"
+                           "<TD>name</TD>"
+                        "</TR>\n";
+         }
+         else
+         {
+            if( styling->classprefix)
+               format = "<TR>"
+                           "<TH>name</TH>"
+                           "<TH>signature</TH>"
+                           "<TH>methodid</TH>"
+                           "<TH>bits</TH>"
+                           "<TH>implementation</TH>"
+                        "</TR>\n";
+            else
+               format =  "<TR>"
+                           "<TD>name</TD>"
+                           "<TD>signature</TD>"
+                           "<TD>methodid</TD>"
+                           "<TD>bits</TD>"
+                           "<TD>implementation</TD>"
+                         "</TR>\n";
+         }
 
+         mulle_buffer_add_string( buffer, format);
+      }
 
-   if( list->n_methods)
-   {
       if( mulle_objc_environment_get_yes_no_default( "MULLE_OBJC_TERSE_TABLE", 0))
-      {
-         if( styling->classprefix)
-            format = "<TR>"
-                        "<TH>name</TH>"
-                     "</TR>\n";
-         else
-            format = "<TR>"
-                        "<TD>name</TD>"
-                     "</TR>\n";
-      }
+         format = "<TR>"
+                    "<TD>%s</TD>"
+                  "</TR>\n";
       else
+         format = "<TR>"
+                    "<TD>%s</TD>"
+                    "<TD>%s</TD>"
+                    "<TD>%08lx</TD>"
+                    "<TD>0x%lx</TD>"
+                    "<TD>%s</TD>"
+                  "</TR>\n";
+
+      mulle_buffer_do( tmp_buffer)
       {
-         if( styling->classprefix)
-            format = "<TR>"
-                        "<TH>name</TH>"
-                        "<TH>signature</TH>"
-                        "<TH>methodid</TH>"
-                        "<TH>bits</TH>"
-                        "<TH>implementation</TH>"
-                     "</TR>\n";
-         else
-            format =  "<TR>"
-                        "<TD>name</TD>"
-                        "<TD>signature</TD>"
-                        "<TD>methodid</TD>"
-                        "<TD>bits</TD>"
-                        "<TD>implementation</TD>"
-                      "</TR>\n";
+         unsigned int   j;
+
+         for( j = 0; j < list->n_methods; j++)
+         {
+            char   *impl_str;
+
+            mulle_buffer_reset( tmp_buffer);
+            mulle_buffer_sprintf_functionpointer( tmp_buffer,
+                                                  (mulle_functionpointer_t) &list->methods[ j].value);
+            impl_str = mulle_buffer_extract_string( tmp_buffer);
+
+            mulle_buffer_sprintf( buffer,
+                     format,
+                     html_escape( list->methods[ j].descriptor.name),
+                     html_escape( list->methods[ j].descriptor.signature),
+                     (unsigned long) list->methods[ j].descriptor.methodid,
+                     (unsigned long) list->methods[ j].descriptor.bits,
+                     impl_str);
+            mulle_free( impl_str);
+         }
       }
 
-      mulle_asprintf( &tmp[ i],
-                format);
-
-      len += strlen( tmp[ i]);
-      ++i;
-   }
-
-   if( mulle_objc_environment_get_yes_no_default( "MULLE_OBJC_TERSE_TABLE", 0))
-      format = "<TR>"
-                 "<TD>%s</TD>"
-               "</TR>\n";
-   else
-      format = "<TR>"
-                 "<TD>%s</TD>"
-                 "<TD>%s</TD>"
-                 "<TD>%08lx</TD>"
-                 "<TD>0x%lx</TD>"
-                 "<TD>%s</TD>"
-               "</TR>\n";
-
-   mulle_buffer_do( buffer)
-   {
-      for( j = 0; j < list->n_methods; j++)
-      {
-         mulle_buffer_reset( buffer);
-         mulle_buffer_sprintf_functionpointer( buffer,
-                                               (mulle_functionpointer_t) &list->methods[ i].value);
-         mulle_asprintf( &tmp[ i],
-                         format,
-                         html_escape( list->methods[ j].descriptor.name),
-                         html_escape( list->methods[ j].descriptor.signature),
-                         (unsigned long) list->methods[ j].descriptor.methodid,
-                         (unsigned long) list->methods[ j].descriptor.bits,
-                         mulle_buffer_get_string( buffer));
-         len += strlen( tmp[ i]);
-         ++i;
-      }
-   }
-
-   mulle_qsort_r( &tmp[ i - j], j, sizeof( char *), strcmp_r, NULL);
-
-   mulle_asprintf( &tmp[ i], "</TABLE>");
-   len += strlen( tmp[ i]);
-   ++i;
-
-   assert( i <= n);
-
-   return( final_concat_malloced_tmp_known_len( tmp, i, len));
+      mulle_buffer_add_string( buffer, "</TABLE>");
 }
 
 
 #pragma mark - loadclass
 
-char   *mulle_objc_loadclass_describe_row_html( void *value,
-                                                struct _mulle_objc_htmltablestyle *styling)
+void   mulle_buffer_describe_loadclass_row( struct mulle_buffer *buffer,
+                                               void *value,
+                                               struct _mulle_objc_htmltablestyle *styling,
+                                               void *userinfo)
 {
    struct _mulle_objc_loadclass   *loadcls = value;
-   char                           *s;
 
-   mulle_buffer_do_string( buffer, NULL, s)
-   {
-      mulle_buffer_sprintf( buffer, "<TR><TD>%s</TD><TD>%08lx</TD></TR>\n",
-               loadcls->classname,
-               (unsigned long) loadcls->classid);
-   }
-   return( s);
+   MULLE_C_UNUSED( userinfo);
+
+   mulle_buffer_sprintf( buffer, "<TR><TD>%s</TD><TD>%08lx</TD></TR>\n",
+            loadcls->classname,
+            (unsigned long) loadcls->classid);
 }
 
 
 #pragma mark - loadcategory
 
-char   *mulle_objc_loadcategory_describe_row_html( void *value,
-                                                   struct _mulle_objc_htmltablestyle *styling)
+char   *mulle_buffer_describe_loadcategory( void *value,
+                                                   struct _mulle_objc_htmltablestyle *styling,
+                                                   void *userinfo)
 {
    struct _mulle_objc_loadcategory   *loadcat = value;
    char                              *s;
+
+   MULLE_C_UNUSED( userinfo);
 
    mulle_buffer_do_string( buffer, NULL, s)
    {
@@ -1056,219 +1107,190 @@ char   *mulle_objc_loadcategory_describe_row_html( void *value,
 
 #pragma mark - protocols
 
-char   *mulle_objc_protocols_describe_html( struct _mulle_objc_uniqueidarray *array,
+void   mulle_buffer_describe_protocolids( struct mulle_buffer *buffer,
+                                            struct _mulle_objc_uniqueidarray *array,
                                             struct _mulle_objc_universe *universe,
                                             struct _mulle_objc_htmltablestyle *styling)
 {
-   return( mulle_objc_uniqueidarray_describe_html( array,
-                                                   (void *) protocolid_describe_row_html,
-                                                   universe,
-                                                   styling));
+   mulle_buffer_describe_uniqueidarray( buffer, array,
+                                           mulle_buffer_describe_protocolid_t,
+                                           universe,
+                                           styling);
 }
 
 
 #pragma mark - categories
 
-char   *mulle_objc_categories_describe_html( struct _mulle_objc_uniqueidarray *array,
-                                             struct _mulle_objc_universe *universe,
-                                             struct _mulle_objc_htmltablestyle *styling)
+void   mulle_buffer_describe_categoryids( struct mulle_buffer *buffer,
+                                            struct _mulle_objc_uniqueidarray *array,
+                                            struct _mulle_objc_universe *universe,
+                                            struct _mulle_objc_htmltablestyle *styling)
 {
-   return( mulle_objc_uniqueidarray_describe_html( array,
-                                                   (void *) categoryid_describe_row_html,
-                                                   universe,
-                                                   styling));
+   mulle_buffer_describe_uniqueidarray( buffer, array,
+                                           mulle_buffer_describe_categoryid_t,
+                                           universe,
+                                           styling);
 }
 
 
 #pragma mark - fastclasses
 
-char   *mulle_objc_fastclasstable_describe_html( struct _mulle_objc_fastclasstable *fastclasstable,
-                                                 void (row_description)( struct mulle_buffer *,
-                                                                          unsigned int,
-                                                                          struct _mulle_objc_infraclass *,
-                                                                          struct _mulle_objc_htmltablestyle *),
-                                                 struct _mulle_objc_htmltablestyle *styling)
-
+void   mulle_buffer_describe_fastclasstable( struct mulle_buffer *buffer,
+                                                 struct _mulle_objc_fastclasstable *fastclasstable,
+                                                 mulle_buffer_describe_class_t *row_description,
+                                                 struct _mulle_objc_htmltablestyle *styling,
+                                                 void *userinfo)
 {
-   char   *s;
+   unsigned int   j;
+   void           *value;
 
-   mulle_buffer_do_string( buffer, NULL, s)
+   if( styling)
+      mulle_buffer_add_table_header( buffer, styling);
+
+   for( j = 0; j < MULLE_OBJC_S_FASTCLASSES; j++)
    {
-      unsigned int   j;
-      void           *value;
-
-      if( styling)
-         asprintf_table_header( buffer, styling);
-
-      for( j = 0; j < MULLE_OBJC_S_FASTCLASSES; j++)
-      {
-         value = _mulle_atomic_pointer_read_nonatomic( &fastclasstable->classes[ j].pointer);
-         (*row_description)( buffer, j, value, styling);
-      }
-
-      if( styling)
-         mulle_buffer_add_string( buffer, "</TABLE>");
+      value = _mulle_atomic_pointer_read_nonatomic( &fastclasstable->classes[ j].pointer);
+      (*row_description)( buffer, value, styling, userinfo);
    }
-   return( s);
+
+   if( styling)
+      mulle_buffer_add_string( buffer, "</TABLE>");
 }
 
 
 #pragma mark - pointerarray
 
-char   *mulle_concurrent_pointerarray_describe_html( struct mulle_concurrent_pointerarray *list,
-                                                     void (row_description)( struct mulle_buffer *,
-                                                                              void *,
-                                                                              struct _mulle_objc_htmltablestyle *),
-                                                     struct _mulle_objc_htmltablestyle *styling)
-
+void   mulle_buffer_describe_concurrent_pointerarray( struct mulle_buffer *buffer,
+                                                     struct mulle_concurrent_pointerarray *list,
+                                                     mulle_buffer_describe_pointer_t *row_description,
+                                                     struct _mulle_objc_htmltablestyle *styling,
+                                                     void *userinfo)
 {
-   char   *s;
+   struct mulle_concurrent_pointerarrayenumerator   rover;
+   void                                             *value;
 
-   mulle_buffer_do_string( buffer, NULL, s)
+   if( styling)
+      mulle_buffer_add_table_header( buffer, styling);
+
+   rover = mulle_concurrent_pointerarray_enumerate( list);
+   while( value = _mulle_concurrent_pointerarrayenumerator_next( &rover))
    {
-      struct mulle_concurrent_pointerarrayenumerator   rover;
-      void                                             *value;
-
-      if( styling)
-         asprintf_table_header( buffer, styling);
-
-      rover = mulle_concurrent_pointerarray_enumerate( list);
-      while( value = _mulle_concurrent_pointerarrayenumerator_next( &rover))
-         (*row_description)( buffer, value, styling);
-
-      if( styling)
-         mulle_buffer_add_string( buffer, "</TABLE>");
+      (*row_description)( buffer, value, styling, userinfo);
    }
-   return( s);
+
+   if( styling)
+      mulle_buffer_add_string( buffer, "</TABLE>");
 }
 
 
 #pragma mark - hashmap
 
-char   *mulle_concurrent_hashmap_describe_html( struct mulle_concurrent_hashmap *map,
-                                                void (row_description)( struct mulle_buffer *,
-                                                                         intptr_t,
-                                                                         void *,
-                                                                         struct _mulle_objc_htmltablestyle *),
-                                                struct _mulle_objc_htmltablestyle *styling)
+void   mulle_buffer_describe_concurrent_hashmap( struct mulle_buffer *buffer,
+                                                struct mulle_concurrent_hashmap *map,
+                                                mulle_buffer_describe_hashmap_entry_t *row_description,
+                                                struct _mulle_objc_htmltablestyle *styling,
+                                                void *userinfo)
 {
-   char   *s;
+   struct mulle_pointerarray   ptr_array;
+   intptr_t                    hash;
+   void                        *value;
+   char                        *null_description;
 
-   mulle_buffer_do_string( buffer, NULL, s)
+   if( styling)
+      mulle_buffer_add_table_header( buffer, styling);
+
+   null_description = "*null*";
+
+   mulle_pointerarray_init( &ptr_array, 0, NULL);
+
+   mulle_concurrent_hashmap_for( map, hash, value)
    {
-      struct mulle_pointerarray   array;
-      intptr_t                    uniqueid;
-      void                        *value;
-      char                        *null_description;
-      char                        **p;
-      char                        **sentinel;
+      char   *row;
 
-      if( styling)
-         asprintf_table_header( buffer, styling);
+      if( ! value)
+         value = null_description;
 
-      null_description = "*null*";
-
-      mulle_pointerarray_init( &array, 0, NULL);
-
-      mulle_concurrent_hashmap_for( map, uniqueid, value)
+      mulle_buffer_do_string( tmp_buffer, NULL, row)
       {
-         char   *row;
-
-         if( ! value)
-            value = null_description;
-
-         mulle_buffer_do_string( tmp_buffer, NULL, row)
-         {
-            (*row_description)( tmp_buffer, uniqueid, value, styling);
-         }
-         mulle_pointerarray_add( &array, row);
+         (*row_description)( tmp_buffer, hash, value, styling, userinfo);
       }
-
-      mulle_qsort_r( mulle_pointerarray_get_all( &array),
-                     mulle_pointerarray_get_count( &array),
-                     sizeof( char *),
-                     strcmp_r,
-                     NULL);
-
-      p        = mulle_pointerarray_get_all( &array);
-      sentinel = &p[ mulle_pointerarray_get_count( &array)];
-      while( p < sentinel)
-      {
-         mulle_buffer_add_string( buffer, *p);
-         mulle_free( *p);
-         p++;
-      }
-
-      mulle_pointerarray_done( &array);
-
-      if( styling)
-         mulle_buffer_add_string( buffer, "</TABLE>");
+      mulle_pointerarray_add( &ptr_array, row);
    }
-   return( s);
+
+   mulle_qsort_r( _mulle_pointerarray_get_storage( &ptr_array),
+                   mulle_pointerarray_get_count( &ptr_array),
+                   sizeof( char *),
+                   strcmp_r,
+                   NULL);
+
+   {
+      char   *row;
+
+      mulle_pointerarray_for( &ptr_array, row)
+      {
+         mulle_buffer_add_string( buffer, row);
+         mulle_free( row);
+      }
+   }
+
+   mulle_pointerarray_done( &ptr_array);
+
+   if( styling)
+      mulle_buffer_add_string( buffer, "</TABLE>");
 }
 
 
 #pragma mark - uniqueidarray
 
-char   *mulle_objc_uniqueidarray_describe_html( struct _mulle_objc_uniqueidarray *array,
-                                                void (row_description)( struct mulle_buffer *,
-                                                                         void *,
-                                                                         struct _mulle_objc_universe *,
-                                                                         struct _mulle_objc_htmltablestyle *),
+void   mulle_buffer_describe_uniqueidarray( struct mulle_buffer *buffer,
+                                                struct _mulle_objc_uniqueidarray *array,
+                                                mulle_buffer_describe_uniqueid_t *row_description,
                                                 struct _mulle_objc_universe *universe,
                                                 struct _mulle_objc_htmltablestyle *styling)
-
 {
-   char   *s;
+   struct mulle_pointerarray   ptr_array;
+   mulle_objc_uniqueid_t       *p;
+   mulle_objc_uniqueid_t       *sentinel;
 
-   mulle_buffer_do_string( buffer, NULL, s)
+   if( styling)
+      mulle_buffer_add_table_header( buffer, styling);
+
+   mulle_pointerarray_init( &ptr_array, 0, NULL);
+
+   p        = array->entries;
+   sentinel = &p[ array->n];
+
+   while( p < sentinel)
    {
-      struct mulle_pointerarray   ptr_array;
-      mulle_objc_uniqueid_t       *p;
-      mulle_objc_uniqueid_t       *sentinel;
-      char                        **q;
-      char                        **sentinel2;
+      char   *row;
 
-      if( styling)
-         asprintf_table_header( buffer, styling);
-
-      mulle_pointerarray_init( &ptr_array, 0, NULL);
-
-      p        = array->entries;
-      sentinel = &p[ array->n];
-
-      while( p < sentinel)
+      mulle_buffer_do_string( tmp_buffer, NULL, row)
       {
-         char   *row;
-
-         mulle_buffer_do_string( tmp_buffer, NULL, row)
-         {
-            (*row_description)( tmp_buffer, (void *) (uintptr_t) *p, universe, styling);
-         }
-         mulle_pointerarray_add( &ptr_array, row);
-         p++;
+         (*row_description)( tmp_buffer, *p, styling, universe);
       }
-
-      mulle_qsort_r( mulle_pointerarray_get_all( &ptr_array),
-                     mulle_pointerarray_get_count( &ptr_array),
-                     sizeof( char *),
-                     strcmp_r,
-                     NULL);
-
-      q         = mulle_pointerarray_get_all( &ptr_array);
-      sentinel2 = &q[ mulle_pointerarray_get_count( &ptr_array)];
-      while( q < sentinel2)
-      {
-         mulle_buffer_add_string( buffer, *q);
-         mulle_free( *q);
-         q++;
-      }
-
-      mulle_pointerarray_done( &ptr_array);
-
-      if( styling)
-         mulle_buffer_add_string( buffer, "</TABLE>");
+      mulle_pointerarray_add( &ptr_array, row);
+      p++;
    }
-   return( s);
+
+   mulle_qsort_r( _mulle_pointerarray_get_storage( &ptr_array),
+                  mulle_pointerarray_get_count( &ptr_array),
+                  sizeof( char *),
+                  strcmp_r,
+                  NULL);
+
+   {
+      char   *row;
+
+      mulle_pointerarray_for( &ptr_array, row)
+      {
+         mulle_buffer_add_string( buffer, row);
+         mulle_free( row);
+      }
+   }
+
+   mulle_pointerarray_done( &ptr_array);
+
+   if( styling)
+      mulle_buffer_add_string( buffer, "</TABLE>");
 }
 
