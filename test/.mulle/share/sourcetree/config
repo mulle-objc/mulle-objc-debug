@@ -1,1 +1,1 @@
-mulle-objc-debug;${MULLE__OBJC__DEBUG_NODETYPE:-tar};;3DE998AB-BB3F-4FEA-9685-38B590B69117;${MULLE__OBJC__DEBUG_URL:-https://github.com/mulle-nat/mulle-objc-debug/archive/${MULLE_TAG}.tar.gz};${MULLE__OBJC__DEBUG_BRANCH};${MULLE__OBJC__DEBUG_TAG:-latest};;
+mulle-objc-debug;${MULLE__OBJC__DEBUG_NODETYPE:-tar};;9D9B9010-0A51-41E5-84B3-506F72EB8B88;${MULLE__OBJC__DEBUG_URL:-https://github.com/nat/mulle-objc-debug/archive/${MULLE_TAG}.tar.gz};${MULLE__OBJC__DEBUG_BRANCH};${MULLE__OBJC__DEBUG_TAG:-latest};;

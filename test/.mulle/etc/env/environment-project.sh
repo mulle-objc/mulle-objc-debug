@@ -20,13 +20,13 @@ export PROJECT_LANGUAGE="c"
 #
 #
 #
-export PROJECT_DIALECT="c"
+export PROJECT_DIALECT="objc"
 
 
 #
 #
 #
-export PROJECT_EXTENSIONS="c"
+export PROJECT_EXTENSIONS="c:m"
 
 
 #

@@ -40,7 +40,9 @@
 
 #include <stdarg.h>
 #include <stdint.h>
+#include <mulle-objc-runtime/mulle-objc-runtime.h>
 
+struct mulle_buffer;
 
 struct _mulle_objc_universe;
 struct _mulle_objc_staticstring;
@@ -64,148 +66,248 @@ struct _mulle_objc_htmltablestyle
    char   *color;        // used if classprefix is not set
    char   *bgcolor;      // used if classprefix is not set
    int    colspan;       // optional
+   char   **headers;     // NULL or array of static strings for column headers (only used if >2 columns)
 };
 
 MULLE_OBJC_DEBUG_GLOBAL
-char   *mulle_objc_universe_describe_html( struct _mulle_objc_universe *universe,
-                                           struct _mulle_objc_htmltablestyle *styling);
+void   mulle_buffer_describe_universe( struct mulle_buffer *buffer,
+                                       struct _mulle_objc_universe *universe,
+                                       struct _mulle_objc_htmltablestyle *styling);
 
 MULLE_OBJC_DEBUG_GLOBAL
-char   *mulle_objc_staticstring_describe_html( struct _mulle_objc_staticstring *string,
+void  mulle_buffer_describe_staticstring( struct mulle_buffer *buffer,
+                                          struct _mulle_objc_staticstring *string,
+                                          struct _mulle_objc_htmltablestyle *styling);
+MULLE_OBJC_DEBUG_GLOBAL
+char   *mulle_buffer_describe_staticstring_hor( struct _mulle_objc_staticstring *string,
+                                                struct _mulle_objc_htmltablestyle *styling);
+MULLE_OBJC_DEBUG_GLOBAL
+void   mulle_buffer_describe_staticstring_row( struct mulle_buffer *buffer,
+                                               void *value,
                                                struct _mulle_objc_htmltablestyle *styling);
 MULLE_OBJC_DEBUG_GLOBAL
-char   *mulle_objc_staticstring_describe_hor_html( struct _mulle_objc_staticstring *string,
-                                                   struct _mulle_objc_htmltablestyle *styling);
-MULLE_OBJC_DEBUG_GLOBAL
-char   *mulle_objc_staticstring_describe_row_html( void *value,
-                                                   struct _mulle_objc_htmltablestyle *styling);
+void   mulle_buffer_describe_staticstring_entry( struct mulle_buffer *buffer,
+                                                 void *value,
+                                                 struct _mulle_objc_htmltablestyle *styling,
+                                                 void *userinfo);
 
 MULLE_OBJC_DEBUG_GLOBAL
-char   *mulle_objc_infraclass_describe_row_html( intptr_t  classid,
-                                                 void *cls,
-                                                 struct _mulle_objc_htmltablestyle *styling);
-MULLE_OBJC_DEBUG_GLOBAL
-char   *mulle_objc_fastclassentry_describe_row_html( unsigned int i,
-                                                     struct _mulle_objc_infraclass *infra,
-                                                     struct _mulle_objc_htmltablestyle *styling);
-
-MULLE_OBJC_DEBUG_GLOBAL
-char   *mulle_objc_classestoload_describe_row( intptr_t classid,
-                                               void *cls,
-                                               struct _mulle_objc_htmltablestyle *styling);
-MULLE_OBJC_DEBUG_GLOBAL
-char   *mulle_objc_categoriestoload_describe_row( intptr_t classid,
-                                                  void *cls,
-                                                  struct _mulle_objc_htmltablestyle *styling);
-
-MULLE_OBJC_DEBUG_GLOBAL
-char   *mulle_objc_class_describe_html( struct _mulle_objc_class *cls,
-                                        int show_fields,
-                                        struct _mulle_objc_htmltablestyle *styling);
-MULLE_OBJC_DEBUG_GLOBAL
-char   *mulle_objc_class_describe_html_short( struct _mulle_objc_class *cls,
+void   mulle_buffer_describe_infraclass_row( struct mulle_buffer *buffer,
+                                             intptr_t  classid,
+                                             void *cls,
                                              struct _mulle_objc_htmltablestyle *styling);
 MULLE_OBJC_DEBUG_GLOBAL
-char   *mulle_objc_class_describe_html_tiny( struct _mulle_objc_class *cls,
-                                             struct _mulle_objc_htmltablestyle *styling);
-
-MULLE_OBJC_DEBUG_GLOBAL
-char   *mulle_objc_class_describe_row_html( intptr_t classid,
-                                            void *cls,
+void   mulle_buffer_describe_fastclass_row( struct mulle_buffer *buffer,
+                                            unsigned int i,
+                                            struct _mulle_objc_infraclass *infra,
                                             struct _mulle_objc_htmltablestyle *styling);
+MULLE_OBJC_DEBUG_GLOBAL
+void   mulle_buffer_describe_fastclass( struct mulle_buffer *buffer,
+                                        struct _mulle_objc_infraclass *cls,
+                                        struct _mulle_objc_htmltablestyle *styling,
+                                        void *userinfo);
 
 MULLE_OBJC_DEBUG_GLOBAL
-char   *mulle_objc_ivarlist_describe_html( struct _mulle_objc_ivarlist *list,
+char   *mulle_buffer_describe_classtoload( intptr_t classid,
+                                           void *cls,
                                            struct _mulle_objc_htmltablestyle *styling);
+MULLE_OBJC_DEBUG_GLOBAL
+char   *mulle_buffer_describe_categoriestoload_row( intptr_t classid,
+                                                    void *cls,
+                                                    struct _mulle_objc_htmltablestyle *styling);
 
 MULLE_OBJC_DEBUG_GLOBAL
-char   *mulle_objc_ivarlist_describe_hor_html( struct _mulle_objc_ivarlist *list,
-                                              struct _mulle_objc_htmltablestyle *styling);
+void   mulle_buffer_describe_class( struct mulle_buffer *buffer,
+                                    struct _mulle_objc_class *cls,
+                                    int show_fields,
+                                    struct _mulle_objc_htmltablestyle *styling);
+MULLE_OBJC_DEBUG_GLOBAL
+void   mulle_buffer_describe_class_short( struct mulle_buffer *buffer,
+                                          struct _mulle_objc_class *cls,
+                                          struct _mulle_objc_htmltablestyle *styling);
+MULLE_OBJC_DEBUG_GLOBAL
+void   mulle_buffer_describe_class_tiny( struct mulle_buffer *buffer,
+                                         struct _mulle_objc_class *cls,
+                                         struct _mulle_objc_htmltablestyle *styling);
 
 MULLE_OBJC_DEBUG_GLOBAL
-char   *mulle_objc_propertylist_describe_html( struct _mulle_objc_propertylist *list,
-                                              struct _mulle_objc_htmltablestyle *styling);
-
-MULLE_OBJC_DEBUG_GLOBAL
-char   *mulle_objc_cache_describe_html( struct _mulle_objc_cache *cache,
-                                        struct _mulle_objc_universe *universe,
+void   mulle_buffer_describe_class_row( struct mulle_buffer *buffer,
+                                        intptr_t classid,
+                                        void *cls,
                                         struct _mulle_objc_htmltablestyle *styling);
 
 MULLE_OBJC_DEBUG_GLOBAL
-char   *mulle_objc_descriptor_describe_html( struct _mulle_objc_descriptor *desc,
+char   *mulle_buffer_describe_ivarlist( struct _mulle_objc_ivarlist *list,
+                                        struct _mulle_objc_htmltablestyle *styling);
+
+MULLE_OBJC_DEBUG_GLOBAL
+void   mulle_buffer_describe_ivarlist_hor( struct mulle_buffer *buffer,
+                                           struct _mulle_objc_ivarlist *list,
+                                           struct _mulle_objc_htmltablestyle *styling);
+
+MULLE_OBJC_DEBUG_GLOBAL
+void   mulle_buffer_describe_propertylist( struct mulle_buffer *buffer,
+                                           struct _mulle_objc_propertylist *list,
+                                           struct _mulle_objc_htmltablestyle *styling);
+
+MULLE_OBJC_DEBUG_GLOBAL
+void   mulle_buffer_describe_cache( struct mulle_buffer *buffer,
+                                    struct _mulle_objc_cache *cache,
+                                    struct _mulle_objc_universe *universe,
+                                    struct _mulle_objc_htmltablestyle *styling);
+
+MULLE_OBJC_DEBUG_GLOBAL
+char   *mulle_buffer_describe_descriptor_html( struct _mulle_objc_descriptor *desc,
+                                               struct _mulle_objc_htmltablestyle *styling);
+MULLE_OBJC_DEBUG_GLOBAL
+char   *mulle_buffer_describe_descriptor_hor( struct _mulle_objc_descriptor *desc);
+
+MULLE_OBJC_DEBUG_GLOBAL
+void   mulle_buffer_describe_descriptor( struct mulle_buffer *buffer,
+                                         intptr_t  methodid,
+                                         void *descriptor,
+                                         struct _mulle_objc_htmltablestyle *styling);
+MULLE_OBJC_DEBUG_GLOBAL
+void   mulle_buffer_describe_category( struct mulle_buffer *buffer,
+                                       intptr_t  categoryid,
+                                       void *value,
+                                       struct _mulle_objc_htmltablestyle *styling);
+MULLE_OBJC_DEBUG_GLOBAL
+void   mulle_buffer_describe_protocol( struct mulle_buffer *buffer,
+                                       intptr_t  protocolid,
+                                       void *value,
+                                       struct _mulle_objc_htmltablestyle *styling);
+
+MULLE_OBJC_DEBUG_GLOBAL
+void   mulle_buffer_describe_super( struct mulle_buffer *buffer,
+                                    intptr_t  superid,
+                                    void *value,
+                                    struct _mulle_objc_htmltablestyle *styling);
+MULLE_OBJC_DEBUG_GLOBAL
+void   mulle_buffer_describe_super_hashmap_entry( struct mulle_buffer *buffer,
+                                                  intptr_t hash,
+                                                  void *value,
+                                                  struct _mulle_objc_htmltablestyle *styling,
+                                                  void *userinfo);
+
+MULLE_OBJC_DEBUG_GLOBAL
+void   mulle_buffer_describe_methodlist( struct mulle_buffer *buffer,
+                                         struct _mulle_objc_methodlist *list,
+                                         struct _mulle_objc_universe *universe,
+                                         int show_fields,
+                                         struct _mulle_objc_htmltablestyle *styling);
+
+MULLE_OBJC_DEBUG_GLOBAL
+void   mulle_buffer_describe_methodlist_hor( struct mulle_buffer *buffer,
+                                             struct _mulle_objc_methodlist *list,
                                              struct _mulle_objc_htmltablestyle *styling);
-MULLE_OBJC_DEBUG_GLOBAL
-char   *mulle_objc_descriptor_describe_hor_html( struct _mulle_objc_descriptor *desc);
 
 MULLE_OBJC_DEBUG_GLOBAL
-char   *mulle_objc_descriptor_describe_row_html( intptr_t  methodid,
-                                                 void *descriptor,
-                                                 struct _mulle_objc_htmltablestyle *styling);
+void   mulle_buffer_describe_protocolids( struct mulle_buffer *buffer,
+                                          struct _mulle_objc_uniqueidarray *array,
+                                          struct _mulle_objc_universe *universe,
+                                          struct _mulle_objc_htmltablestyle *styling);
 MULLE_OBJC_DEBUG_GLOBAL
-char   *mulle_objc_category_describe_row_html( intptr_t  categoryid,
-                                               void *value,
-                                               struct _mulle_objc_htmltablestyle *styling);
-MULLE_OBJC_DEBUG_GLOBAL
-char   *mulle_objc_protocol_describe_row_html( intptr_t  methodid,
-                                               void *value,
-                                               struct _mulle_objc_htmltablestyle *styling);
+void   mulle_buffer_describe_categoryids( struct mulle_buffer *buffer,
+                                          struct _mulle_objc_uniqueidarray *array,
+                                          struct _mulle_objc_universe *universe,
+                                          struct _mulle_objc_htmltablestyle *styling);
 
 MULLE_OBJC_DEBUG_GLOBAL
-char   *mulle_objc_super_describe_row_html( intptr_t  superid,
+void   mulle_buffer_describe_loadclass_row( struct mulle_buffer *buffer,
                                             void *value,
-                                            struct _mulle_objc_htmltablestyle *styling);
+                                            struct _mulle_objc_htmltablestyle *styling,
+                                            void *userinfo);
+MULLE_OBJC_DEBUG_GLOBAL
+void   mulle_buffer_describe_loadclass( struct mulle_buffer *buffer,
+                                        void *value,
+                                        struct _mulle_objc_htmltablestyle *styling,
+                                        void *userinfo);
+// Internal callback functions for hashmap usage
+void   mulle_buffer_describe_class_hashmap_entry( struct mulle_buffer *buffer,
+                                                  intptr_t classid,
+                                                  void *cls,
+                                                  struct _mulle_objc_htmltablestyle *styling,
+                                                  void *userinfo);
+void   mulle_buffer_describe_descriptor_hashmap_entry( struct mulle_buffer *buffer,
+                                                       intptr_t methodid,
+                                                       void *value,
+                                                       struct _mulle_objc_htmltablestyle *styling,
+                                                       void *userinfo);
+void   mulle_buffer_describe_protocol_hashmap_entry( struct mulle_buffer *buffer,
+                                                     intptr_t protocolid,
+                                                     void *value,
+                                                     struct _mulle_objc_htmltablestyle *styling,
+                                                     void *userinfo);
+void   mulle_buffer_describe_loadcategory_hashmap_entry( struct mulle_buffer *buffer,
+                                                         intptr_t categoryid,
+                                                         void *value,
+                                                         struct _mulle_objc_htmltablestyle *styling,
+                                                         void *userinfo);
 
 MULLE_OBJC_DEBUG_GLOBAL
-char   *mulle_objc_methodlist_describe_html( struct _mulle_objc_methodlist *list,
-                                             struct _mulle_objc_universe *universe,
-                                             int show_fields,
-                                             struct _mulle_objc_htmltablestyle *styling);
+char   *mulle_buffer_describe_loadcategory( void *value,
+                                            struct _mulle_objc_htmltablestyle *styling,
+                                            void *userinfo);
+
+
+
+typedef void   mulle_buffer_describe_class_t( struct mulle_buffer *,
+                                              struct _mulle_objc_infraclass *,
+                                              struct _mulle_objc_htmltablestyle *,
+                                              void *userinfo);
+
 
 MULLE_OBJC_DEBUG_GLOBAL
-char   *mulle_objc_methodlist_describe_hor_html( struct _mulle_objc_methodlist *list,
-                                                 struct _mulle_objc_htmltablestyle *styling);
+void   mulle_buffer_describe_fastclasstable( struct mulle_buffer *buffer,
+                                             struct _mulle_objc_fastclasstable *fastclasstable,
+                                             mulle_buffer_describe_class_t *row_description,
+                                             struct _mulle_objc_htmltablestyle *styling,
+                                             void *userinfo);
+
+
+typedef void   mulle_buffer_describe_pointer_t( struct mulle_buffer *,
+                                                void *,
+                                                struct _mulle_objc_htmltablestyle *,
+                                                void *userinfo);
+
 
 MULLE_OBJC_DEBUG_GLOBAL
-char   *mulle_objc_protocols_describe_html( struct _mulle_objc_uniqueidarray *array,
-                                            struct _mulle_objc_universe *universe,
-                                            struct _mulle_objc_htmltablestyle *styling);
-MULLE_OBJC_DEBUG_GLOBAL
-char   *mulle_objc_categories_describe_html( struct _mulle_objc_uniqueidarray *array,
-                                             struct _mulle_objc_universe *universe,
-                                             struct _mulle_objc_htmltablestyle *styling);
+void   mulle_buffer_describe_concurrent_pointerarray( struct mulle_buffer *buffer,
+                                                     struct mulle_concurrent_pointerarray *list,
+                                                     mulle_buffer_describe_pointer_t *row_description,
+                                                     struct _mulle_objc_htmltablestyle *styling,
+                                                     void *userinfo);
+
+
+typedef void   mulle_buffer_describe_hashmap_entry_t( struct mulle_buffer *,
+                                                      intptr_t,
+                                                      void *,
+                                                      struct _mulle_objc_htmltablestyle *,
+                                                      void *userinfo);
 
 MULLE_OBJC_DEBUG_GLOBAL
-char   *mulle_objc_loadclass_describe_row_html( void *value,
-                                                struct _mulle_objc_htmltablestyle *styling);
-MULLE_OBJC_DEBUG_GLOBAL
-char   *mulle_objc_loadcategory_describe_row_html( void *value,
-                                                   struct _mulle_objc_htmltablestyle *styling);
+void   mulle_buffer_describe_concurrent_hashmap( struct mulle_buffer *buffer,
+                                                struct mulle_concurrent_hashmap *map,
+                                                mulle_buffer_describe_hashmap_entry_t *row_description,
+                                                struct _mulle_objc_htmltablestyle *styling,
+                                                void *userinfo);
+
+
+typedef void   mulle_buffer_describe_uniqueid_t( struct mulle_buffer *,
+                                                 mulle_objc_uniqueid_t uniqueid,
+                                                 struct _mulle_objc_htmltablestyle *,
+                                                 void *userinfo);
 
 MULLE_OBJC_DEBUG_GLOBAL
-char   *mulle_objc_fastclasstable_describe_html( struct _mulle_objc_fastclasstable *fastclasstable,
-                                                 char *(row_description)( unsigned int i,
-                                                                          struct _mulle_objc_infraclass *,
-                                                                          struct _mulle_objc_htmltablestyle *),
-                                                 struct _mulle_objc_htmltablestyle *styling);
-
-MULLE_OBJC_DEBUG_GLOBAL
-char   *mulle_concurrent_pointerarray_describe_html( struct   mulle_concurrent_pointerarray *list,
-                                                     char *(row_description)( void *,
-                                                                              struct _mulle_objc_htmltablestyle *),
-                                                     struct _mulle_objc_htmltablestyle *styling);
-MULLE_OBJC_DEBUG_GLOBAL
-char   *mulle_concurrent_hashmap_describe_html( struct mulle_concurrent_hashmap *map,
-                                                char *(row_description)( intptr_t,
-                                                                         void *,
-                                                                         struct _mulle_objc_htmltablestyle *),
-                                                struct _mulle_objc_htmltablestyle *styling);
-
-MULLE_OBJC_DEBUG_GLOBAL
-char   *mulle_objc_uniqueidarray_describe_html( struct _mulle_objc_uniqueidarray *array,
-                                                char *(row_description)( void *,
-                                                                         struct _mulle_objc_universe *,
-                                                                         struct _mulle_objc_htmltablestyle *),
+void   mulle_buffer_describe_uniqueidarray( struct mulle_buffer *buffer,
+                                                struct _mulle_objc_uniqueidarray *array,
+                                                mulle_buffer_describe_uniqueid_t  *row_description,
                                                 struct _mulle_objc_universe *universe,
                                                 struct _mulle_objc_htmltablestyle *styling);
+
+// Test function for new header functionality
+MULLE_OBJC_DEBUG_GLOBAL
+char   *mulle_objc_test_headers_html( void);
 
 #endif /* mulle_objc_html_h */
