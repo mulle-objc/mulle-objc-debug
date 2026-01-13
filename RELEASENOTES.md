@@ -1,3 +1,11 @@
+## 0.23.0
+
+
+* improved quickstart example with dependency toc command
+* removed erroneous mulle-core dependency references from README
+* added clib.json for clib package distribution
+
+
 ## 0.22.0
 
 Various small improvements
