@@ -27,7 +27,6 @@ and debugging support.
 
 |   Requirement         | Release Version  | Description
 |-----------------------|------------------|---------------
-| [mulle-core](https://github.com/mulle-core/mulle-core) | ![Mulle kybernetiK tag](https://img.shields.io/github/tag/mulle-core/mulle-core.svg) [![Build Status](https://github.com/mulle-core/mulle-core/workflows/CI/badge.svg?branch=release)](https://github.com/mulle-core/mulle-core/actions/workflows/mulle-sde-ci.yml) | 🌋 Almagamated library of mulle-core + mulle-concurrent + mulle-c
 | [mulle-objc-runtime](https://github.com/mulle-objc/mulle-objc-runtime) | ![Mulle kybernetiK tag](https://img.shields.io/github/tag/mulle-objc/mulle-objc-runtime.svg) [![Build Status](https://github.com/mulle-objc/mulle-objc-runtime/workflows/CI/badge.svg?branch=release)](https://github.com/mulle-objc/mulle-objc-runtime/actions/workflows/mulle-sde-ci.yml) | ⏩ A fast, portable Objective-C runtime written 100% in C11
 
 
@@ -39,6 +38,7 @@ mulle-sde init -d my-project -m mulle-objc/objc-developer executable
 cd my-project
 mulle-sde vibecoding on
 mulle-sde run
+mulle-sde dependency toc mulle-objc/mulle-objc-debug
 ```
 
 You are done, skip the following "Add" step.
@@ -85,9 +85,18 @@ file).
 git submodule add -f --name "mulle-core" \
                             "https://github.com/mulle-core/mulle-core.git" \
                             "stash/mulle-core"
-git submodule add -f --name "mulle-core" \
-                            "https://github.com/mulle-core/mulle-core.git" \
-                            "stash/mulle-core"
+git submodule add -f --name "libbacktrace" \
+                            "https://github.com/mulle-core/libbacktrace.git" \
+                            "stash/libbacktrace"
+git submodule add -f --name "mulle-allocator" \
+                            "https://github.com/mulle-c/mulle-allocator.git" \
+                            "stash/mulle-allocator"
+git submodule add -f --name "mulle-thread" \
+                            "https://github.com/mulle-concurrent/mulle-thread.git" \
+                            "stash/mulle-thread"
+git submodule add -f --name "mulle-core-all-load" \
+                            "https://github.com/mulle-core/mulle-core-all-load.git" \
+                            "stash/mulle-core-all-load"
 git submodule add -f --name "mulle-objc-runtime" \
                             "https://github.com/mulle-objc/mulle-objc-runtime.git" \
                             "stash/mulle-objc-runtime"
@@ -100,12 +109,18 @@ git submodule update --init --recursive
 ``` cmake
 add_subdirectory( stash/mulle-objc-debug)
 add_subdirectory( stash/mulle-objc-runtime)
-add_subdirectory( stash/mulle-core)
+add_subdirectory( stash/mulle-core-all-load)
+add_subdirectory( stash/mulle-thread)
+add_subdirectory( stash/mulle-allocator)
+add_subdirectory( stash/libbacktrace)
 add_subdirectory( stash/mulle-core)
 
 target_link_libraries( ${PROJECT_NAME} PUBLIC mulle-objc-debug)
 target_link_libraries( ${PROJECT_NAME} PUBLIC mulle-objc-runtime)
-target_link_libraries( ${PROJECT_NAME} PUBLIC mulle-core)
+target_link_libraries( ${PROJECT_NAME} PUBLIC mulle-core-all-load)
+target_link_libraries( ${PROJECT_NAME} PUBLIC mulle-thread)
+target_link_libraries( ${PROJECT_NAME} PUBLIC mulle-allocator)
+target_link_libraries( ${PROJECT_NAME} PUBLIC libbacktrace)
 target_link_libraries( ${PROJECT_NAME} PUBLIC mulle-core)
 ```
 
@@ -128,7 +143,6 @@ Install all requirements
 
 | Requirements                                 | Description
 |----------------------------------------------|-----------------------
-| [mulle-core](https://github.com/mulle-core/mulle-core)             | 🌋 Almagamated library of mulle-core + mulle-concurrent + mulle-c
 | [mulle-objc-runtime](https://github.com/mulle-objc/mulle-objc-runtime)             | ⏩ A fast, portable Objective-C runtime written 100% in C11
 
 #### Download & Install

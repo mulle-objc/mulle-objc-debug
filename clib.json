@@ -1,0 +1,30 @@
+{
+   "name" : "mulle-objc-debug",
+   "version" : "0.23.0",
+   "description" : "🐞 Debug support for the mulle-objc-runtime",
+   "keywords" : [],
+   "license" : "BSD-3-Clause",
+   "repo" : "mulle-objc/mulle-objc-debug",
+   "src" : [
+      "src/c-set.inc",
+      "src/generic/include-private.h",
+      "src/generic/include.h",
+      "src/mulle-objc-debug.h",
+      "src/mulle-objc-dotdump.c",
+      "src/mulle-objc-dotdump.h",
+      "src/mulle-objc-gdb.c",
+      "src/mulle-objc-html.c",
+      "src/mulle-objc-html.h",
+      "src/mulle-objc-htmldump.c",
+      "src/mulle-objc-htmldump.h",
+      "src/mulle-objc-lldb.c",
+      "src/mulle-objc-typeinfodump.c",
+      "src/mulle-objc-typeinfodump.h",
+      "src/mulle-objc.css.inc",
+      "src/reflect/_mulle-objc-debug-include-private.h",
+      "src/reflect/_mulle-objc-debug-include.h"
+   ],
+   "dependencies" : {
+      "mulle-objc/mulle-objc-runtime": "*"
+   }
+}

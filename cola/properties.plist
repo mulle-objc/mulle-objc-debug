@@ -14,14 +14,6 @@
    dependencies =
    (
       {
-         description="🌋 Almagamated library of mulle-core + mulle-concurrent + mulle-c";
-         domain="github";
-         name="mulle-core";
-         repo="mulle-core";
-         url="https://github.com/mulle-core/mulle-core";
-         user="mulle-core";
-      },
-      {
          description="⏩ A fast, portable Objective-C runtime written 100% in C11";
          domain="github";
          name="mulle-objc-runtime";
