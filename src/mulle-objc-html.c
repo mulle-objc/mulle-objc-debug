@@ -849,7 +849,7 @@ void   mulle_buffer_html_cache( struct mulle_buffer *buffer,
                                 index,
                                 sel & cache->mask);
 #ifdef MULLE_OBJC_CACHEENTRY_REMEMBERS_THREAD_CLASS
-      mulle_buffer_sprintf( buffer, "<TD>%p</TD>", cache->entries[ j].thread);
+      mulle_buffer_sprintf( buffer, "<TD>%p</TD>", cache->entries[ j].thread_id);
 #endif
       mulle_buffer_add_string( buffer, "</TR>\n");
    }

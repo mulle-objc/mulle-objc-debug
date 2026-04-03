@@ -989,7 +989,7 @@ static void   mulle_objc_class_dotdump_to_file( struct _mulle_objc_class *cls,
                                                 unsigned long options)
 {
    _mulle_objc_class_dotdump_to_file( cls, directory, filename, options);
-   fprintf( stderr, "Written dot file \"%s\"\n", filename);
+   mulle_fprintf( stderr, "Written dot file \"%s\"\n", filename);
 }
 
 
@@ -1084,7 +1084,7 @@ static void
 
    if( ! universe)
    {
-      fprintf( stderr, "No universe found!\n");
+      mulle_fprintf( stderr, "No universe found!\n");
       return;
    }
 
@@ -1098,7 +1098,7 @@ static void
    _mulle_objc_universe_dotdump_overview_to_fp( universe, directory, fp);
    fclose( fp);
 
-   fprintf( stderr, "Written dot file \"%s\"\n", filename);
+   mulle_fprintf( stderr, "Written dot file \"%s\"\n", filename);
 }
 
 
@@ -1165,7 +1165,7 @@ static void   mulle_objc_universe_dotdump_to_file( struct _mulle_objc_universe *
 
    if( ! universe)
    {
-      fprintf( stderr, "No universe found!\n");
+      mulle_fprintf( stderr, "No universe found!\n");
       return;
    }
 
@@ -1180,7 +1180,7 @@ static void   mulle_objc_universe_dotdump_to_file( struct _mulle_objc_universe *
    fclose( fp);
 
    if( log)
-      fprintf( stderr, "Written dot file \"%s\"\n", filename);
+      mulle_fprintf( stderr, "Written dot file \"%s\"\n", filename);
 }
 
 

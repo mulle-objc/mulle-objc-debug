@@ -760,7 +760,7 @@ void
    info.directory = directory;
 
    if( mulle_objc_universe_walk( universe, callback, &info) != mulle_objc_walk_error)
-      fprintf( stderr, "Dumped HTML to \"%s\"\n", directory);
+      mulle_fprintf( stderr, "Dumped HTML to \"%s\"\n", directory);
 
    c_set_done( &info.set);
    write_css_if_needed( directory);
@@ -804,7 +804,7 @@ void   mulle_objc_class_htmldump_to_directory( struct _mulle_objc_class *cls,
    while( cls = _mulle_objc_class_get_superclass( cls));
 
    write_css_if_needed( directory);
-   fprintf( stderr, "Dumped HTML to \"/%s\"\n", directory);
+   mulle_fprintf( stderr, "Dumped HTML to \"/%s\"\n", directory);
 }
 
 

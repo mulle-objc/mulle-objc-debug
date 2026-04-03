@@ -1,4 +1,5 @@
 # mulle-objc-debug Library Documentation for AI
+<!-- Keywords: debugging, runtime-inspection -->
 
 ## 1. Introduction & Purpose
 

@@ -16,13 +16,13 @@
 
 // To remove the following dependency (headers and library) completely:
 //   `mulle-sde dependency remove mulle-objc-runtime`
-// (Use 1CBD88F9-8E8E-4448-A604-B26569445FFE instead of mulle-objc-runtime, if there are duplicate entries)
+// (Use 440E8246-6A2F-45E8-AC96-A2D94DD3285E instead of mulle-objc-runtime, if there are duplicate entries)
 //
 // You can tweak the following #include with these commands:
 //    remove #include: `mulle-sde dependency mark mulle-objc-runtime no-header`
 //    rename              : `mulle-sde dependency|library set mulle-objc-runtime include whatever.h`
 //    reorder             : `mulle-sde dependency move mulle-objc-runtime <up|down>`
-//    toggle #include: `mulle-sde dependency mark mulle-objc-runtime [no-]import`
+//    toggle objc         : `mulle-sde dependency mark mulle-objc-runtime [no-]import`
 //    toggle public       : `mulle-sde dependency mark mulle-objc-runtime [no-]public`
 //    toggle optional     : `mulle-sde dependency mark mulle-objc-runtime [no-]require`
 //    remove for platform : `mulle-sde dependency mark mulle-objc-runtime no-platform-<uname>`

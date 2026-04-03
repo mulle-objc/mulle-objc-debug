@@ -75,7 +75,7 @@ mulle_objc_implementation_t
    }
 
    if( args->debug)
-      fprintf( stderr, "mulle_objc_lldb_lookup_implementation: %p %08lx %p (%d)\n",
+      mulle_fprintf( stderr, "mulle_objc_lldb_lookup_implementation: %p %08lx %p (%d)\n",
                         obj, (unsigned long) methodid, args->class_or_superid, args->calltype);
 
    // call "-class" so class initializes.. But WHY ??
@@ -113,7 +113,7 @@ mulle_objc_implementation_t
       mulle_buffer_do( buffer)
       {
          mulle_buffer_sprintf_functionpointer( buffer, (mulle_functionpointer_t) imp);         
-         fprintf( stderr, "mulle_objc_lldb_lookup_implementation: resolved to %s\n", 
+         mulle_fprintf( stderr, "mulle_objc_lldb_lookup_implementation: resolved to %s\n",
                            mulle_buffer_get_string( buffer));
       }
    }
@@ -134,11 +134,11 @@ struct _mulle_objc_class *
 
    preserve = errno;
    if( debug)
-      fprintf( stderr, "isa lookup %p\n", obj);
+      mulle_fprintf( stderr, "isa lookup %p\n", obj);
 
    cls = mulle_objc_object_get_isa( obj);
    if( debug)
-      fprintf( stderr, "resolved to isa=%p (%s)\n",
+      mulle_fprintf( stderr, "resolved to isa=%p (%s)\n",
                            cls, cls ? _mulle_objc_class_get_name( cls) : "");
    errno = preserve;
    return( cls);
@@ -173,7 +173,7 @@ void   mulle_objc_lldb_check_object( void *obj, mulle_objc_methodid_t methodid)
    int                        preserve;
    size_t                     len;
 
-   // fprintf( stderr, "check %p %08x %p (%d)\n", obj, methodid);
+   // mulle_fprintf( stderr, "check %p %08x %p (%d)\n", obj, methodid);
 
    if( ! obj)
       return;
@@ -204,7 +204,7 @@ void   *mulle_objc_lldb_get_dangerous_tpsstorage_pointer( void)
 {
    struct _mulle_objc_universe   *universe;
 
-   // fprintf( stderr, "get class storage\n");
+   // mulle_fprintf( stderr, "get class storage\n");
 
    universe = mulle_objc_global_get_universe_inline( MULLE_OBJC_DEFAULTUNIVERSEID);
 //   if( ! universe)
@@ -220,7 +220,7 @@ void   *mulle_objc_lldb_get_dangerous_classstorage_pointer( void)
    struct _mulle_objc_universe      *universe;
    struct mulle_concurrent_hashmap  *map;
 
-   // fprintf( stderr, "get class storage pointer\n");
+   // mulle_fprintf( stderr, "get class storage pointer\n");
 
    universe = mulle_objc_global_get_universe_inline( MULLE_OBJC_DEFAULTUNIVERSEID);
 //   if( ! universe)
@@ -264,7 +264,7 @@ void   *mulle_objc_lldb_create_staticstring( void *cfalloc,
    void                           *extra;
    int                            preserve;
 
-   // fprintf( stderr, "create static string \"%.*s\"\n", (int) numBytes, bytes);
+   // mulle_fprintf( stderr, "create static string \"%.*s\"\n", (int) numBytes, bytes);
 
    preserve  = errno;
 
