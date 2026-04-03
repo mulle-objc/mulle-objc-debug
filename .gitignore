@@ -81,3 +81,5 @@ test*/**/*.test.*
 !/AGENTS.md
 !/README.md
 test/30-dump/mulle-objc.css
+.roam
+.graveyard

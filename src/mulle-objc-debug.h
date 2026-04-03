@@ -48,6 +48,9 @@
 #include "mulle-objc-html.h"
 #include "mulle-objc-typeinfodump.h"
 
+MULLE_OBJC_DEBUG_GLOBAL
+void   mulle_objc_reference_gdb_functions( void);
+
 #ifdef __has_include
 # if __has_include( "_mulle-objc-debug-versioncheck.h")
 #  include "_mulle-objc-debug-versioncheck.h"

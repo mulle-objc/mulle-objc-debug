@@ -157,7 +157,7 @@ void   *objc_msg_lookup( void *obj, void *cmd)
    sel = (mulle_objc_methodid_t) (uintptr_t) cmd;
    if( ! mulle_objc_methodid_is_sane( sel))
    {
-      fprintf( stderr, "objc_msg_lookup: incoming selector is broken\n");
+      mulle_fprintf( stderr, "objc_msg_lookup: incoming selector is broken\n");
       return( NULL);
    }
 
@@ -172,7 +172,7 @@ void   *objc_msg_lookup( void *obj, void *cmd)
    {
    case mulle_metaabi_param_struct :
    case mulle_metaabi_param_error :
-      fprintf( stderr, "objc_msg_lookup: method requires MetaABI _param, gdb can't do metaABI yet.\n");
+      mulle_fprintf( stderr, "objc_msg_lookup: method requires MetaABI _param, gdb can't do metaABI yet.\n");
       return( NULL);
    }
 
@@ -180,7 +180,7 @@ void   *objc_msg_lookup( void *obj, void *cmd)
    {
    case mulle_metaabi_param_struct :
    case mulle_metaabi_param_error :
-      fprintf( stderr, "objc_msg_lookup: return value will not be available, gdb can't do metaABI yet.\n");
+      mulle_fprintf( stderr, "objc_msg_lookup: return value will not be available, gdb can't do metaABI yet.\n");
    }
    return( mulle_objc_method_get_implementation( method));
 }
@@ -194,14 +194,14 @@ void   *objc_msgSend( void *obj, void *cmd, void *param)
 
    if( (uintptr_t) cmd & (~(mulle_objc_methodid_t) -1))
    {
-      fprintf( stderr, "objc_msgSend: incoming selector is not a mulle-objc selector\n");
+      mulle_fprintf( stderr, "objc_msgSend: incoming selector is not a mulle-objc selector\n");
       return( NULL);
    }
 
    sel = (mulle_objc_methodid_t) (uintptr_t) cmd;
    if( ! mulle_objc_methodid_is_sane( sel))
    {
-      fprintf( stderr, "objc_msgSend: incoming selector is broken\n");
+      mulle_fprintf( stderr, "objc_msgSend: incoming selector is broken\n");
       return( NULL);
    }
 
@@ -210,12 +210,12 @@ void   *objc_msgSend( void *obj, void *cmd, void *param)
 
 void   *objc_msgSend_stret( void *obj, void *cmd, void *param)
 {
-   fprintf( stderr, "objc_msgSend_stret: doesn't work with mulle-objc");
+   mulle_fprintf( stderr, "objc_msgSend_stret: doesn't work with mulle-objc");
    return( NULL);
 }
 #endif
 
-
+MULLE_OBJC_DEBUG_GLOBAL
 void   mulle_objc_reference_gdb_functions( void);
 
 void   mulle_objc_reference_gdb_functions( void)
