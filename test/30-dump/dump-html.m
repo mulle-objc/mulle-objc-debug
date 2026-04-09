@@ -1,5 +1,7 @@
 #include "include.h"
 
+#pragma clang diagnostic ignored "-Wobjc-root-class"
+
 
 @interface Root
 @end
