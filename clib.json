@@ -1,11 +1,12 @@
 {
    "name" : "mulle-objc-debug",
-   "version" : "0.23.0",
+   "version" : "0.24.0",
    "description" : "🐞 Debug support for the mulle-objc-runtime",
    "keywords" : [],
    "license" : "BSD-3-Clause",
    "repo" : "mulle-objc/mulle-objc-debug",
    "src" : [
+      "asset/dox/TOC.md",
       "src/c-set.inc",
       "src/generic/include-private.h",
       "src/generic/include.h",

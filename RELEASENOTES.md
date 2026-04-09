@@ -1,43 +1,14 @@
-## 0.23.0
-
-
-* improved quickstart example with dependency toc command
-* removed erroneous mulle-core dependency references from README
-* added clib.json for clib package distribution
-
-
-## 0.22.0
-
-Various small improvements
-
-
-### 0.21.3
-
-Various small improvements
-
-### 0.21.2
+## 0.24.0
 
 
 
-* adapt to changes in mulle-objc-runtime
-
-### 0.21.1
-
-* HTML dump with CSS for nicer default output
-
-## 0.21.0
-
-* moved csv code back to the riuntime
 
 
-### 0.20.2
 
-* Various small improvements
 
-### 0.20.1
 
-* change GLOBALs for Windows
+feature: expose gdb reference and unify debug logging
 
-## 0.20.0
-
-* split off from mulle-objc-runtime
+* add public declaration `mulle_objc_reference_gdb_functions()` so debuggers can reference runtime helpers
+* replace direct fprintf() with `mulle_fprintf()` across dotdump, htmldump, gdb, lldb and typeinfodump for consistent, project-aware debug output
+* use cache `thread_id` in HTML output for correct thread reporting

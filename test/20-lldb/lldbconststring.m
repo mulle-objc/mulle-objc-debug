@@ -11,6 +11,8 @@
 #if 0
 #include <mulle-objc-runtime/mulle-objc-lldb.h>
 
+#pragma clang diagnostic ignored "-Wobjc-root-class"
+
 
 @interface SomeString
 {
