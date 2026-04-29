@@ -53,7 +53,7 @@ enum mulle_objc_dotdump_options
    MULLE_OBJC_SHOW_METACLASS               = 0x000008,
    MULLE_OBJC_SHOW_SUPERCLASS              = 0x000010,
    MULLE_OBJC_SHOW_METHODLISTS             = 0x000020,
-   MULLE_OBJC_SHOW_PROTOCOLCLASSES         = 0x000040,
+   MULLE_OBJC_SHOW_MIXINS                  = 0x000040,
    MULLE_OBJC_SHOW_SELECTORS               = 0x000080,
    MULLE_OBJC_SHOW_SUPERS                  = 0x000100,
    MULLE_OBJC_SHOW_PROTOCOLS               = 0x000200,
@@ -70,7 +70,7 @@ enum mulle_objc_dotdump_options
    MULLE_OBJC_SHOW_PROPERTYLIST            = 0x100000,
    // more options not in show all
    MULLE_OBJC_SHOW_CLASS_HYPERLINK         = 0x200000,
-   MULLE_OBJC_SHOW_PROTOCOLCLASS_HYPERLINK = 0x400000,
+   MULLE_OBJC_SHOW_MIXIN_HYPERLINK         = 0x400000,
    MULLE_OBJC_SHOW_UNIVERSE_HYPERLINK      = 0x800000,
    MULLE_OBJC_SHOW_HYPERLINK               = 0x800000 + 0x400000 + 0x200000, // the above
    MULLE_OBJC_SHOW_ALL                     = ~MULLE_OBJC_SHOW_HYPERLINK,

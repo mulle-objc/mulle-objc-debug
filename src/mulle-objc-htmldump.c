@@ -387,11 +387,11 @@ static void   _mulle_buffer_print_universe_html( struct mulle_buffer *buffer,
 
    mulle_buffer_append_string( buffer, "\n<DIV CLASS=\"universe_strings\">\n");
    {
-      if( mulle_concurrent_pointerarray_get_count( &universe->staticstrings))
+      if( mulle_concurrent_pointerarray_get_count( &universe->staticinstances))
       {
          mulle_buffer_append_string( buffer, "<H2>Strings</H2>");
          mulle_buffer_append_string( buffer, "<TABLE CLASS=\"universe_string_table\">\n");
-         rover = mulle_concurrent_pointerarray_enumerate( &universe->staticstrings);
+         rover = mulle_concurrent_pointerarray_enumerate( &universe->staticinstances);
          while( string = _mulle_concurrent_pointerarrayenumerator_next( &rover))
          {
             mulle_buffer_append_string( buffer, "<li>");
@@ -444,7 +444,7 @@ static void   _mulle_buffer_print_infraclass_html( struct mulle_buffer *buffer,
                                                    struct _mulle_objc_infraclass *infra)
 {
     struct mulle_concurrent_pointerarrayenumerator   rover;
-    struct _mulle_objc_protocolclassenumerator       prover;
+    struct _mulle_objc_mixinenumerator       prover;
     struct _mulle_objc_cache                         *cache;
     struct _mulle_objc_class                         *cls;
     struct _mulle_objc_infraclass                    *superclass;
@@ -485,23 +485,23 @@ static void   _mulle_buffer_print_infraclass_html( struct mulle_buffer *buffer,
     }
     mulle_buffer_append_string( buffer, "</DIV>\n");
 
-    // Protocol class links
-    mulle_buffer_append_string( buffer, "<DIV CLASS=\"class_protocolclass_links\">\n");
+    // Mixin links
+    mulle_buffer_append_string( buffer, "<DIV CLASS=\"class_mixin_links\">\n");
     {
         pair = _mulle_objc_infraclass_get_classpair(infra);
         if (!(_mulle_objc_infraclass_get_inheritance(infra) & MULLE_OBJC_CLASS_DONT_INHERIT_PROTOCOLS) &&
-            mulle_concurrent_pointerarray_get_count(&pair->protocolclasses)) {
-            mulle_buffer_append_string( buffer, "<H2>Inherited Protocol Classes</H2>");
+            mulle_concurrent_pointerarray_get_count(&pair->mixins)) {
+            mulle_buffer_append_string( buffer, "<H2>Inherited Mixins</H2>");
 
             mulle_buffer_append_string( buffer, "<OL>\n");
 
-            prover = _mulle_objc_classpair_enumerate_protocolclasses(pair);
-            while (prop_cls = _mulle_objc_protocolclassenumerator_next(&prover)) {
+            prover = _mulle_objc_classpair_enumerate_mixins(pair);
+            while (prop_cls = _mulle_objc_mixinenumerator_next(&prover)) {
                 mulle_buffer_append_string( buffer, "<LI>");
                 mulle_buffer_html_class_short( buffer, _mulle_objc_infraclass_as_class(prop_cls), &classtable_style);
                 mulle_buffer_append_string( buffer, "</LI>\n");
             }
-            _mulle_objc_protocolclassenumerator_done(&prover);
+            _mulle_objc_mixinenumerator_done(&prover);
 
             mulle_buffer_append_string( buffer, "</OL>\n");
         }

@@ -1,1 +1,1 @@
-mulle-objc-debug;${MULLE__OBJC__DEBUG_NODETYPE:-tar};;65C7AB9B-5511-400E-9366-C8077877584B;${MULLE__OBJC__DEBUG_URL:-https://github.com/nat/mulle-objc-debug/archive/${MULLE_TAG}.tar.gz};${MULLE__OBJC__DEBUG_BRANCH};${MULLE__OBJC__DEBUG_TAG:-latest};;
+mulle-objc-debug;${MULLE__OBJC__DEBUG_NODETYPE:-tar};;AC1A4061-1A21-480B-9A97-A8360D427915;${MULLE__OBJC__DEBUG_URL:-https://github.com/mulle-kybernetik-tv/mulle-objc-debug/archive/${MULLE_TAG}.tar.gz};${MULLE__OBJC__DEBUG_BRANCH};${MULLE__OBJC__DEBUG_TAG:-latest};;

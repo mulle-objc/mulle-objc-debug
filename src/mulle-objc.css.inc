@@ -53,7 +53,7 @@
 ".class_meta_link {}\n"
 ".class_methods {}\n"
 ".class_properties {}\n"
-".class_protocolclasses {}\n"
+".class_mixins {}\n"
 ".class_protocols {}\n"
 ".class_runtime_link {}\n"
 ".class_table {}\n"
