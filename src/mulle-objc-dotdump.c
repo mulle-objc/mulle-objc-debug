@@ -387,11 +387,11 @@ static void   _mulle_buffer_dot_universe( struct mulle_buffer *buffer,
       }
 
    if( info->options & MULLE_OBJC_SHOW_STRINGS)
-      if( mulle_concurrent_pointerarray_get_count( &universe->staticstrings))
+      if( mulle_concurrent_pointerarray_get_count( &universe->staticinstances))
       {
-         mulle_buffer_sprintf( buffer, "\"%p\" [ label=<", &universe->staticstrings);
+         mulle_buffer_sprintf( buffer, "\"%p\" [ label=<", &universe->staticinstances);
          mulle_buffer_html_concurrent_pointerarray( buffer,
-                                                    &universe->staticstrings,
+                                                    &universe->staticinstances,
                                                     mulle_buffer_html_staticstring_element,
                                                     &staticstringtable_title,
                                                     NULL);
@@ -503,27 +503,27 @@ static void   _mulle_buffer_dot_hyper_infraclass( struct mulle_buffer *buffer,
 extern char   *_mulle_objc_grapviz_html_header_description( char *name, int is_meta);
 
 
-static void   _mulle_buffer_dot_protocolclasses( struct mulle_buffer *buffer,
+static void   _mulle_buffer_dot_mixins( struct mulle_buffer *buffer,
                                                  struct _mulle_objc_class *cls,
                                                  struct dump_info *info)
 {
-   struct _mulle_objc_protocolclassenumerator   rover;
-   struct _mulle_objc_infraclass                *prop_cls;
-   unsigned int                                 i;
-   struct _mulle_objc_classpair                 *pair;
+   struct _mulle_objc_mixinenumerator   rover;
+   struct _mulle_objc_infraclass        *prop_cls;
+   unsigned int                         i;
+   struct _mulle_objc_classpair         *pair;
 
    i     = 0;
    pair  = _mulle_objc_class_get_classpair( cls);
-   rover = _mulle_objc_classpair_enumerate_protocolclasses( pair);
-   while( prop_cls = _mulle_objc_protocolclassenumerator_next( &rover))
+   rover = _mulle_objc_classpair_enumerate_mixins( pair);
+   while( prop_cls = _mulle_objc_mixinenumerator_next( &rover))
    {
-      mulle_buffer_sprintf( buffer, "\"%p\" -> \"%p\"  [ label=\"protocol class #%u\" ];\n",
+      mulle_buffer_sprintf( buffer, "\"%p\" -> \"%p\"  [ label=\"mixin #%u\" ];\n",
               cls, prop_cls, i++);
 
       if( ! c_set_member( &info->set, prop_cls))
       {
          c_set_add( &info->set, prop_cls);
-         if( info->options & MULLE_OBJC_SHOW_PROTOCOLCLASS_HYPERLINK)
+         if( info->options & MULLE_OBJC_SHOW_MIXIN_HYPERLINK)
             _mulle_buffer_dot_hyper_infraclass( buffer, prop_cls, info);
          else
          {
@@ -533,7 +533,7 @@ static void   _mulle_buffer_dot_protocolclasses( struct mulle_buffer *buffer,
          }
       }
    }
-   _mulle_objc_protocolclassenumerator_done( &rover);
+   _mulle_objc_mixinenumerator_done( &rover);
 }
 
 
@@ -626,14 +626,14 @@ static void   _mulle_buffer_dot_class( struct mulle_buffer *buffer,
                     _mulle_objc_class_is_infraclass( cls)
                     ? 3 : 1);
 //
-//            // also show protocolclasses of superclass
+//            // also show mixins of superclass
 //            if( ! (_mulle_objc_class_get_inheritance( cls) & MULLE_OBJC_CLASS_DONT_INHERIT_PROTOCOLS))
 //            {
 //               struct dump_info   secondary_info;
 //
 //               secondary_info         = *info;
 //               secondary_info.options = MULLE_OBJC_SHOW_INFRACLASS|MULLE_OBJC_SHOW_FILELINK;
-//               _mulle_buffer_dot_protocolclasses( superclass, &secondary_info);
+//               _mulle_buffer_dot_mixins( superclass, &secondary_info);
 //            }
          }
       }
@@ -686,11 +686,11 @@ static void   _mulle_buffer_dot_class( struct mulle_buffer *buffer,
       }
    }
 
-   if( info->options & MULLE_OBJC_SHOW_PROTOCOLCLASSES)
+   if( info->options & MULLE_OBJC_SHOW_MIXINS)
    {
       if( ! (_mulle_objc_class_get_inheritance( cls) & MULLE_OBJC_CLASS_DONT_INHERIT_PROTOCOLS))
       {
-         _mulle_buffer_dot_protocolclasses( buffer, cls, info);
+         _mulle_buffer_dot_mixins( buffer, cls, info);
          mulle_buffer_sprintf( buffer, "\n\n");
       }
    }
@@ -1322,11 +1322,11 @@ static void   _mulle_buffer_dot_hierarchy( struct mulle_buffer *buffer,
    {
       struct  print_hierarchy_info   subinfo;
 
-      // wrap around to root infra for meta, but not if cls is a protocolclass
+      // wrap around to root infra for meta, but not if cls is a mixin
       if( _mulle_objc_class_is_metaclass( supercls) == info->is_meta
           || (info->is_meta
               && _mulle_objc_class_get_superclass( supercls) == NULL
-              && ! mulle_objc_infraclass_is_protocolclass( _mulle_objc_class_get_infraclass( cls))))
+              && ! mulle_objc_infraclass_is_mixin( _mulle_objc_class_get_infraclass( cls))))
       {
          print_hierarchy_info_init( &subinfo, cls, "superclass", info->class_set, info->buffer);
          subinfo.is_meta = info->is_meta;
@@ -1335,17 +1335,17 @@ static void   _mulle_buffer_dot_hierarchy( struct mulle_buffer *buffer,
    }
 
    /*
-    * Dump protocol classes
+    * Dump mixins
     */
    {
       struct  print_hierarchy_info   subinfo;
 
-      print_hierarchy_info_init( &subinfo, cls, "protocolclass", info->class_set, info->buffer);
+      print_hierarchy_info_init( &subinfo, cls, "mixin", info->class_set, info->buffer);
       subinfo.counter = 1;
       subinfo.is_meta = info->is_meta;
 
       pair = _mulle_objc_class_get_classpair( cls);
-      _mulle_objc_classpair_walk_protocolclasses( pair, 0, classpair_callback, &subinfo);
+      _mulle_objc_classpair_walk_mixins( pair, 0, classpair_callback, &subinfo);
    }
 
    /*

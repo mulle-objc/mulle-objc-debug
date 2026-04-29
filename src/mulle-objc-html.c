@@ -1033,7 +1033,7 @@ void   mulle_buffer_html_loadclass_element( struct mulle_buffer *buffer,
                                             struct _mulle_objc_htmltablestyle *styling,
                                             void *userinfo)
 {
-   struct _mulle_objc_loadclass   *loadcls = value;
+   struct _mulle_objc_loadclassbase   *loadcls = value;
 
    MULLE_C_UNUSED( userinfo);
 
