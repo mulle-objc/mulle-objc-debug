@@ -84,3 +84,5 @@ test/30-dump/mulle-objc.css
 .roam
 .graveyard
 *.tmp.*
+*.test.*
+.idea
