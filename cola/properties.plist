@@ -6,7 +6,7 @@
       language="c";
       dialect="c";
       name="mulle-objc-debug";
-      version="0.24.0";
+       version="0.25.0";
       user="mulle-objc";
       repo="mulle-objc-debug";
       homepage="https://github.com/mulle-objc/mulle-objc-debug";

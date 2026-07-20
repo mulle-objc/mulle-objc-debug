@@ -53,13 +53,13 @@ export MULLE__OBJC__RUNTIME_BRANCH="prerelease"
 
 
 #
-# mulle-objc-cc nodetype: ${MULLE__OBJC__CC_NODETYPE:-git}
+# mulle-objc-cc nodetype: ${MULLE__OBJC__CC_NODETYPE:-tar}
 #
 export MULLE__OBJC__CC_NODETYPE="git"
 
 
 #
-# mulle-objc-cc url: ${MULLE__OBJC__CC_URL:-https://github.com/mulle-cc/mulle-objc-cc.git}
+# mulle-objc-cc url: ${MULLE__OBJC__CC_URL:-https://github.com/mulle-cc/mulle-objc-cc/archive/${MULLE_TAG}.tar.gz}
 #
 export MULLE__OBJC__CC_URL="https://github.com/mulle-cc/mulle-objc-cc.git"
 
