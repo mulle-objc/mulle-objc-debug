@@ -1,5 +1,5 @@
 # mulle-objc-debug Library Documentation for AI
-<!-- Keywords: debugging, runtime-inspection, graphviz, html-dump, dot-dump -->
+<!-- Keywords: dump, html, graphviz, dot, typeinfo, gdb, debugger -->
 
 ## 1. Introduction & Purpose
 
@@ -454,12 +454,18 @@ void   mulle_objc_typeinfo_dump_to_file( struct mulle_objc_typeinfo *info,
 ## 4. Performance Characteristics
 
 - All dump operations are **O(n)** in the number of classes/methods/etc.
-- All output is to files/directories — not real-time, not streaming.
+- All output is to files/directories — not real-time, not streaming. There is
+  no streaming or real-time API for DOT or HTML dump. For programmatic HTML
+  table rendering, use the `mulle_buffer_html_*` functions with
+  `mulle_buffer_do_string` and read the resulting string.
 - **Not thread-safe.** Call dump functions from a single thread, preferably at a
-  quiescent point (e.g., at exit or from a debugger breakpoint).
+  quiescent point (e.g., at exit or from a debugger breakpoint). The runtime
+  must not be modifying classes during the dump.
 - Memory usage proportional to the size of the HTML/DOT output buffers.
 - DOT hyperlink options (`MULLE_OBJC_SHOW_HYPERLINK`) produce larger output
   files with cross-references between class pages.
+- **Output directory must exist** before calling dump functions — they do not
+  create intermediate directories.
 
 ## 5. AI Usage Recommendations & Patterns
 
@@ -475,15 +481,43 @@ void   mulle_objc_typeinfo_dump_to_file( struct mulle_objc_typeinfo *info,
   to a string (e.g., `"test"`) to use CSS classes like `class="test_table"`.
 - **Headers arrays** must be NULL-terminated and are only rendered when
   `colspan > 2`.
-- **The `mulle_objc_dotdump_options` enum values can be OR'd** together. Use
-  `MULLE_OBJC_SHOW_DEFAULT` for typical output; `MULLE_OBJC_SHOW_ALL` for
-  comprehensive detail.
+- **The `mulle_objc_dotdump_options` enum values can be OR'd** together as an
+  `unsigned long` bitmask. Use `MULLE_OBJC_SHOW_DEFAULT` for typical output;
+  `MULLE_OBJC_SHOW_ALL` for comprehensive detail. Note: hyperlink flags
+  (`MULLE_OBJC_SHOW_CLASS_HYPERLINK`, `MULLE_OBJC_SHOW_MIXIN_HYPERLINK`,
+  `MULLE_OBJC_SHOW_UNIVERSE_HYPERLINK`) are NOT included in
+  `MULLE_OBJC_SHOW_ALL` (it is `~MULLE_OBJC_SHOW_HYPERLINK`) — combine
+  explicitly if you want cross-reference hyperlinks.
 - **CSS stylesheet**: When using HTML dump, copy `mulle-objc.css` alongside the
   output. The CSS file is provided as `src/mulle-objc.css.inc` and is
   auto-copied during dump operations to the output directory.
+- **CSS class naming convention**: When using `classprefix`, the generated CSS
+  class names follow this pattern:
+  - `{prefix}_table` — `<TABLE>` element
+  - `{prefix}_table_header` — table title `<TH>` row
+  - `{prefix}_table_subheader` — column headers row (when `headers` is set)
+  - Specific runtime panels: `{prefix}_values`, `{prefix}_methods`,
+    `{prefix}_ivars`, `{prefix}_properties`, `{prefix}_cache`, etc.
 - **GDB reference**: Call `mulle_objc_reference_gdb_functions()` early in
   `main()` to prevent the linker from stripping debugger helper symbols when
-  using GDB/LLDB integration.
+  using GDB/LLDB integration. This references `mulle_objc_gdb_lookup_class`,
+  `mulle_objc_gdb_lookup_selector`, `mulle_objc_gdb_lookup_implementation`,
+  and `sel_get_any_uid`.
+- **LLDB integration is dead code**: `src/mulle-objc-lldb.c` and the
+  `test/20-lldb/lldbconststring.m` test are compiled out by `#if 0` blocks.
+  The `mulle_objc_reference_lldb_functions` symbol is not declared in any
+  public header. Do not rely on LLDB integration; use the GDB API instead.
+- **HTML escape quirk**: The internal `html_escape` function does not escape
+  `&` or `<` — it returns `"bad-html"` if either character is present. Class
+  and method names containing these characters will produce broken HTML.
+  Avoid such names for debugging.
+- **Output directory**: Dump functions write multiple files into the given
+  directory. The directory **must exist** before calling — functions do not
+  create intermediate directories.
+- **Type info dump uses FILE*, not buffer**: `mulle_objc_typeinfo_dump_to_file`
+  writes directly to a `FILE*` with a prefix indent string. It does not use
+  `mulle_buffer`. For programmatic access to type info, use the runtime's
+  `mulle_objc_typeinfo` API directly.
 
 ## 6. Integration Examples
 
