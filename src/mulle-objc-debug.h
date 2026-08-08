@@ -1,11 +1,11 @@
 //
 //  mulle-objc-debug.h
-//  mulle-objc-runtime
+//  mulle-objc-debug
 //
-//  Created by Nat! on 10.07.16.
 //  Copyright (c) 2021 Nat! - Mulle kybernetiK.
 //  Copyright (c) 2021 Codeon GmbH.
 //  All rights reserved.
+//
 //
 //  Redistribution and use in source and binary forms, with or without
 //  modification, are permitted provided that the following conditions are met:

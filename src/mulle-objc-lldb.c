@@ -1,11 +1,11 @@
 //
-//  mulle_objc_lldb.c
-//  mulle-objc-debug-universe
+//  mulle-objc-lldb.c
+//  mulle-objc-debug
 //
-//  Created by Nat! on 18.05.17.
-//  Copyright © 2017 Mulle kybernetiK.
-//  Copyright © 2017 Codeon GmbH.
+//  Copyright (c) 2021 Nat! - Mulle kybernetiK.
+//  Copyright (c) 2017 Codeon GmbH.
 //  All rights reserved.
+//
 //
 //  Redistribution and use in source and binary forms, with or without
 //  modification, are permitted provided that the following conditions are met:

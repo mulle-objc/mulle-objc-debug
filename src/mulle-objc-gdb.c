@@ -1,10 +1,11 @@
 //
-//  mulle-objc-gdb.h
+//  mulle-objc-gdb.c
 //  mulle-objc-debug
 //
-//  Created by Nat! on 14.10.19
-//  Copyright © 2019 Mulle kybernetiK. All rights reserved.
-//  Copyright © 2019 Codeon GmbH. All rights reserved.
+//  Copyright (c) 2021 Nat! - Mulle kybernetiK.
+//  Copyright (c) 2019 Codeon GmbH.
+//  All rights reserved.
+//
 //
 //  Redistribution and use in source and binary forms, with or without
 //  modification, are permitted provided that the following conditions are met:

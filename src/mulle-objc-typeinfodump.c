@@ -1,11 +1,11 @@
 //
-//  mulle-objc.typeinfodump.c
+//  mulle-objc-typeinfodump.c
 //  mulle-objc-debug
 //
-//  Created by Nat! on 18.02.20
-//  Copyright (c) 2020 Nat! - Mulle kybernetiK.
+//  Copyright (c) 2021 Nat! - Mulle kybernetiK.
 //  Copyright (c) 2020 Codeon GmbH.
 //  All rights reserved.
+//
 //
 //  Redistribution and use in source and binary forms, with or without
 //  modification, are permitted provided that the following conditions are met:
@@ -33,7 +33,6 @@
 //  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 //  POSSIBILITY OF SUCH DAMAGE.
 //
-
 #include "mulle-objc-typeinfodump.h"
 
 #include "include-private.h"
