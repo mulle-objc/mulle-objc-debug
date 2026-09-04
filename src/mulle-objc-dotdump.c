@@ -440,34 +440,34 @@ static void   _mulle_buffer_dot_universe( struct mulle_buffer *buffer,
 
    if( info->options & MULLE_OBJC_SHOW_CLASSESTOLOAD)
    {
-      if( mulle_concurrent_hashmap_count( &universe->waitqueues.classestoload))
+      if( mulle_concurrent_hashtable_count( &universe->waitqueues.classestoload))
       {
          mulle_buffer_sprintf( buffer, "\"%p\" -> \"%p\" [ label=\"classestoload\" ];\n",
                  universe, &universe->waitqueues.classestoload);
 
          mulle_buffer_sprintf( buffer, "\"%p\" [ label=<", &universe->waitqueues.classestoload);
 
-         mulle_buffer_html_concurrent_hashmap( buffer,
-                                               &universe->waitqueues.classestoload,
-                                               _mulle_buffer_html_loadclasslist_entry,
-                                               &classestoload_style,
-                                               NULL);
+         mulle_buffer_html_concurrent_hashtable( buffer,
+                                                 &universe->waitqueues.classestoload,
+                                                 _mulle_buffer_html_loadclasslist_entry,
+                                                 &classestoload_style,
+                                                 NULL);
 
          mulle_buffer_sprintf( buffer, ">, shape=\"%s\" ];\n", "box");
       }
 
-      if( mulle_concurrent_hashmap_count( &universe->waitqueues.categoriestoload))
+      if( mulle_concurrent_hashtable_count( &universe->waitqueues.categoriestoload))
       {
          mulle_buffer_sprintf( buffer, "\"%p\" -> \"%p\" [ label=\"categoriestoload\" ];\n",
                  universe, &universe->waitqueues.categoriestoload);
 
          mulle_buffer_sprintf( buffer, "\"%p\" [ label=<", &universe->waitqueues.categoriestoload);
 
-         mulle_buffer_html_concurrent_hashmap( buffer,
-                                               &universe->waitqueues.categoriestoload,
-                                               mulle_buffer_html_loadcategory_entry,
-                                               &categoriestoload_style,
-                                               NULL);
+         mulle_buffer_html_concurrent_hashtable( buffer,
+                                                 &universe->waitqueues.categoriestoload,
+                                                 mulle_buffer_html_loadcategory_entry,
+                                                 &categoriestoload_style,
+                                                 NULL);
 
          mulle_buffer_sprintf( buffer, ">, shape=\"%s\" ];\n", "box");
       }

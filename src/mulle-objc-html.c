@@ -1196,6 +1196,57 @@ void   mulle_buffer_html_concurrent_hashmap( struct mulle_buffer *buffer,
 }
 
 
+void   mulle_buffer_html_concurrent_hashtable( struct mulle_buffer *buffer,
+                                               struct mulle_concurrent_hashtable *table,
+                                               mulle_buffer_html_hashmap_callback_t *row_description,
+                                               struct _mulle_objc_htmltablestyle *styling,
+                                               void *userinfo)
+{
+   struct mulle_pointerarray   ptr_array;
+   intptr_t                    hash;
+   void                        *value;
+   char                        *null_description;
+   char                        *s;
+
+   if( styling)
+      mulle_buffer_add_table_header_colspan( buffer, styling, styling->colspan);
+
+   null_description = "*null*";
+
+   mulle_pointerarray_init( &ptr_array, 0, NULL);
+
+   mulle_concurrent_hashtable_for( table, hash, value)
+   {
+      if( ! value)
+         value = null_description;
+
+      mulle_buffer_do_string( tmp_buffer, NULL, s)
+      {
+         (*row_description)( tmp_buffer, hash, value, styling, userinfo);
+      }
+      mulle_pointerarray_add( &ptr_array, s);
+   }
+
+   mulle_qsort_r( _mulle_pointerarray_get_storage( &ptr_array),
+                   mulle_pointerarray_get_count( &ptr_array),
+                   sizeof( char *),
+                   strcmp_r,
+                   NULL);
+
+   mulle_pointerarray_for( &ptr_array, s)
+   {
+      mulle_buffer_add_string( buffer, s);
+      mulle_free( s);
+   }
+
+   mulle_pointerarray_done( &ptr_array);
+
+   if( styling)
+      mulle_buffer_add_string( buffer, "</TABLE>");
+}
+
+
+
 #pragma mark - uniqueidarray
 
 void   mulle_buffer_html_uniqueidarray( struct mulle_buffer *buffer,
