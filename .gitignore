@@ -86,3 +86,6 @@ test/30-dump/mulle-objc.css
 *.tmp.*
 *.test.*
 .idea
+.kiro/
+TODO.md
+REVIEW.md
