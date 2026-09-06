@@ -39,7 +39,7 @@ Depends on `mulle-objc-runtime` (private dependency, not re-exported).
 
 Main include header. Includes all sub-headers and declares:
 
-- `#define MULLE_OBJC_DEBUG_VERSION  ((0UL << 20) | (25 << 8) | 0)`
+- `#define MULLE_OBJC_DEBUG_VERSION  ((0UL << 20) | (26 << 8) | 0)`
   - Version macro in `(MAJOR << 20) | (MINOR << 8) | PATCH` format.
 
 ```c
@@ -339,6 +339,21 @@ void   mulle_buffer_html_concurrent_hashmap( struct mulle_buffer *buffer,
                                               struct _mulle_objc_htmltablestyle *styling,
                                               void *userinfo);
 
+MULLE_OBJC_DEBUG_GLOBAL
+void   mulle_buffer_html_concurrent_hashtable( struct mulle_buffer *buffer,
+                                               struct mulle_concurrent_hashtable *table,
+                                               mulle_buffer_html_hashmap_callback_t *row_description,
+                                               struct _mulle_objc_htmltablestyle *styling,
+                                               void *userinfo);
+```
+- Same signature shape as `mulle_buffer_html_concurrent_hashmap`, but iterates
+  a `struct mulle_concurrent_hashtable`. Unlike the hashmap variant, it sorts
+  the rendered rows before emitting them (via `mulle_qsort_r` over collected
+  row strings), so output order is deterministic. The dotdump code in
+  `mulle-objc-dotdump.c` uses this to render the universe waitqueues
+  `classestoload` and `categoriestoload`, which are concurrent hashtables.
+
+```c
 MULLE_OBJC_DEBUG_GLOBAL
 void   mulle_buffer_html_uniqueidarray( struct mulle_buffer *buffer,
                                          struct _mulle_objc_uniqueidarray *array,
