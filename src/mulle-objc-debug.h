@@ -40,7 +40,7 @@
 #include "include.h"
 
 // MEMO: mulle-project-version uses a special hack to not have __
-#define MULLE_OBJC_DEBUG_VERSION  ((0UL << 20) | (26 << 8) | 0)
+#define MULLE_OBJC_DEBUG_VERSION  ((0UL << 20) | (26 << 8) | 1)
 
 
 #include "mulle-objc-dotdump.h"
