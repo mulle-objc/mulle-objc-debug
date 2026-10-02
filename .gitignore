@@ -89,3 +89,8 @@ test/30-dump/mulle-objc.css
 .kiro/
 TODO.md
 REVIEW.md
+.vscode/
+.touch
+*.orig
+*.workspace
+research/
