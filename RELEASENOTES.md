@@ -1,3 +1,12 @@
+### 0.26.1
+
+
+
+
+* mulle-objc-debug can now be consumed as a cmake subproject, automatically inheriting include directories and dependency targets
+* dependencies are re-exported transitively, with whole-archive force-linking preserved for initialization libraries
+* add-as-subproject instructions simplified: only mulle-objc-runtime is required now
+
 ## 0.26.0
 
 
