@@ -39,7 +39,7 @@ Depends on `mulle-objc-runtime` (private dependency, not re-exported).
 
 Main include header. Includes all sub-headers and declares:
 
-- `#define MULLE_OBJC_DEBUG_VERSION  ((0UL << 20) | (26 << 8) | 0)`
+- `#define MULLE_OBJC_DEBUG_VERSION  ((0UL << 20) | (26 << 8) | 1)`
   - Version macro in `(MAJOR << 20) | (MINOR << 8) | PATCH` format.
 
 ```c
